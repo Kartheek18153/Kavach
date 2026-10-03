@@ -330,16 +330,6 @@ const Map<String, Map<AppLang, String>> _strings = {
     AppLang.telugu: 'రీసెట్',
     AppLang.hindi: 'रीसेट',
   },
-  'typedTitle': {
-    AppLang.english: 'Typed fallback (if mic fails)',
-    AppLang.telugu: 'టైప్ ప్రత్యామ్నాయం (మైక్ పనిచేయకపోతే)',
-    AppLang.hindi: 'टाइप बैकअप (माइक न चले तो)',
-  },
-  'typedHint': {
-    AppLang.english: 'Type a line the caller said...',
-    AppLang.telugu: 'కాలర్ అన్న మాట టైప్ చేయండి...',
-    AppLang.hindi: 'कॉलर ने क्या कहा, लिखें...',
-  },
   'transcriptEmpty': {
     AppLang.english: 'Transcript will appear here...',
     AppLang.telugu: 'మాటలు ఇక్కడ కనిపిస్తాయి...',

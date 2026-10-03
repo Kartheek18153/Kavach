@@ -23,16 +23,9 @@ class LiveScreen extends StatefulWidget {
 }
 
 class _LiveScreenState extends State<LiveScreen> {
-  final _typed = TextEditingController();
   RiskLevel _prevLevel = RiskLevel.safe;
   bool _snackedAlert = false;
   bool _overlayDismissed = false;
-
-  @override
-  void dispose() {
-    _typed.dispose();
-    super.dispose();
-  }
 
   void _watchLevel(DemoState s) {
     if (s.level == RiskLevel.danger && _prevLevel != RiskLevel.danger) {
@@ -142,9 +135,6 @@ class _LiveScreenState extends State<LiveScreen> {
                   const SizedBox(height: 14),
                   SectionTitle(context.tr('demoControls')),
                   _demoControls(s),
-                  const SizedBox(height: 14),
-                  SectionTitle(context.tr('typedTitle')),
-                  _typedBox(),
                 ],
               ),
               if (showOverlay) _dangerOverlay(s),
@@ -334,40 +324,6 @@ class _LiveScreenState extends State<LiveScreen> {
         ],
       ),
     );
-  }
-
-  Widget _typedBox() {
-    return GlassCard(
-      child: Row(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: _typed,
-              decoration: InputDecoration(
-                hintText: context.tr('typedHint'),
-                border: InputBorder.none,
-                enabledBorder: InputBorder.none,
-                focusedBorder: InputBorder.none,
-                filled: false,
-              ),
-              onSubmitted: (_) => _submitTyped(),
-            ),
-          ),
-          IconButton.filled(
-            onPressed: _submitTyped,
-            icon: const Icon(Icons.arrow_upward_rounded),
-            style: IconButton.styleFrom(
-                backgroundColor: KavachColors.teal,
-                foregroundColor: Colors.white),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _submitTyped() {
-    widget.session.analyzeText(_typed.text);
-    _typed.clear();
   }
 
   String _fmtTime(int sec) {
