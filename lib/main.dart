@@ -167,7 +167,10 @@ class _FloatingNav extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 for (var i = 0; i < items.length; i++)
-                  _pillItem(context, i, items[i]),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 3),
+                    child: _pillItem(context, i, items[i]),
+                  ),
               ],
             ),
           ),
@@ -177,42 +180,63 @@ class _FloatingNav extends StatelessWidget {
   }
 
   Widget _pillItem(
-      BuildContext context,
-      int i,
-      (IconData, IconData, String) item,
-    ) {
+    BuildContext context,
+    int i,
+    (IconData, IconData, String) item,
+  ) {
     final selected = i == index;
+    if (selected) {
+      return InkWell(
+        borderRadius: BorderRadius.circular(999),
+        onTap: () => onSelect(i),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          decoration: BoxDecoration(
+            color: KavachColors.blue,
+            borderRadius: BorderRadius.circular(999),
+            boxShadow: [
+              BoxShadow(
+                color: KavachColors.blue.withValues(alpha: 0.45),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(item.$2, color: Colors.white, size: 22),
+              const SizedBox(width: 6),
+              Text(
+                context.tr(item.$3),
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
     return InkWell(
       borderRadius: BorderRadius.circular(999),
       onTap: () => onSelect(i),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding:
-            const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        decoration: BoxDecoration(
-          color:
-              selected ? KavachColors.washTeal : Colors.transparent,
-          borderRadius: BorderRadius.circular(999),
+        width: 48,
+        height: 48,
+        decoration: const BoxDecoration(
+          color: Color(0xFFE9EEF5),
+          shape: BoxShape.circle,
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              selected ? item.$2 : item.$1,
-              color: selected ? KavachColors.teal : KavachColors.sub,
-              size: 24,
-            ),
-            const SizedBox(height: 2),
-            Text(
-              context.tr(item.$3),
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w700,
-                color:
-                    selected ? KavachColors.teal : KavachColors.sub,
-              ),
-            ),
-          ],
+        child: Icon(
+          item.$1,
+          color: KavachColors.sub,
+          size: 22,
         ),
       ),
     );
