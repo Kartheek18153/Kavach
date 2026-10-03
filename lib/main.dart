@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 import 'demo/simulator.dart';
@@ -124,32 +126,52 @@ class _FloatingNav extends StatelessWidget {
       ),
       (Icons.summarize_outlined, Icons.summarize_rounded, 'tabReport'),
     ];
+    // Liquid-glass pill: frosted blur over scrolling content, with a
+    // solid fallback when the OS requests reduced transparency.
+    final reduceTransparency = MediaQuery.highContrastOf(context);
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 24),
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      decoration: BoxDecoration(
-        color: KavachColors.surface,
+      child: ClipRRect(
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: KavachColors.line),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x260D47A1),
-            blurRadius: 6,
-            offset: Offset(0, 2),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(
+            sigmaX: reduceTransparency ? 0 : 20,
+            sigmaY: reduceTransparency ? 0 : 20,
           ),
-          BoxShadow(
-            color: Color(0x330D47A1),
-            blurRadius: 28,
-            offset: Offset(0, 14),
+          child: Container(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            decoration: BoxDecoration(
+              color: reduceTransparency
+                  ? KavachColors.surface
+                  : KavachColors.surface.withValues(alpha: 0.55),
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.65),
+                width: 1.5,
+              ),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x260D47A1),
+                  blurRadius: 6,
+                  offset: Offset(0, 2),
+                ),
+                BoxShadow(
+                  color: Color(0x330D47A1),
+                  blurRadius: 28,
+                  offset: Offset(0, 14),
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                for (var i = 0; i < items.length; i++)
+                  _pillItem(context, i, items[i]),
+              ],
+            ),
           ),
-        ],
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          for (var i = 0; i < items.length; i++)
-            _pillItem(context, i, items[i]),
-        ],
+        ),
       ),
     );
   }
