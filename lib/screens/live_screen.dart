@@ -1,0 +1,480 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import '../demo/simulator.dart';
+import '../lang.dart';
+import '../theme.dart';
+import '../widgets/cards.dart';
+import '../widgets/danger_meter.dart';
+import '../widgets/transcript_list.dart';
+import '../widgets/waveform.dart';
+
+/// Live protection: meter, waveform, transcript, reasons, typed fallback.
+/// Shows a full-screen red overlay + vibration on danger.
+class LiveScreen extends StatefulWidget {
+  final DemoSession session;
+  final void Function(Map<String, dynamic> summary) onFinish;
+
+  const LiveScreen({super.key, required this.session, required this.onFinish});
+
+  @override
+  State<LiveScreen> createState() => _LiveScreenState();
+}
+
+class _LiveScreenState extends State<LiveScreen> {
+  final _typed = TextEditingController();
+  RiskLevel _prevLevel = RiskLevel.safe;
+  bool _snackedAlert = false;
+  bool _overlayDismissed = false;
+
+  @override
+  void dispose() {
+    _typed.dispose();
+    super.dispose();
+  }
+
+  void _watchLevel(DemoState s) {
+    if (s.level == RiskLevel.danger && _prevLevel != RiskLevel.danger) {
+      HapticFeedback.vibrate();
+      _overlayDismissed = false;
+    }
+    if (s.alerted && !_snackedAlert) {
+      _snackedAlert = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: KavachColors.danger,
+            content: Text(context.tr('familySent'),
+                style: const TextStyle(fontWeight: FontWeight.w700)),
+          ),
+        );
+      });
+    }
+    _prevLevel = s.level;
+  }
+
+  Map<String, dynamic> _summary(DemoState s) => {
+        'risk': s.risk,
+        'level': s.level,
+        'scamType': s.scamType,
+        'reasons': s.reasons,
+        'reasonsTelugu': s.reasonsTelugu,
+        'alerted': s.alerted,
+        'elapsedSec': s.elapsedSec,
+        'lines': s.lines.length,
+      };
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder<DemoState>(
+      valueListenable: widget.session,
+      builder: (context, s, _) {
+        _watchLevel(s);
+        final showOverlay =
+            s.level == RiskLevel.danger && s.running && !_overlayDismissed;
+        return Scaffold(
+          appBar: AppBar(
+            title: Row(
+              children: [
+                _liveDot(s.running),
+                const SizedBox(width: 10),
+                Text(context.tr('liveTitle')),
+                const Spacer(),
+                Text(
+                  _fmtTime(s.elapsedSec),
+                  style: const TextStyle(
+                      color: KavachColors.sub,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600),
+                ),
+              ],
+            ),
+            actions: const [
+              LangButton(),
+              SizedBox(width: 8),
+            ],
+          ),
+          body: Stack(
+            children: [
+              ListView(
+                padding: const EdgeInsets.fromLTRB(18, 6, 18, 24),
+                children: [
+                  _statusCard(s),
+                  const SizedBox(height: 14),
+                  GlassCard(
+                    borderColor: KavachColors.forLevel(s.level)
+                        .withValues(alpha: 0.45),
+                    child: Column(
+                      children: [
+                        DangerMeter(risk: s.risk, level: s.level),
+                        const SizedBox(height: 12),
+                        Waveform(level: s.level, active: s.running),
+                        const SizedBox(height: 6),
+                        Text(
+                          s.running
+                              ? context.tr('listening')
+                              : s.finished
+                                  ? context.tr('callComplete')
+                                  : context.tr('pressDemo'),
+                          style: const TextStyle(
+                              color: KavachColors.sub, fontSize: 13),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  if (s.reasonsTelugu.isNotEmpty || s.reasons.isNotEmpty)
+                    _verdictCard(s),
+                  SectionTitle(context.tr('liveTranscript')),
+                  GlassCard(child: TranscriptList(lines: s.lines)),
+                  const SizedBox(height: 14),
+                  SectionTitle(context.tr('demoControls')),
+                  _demoControls(s),
+                  const SizedBox(height: 14),
+                  SectionTitle(context.tr('typedTitle')),
+                  _typedBox(),
+                ],
+              ),
+              if (showOverlay) _dangerOverlay(s),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _liveDot(bool running) {
+    return Container(
+      width: 10,
+      height: 10,
+      decoration: BoxDecoration(
+        color: running ? KavachColors.danger : KavachColors.sub,
+        shape: BoxShape.circle,
+      ),
+    );
+  }
+
+  Widget _statusCard(DemoState s) {
+    return GlassCard(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Detected pattern',
+                    style:
+                        TextStyle(color: KavachColors.sub, fontSize: 12)),
+                const SizedBox(height: 2),
+                Text(s.scamType,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w800, fontSize: 16)),
+              ],
+            ),
+          ),
+          StatusChip(s.level),
+        ],
+      ),
+    );
+  }
+
+  Widget _verdictCard(DemoState s) {
+    final color = KavachColors.forLevel(s.level);
+    final bigVerdict = context.appLang == AppLang.telugu || s.reasons.isEmpty
+        ? s.reasonsTelugu
+        : s.reasons.join(' • ');
+    return Container(
+      margin: const EdgeInsets.only(bottom: 14),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: KavachColors.tintForLevel(s.level),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: color.withValues(alpha: 0.5)),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x260D47A1),
+            blurRadius: 6,
+            offset: Offset(0, 2),
+          ),
+          BoxShadow(
+            color: Color(0x1F0D47A1),
+            blurRadius: 24,
+            offset: Offset(0, 12),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.record_voice_over_rounded, color: color),
+              const SizedBox(width: 8),
+              Text(context.tr('verdictTitle'),
+                  style: const TextStyle(
+                      fontWeight: FontWeight.w800, fontSize: 15)),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(bigVerdict,
+              style: const TextStyle(fontSize: 16, height: 1.5)),
+          if (s.reasons.isNotEmpty) const SizedBox(height: 8),
+          for (final r in s.reasons)
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('•  ',
+                      style: TextStyle(
+                          color: color, fontWeight: FontWeight.w900)),
+                  Expanded(
+                    child: Text(r,
+                        style: const TextStyle(
+                            color: KavachColors.sub, fontSize: 13.5)),
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _demoControls(DemoState s) {
+    return GlassCard(
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: s.running
+                      ? null
+                      : () {
+                          _snackedAlert = false;
+                          widget.session.startScam();
+                        },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        KavachColors.danger.withValues(alpha: 0.85),
+                    foregroundColor: Colors.white,
+                  ),
+                  icon: const Icon(Icons.warning_amber_rounded),
+                  label: Text(context.tr('playScam')),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: s.running
+                      ? null
+                      : () {
+                          _snackedAlert = false;
+                          widget.session.startNormal();
+                        },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        KavachColors.safe.withValues(alpha: 0.85),
+                    foregroundColor: Colors.white,
+                  ),
+                  icon: const Icon(Icons.mark_chat_read_rounded),
+                  label: Text(context.tr('playNormal')),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: (!s.running && s.finished) || s.lines.isNotEmpty
+                      ? () {
+                          final sum = _summary(s);
+                          widget.session.reset();
+                          _snackedAlert = false;
+                          _prevLevel = RiskLevel.safe;
+                          widget.onFinish(sum);
+                        }
+                      : null,
+                  icon: const Icon(Icons.summarize_rounded),
+                  label: Text(context.tr('endReport')),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: TextButton.icon(
+                  onPressed: s.lines.isEmpty && !s.running
+                      ? null
+                      : () {
+                          widget.session.reset();
+                          _snackedAlert = false;
+                          _prevLevel = RiskLevel.safe;
+                        },
+                  icon: const Icon(Icons.refresh_rounded),
+                  label: Text(context.tr('reset')),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _typedBox() {
+    return GlassCard(
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _typed,
+              decoration: InputDecoration(
+                hintText: context.tr('typedHint'),
+                border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                filled: false,
+              ),
+              onSubmitted: (_) => _submitTyped(),
+            ),
+          ),
+          IconButton.filled(
+            onPressed: _submitTyped,
+            icon: const Icon(Icons.arrow_upward_rounded),
+            style: IconButton.styleFrom(
+                backgroundColor: KavachColors.teal,
+                foregroundColor: Colors.white),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _submitTyped() {
+    widget.session.analyzeText(_typed.text);
+    _typed.clear();
+  }
+
+  String _fmtTime(int sec) {
+    final m = (sec ~/ 60).toString().padLeft(2, '0');
+    final s = (sec % 60).toString().padLeft(2, '0');
+    return '$m:$s';
+  }
+
+  Widget _dangerOverlay(DemoState s) {
+    final overlayVerdict =
+        context.appLang == AppLang.telugu || s.reasons.isEmpty
+            ? s.reasonsTelugu
+            : s.reasons.join(' • ');
+    return Positioned.fill(
+      child: Container(
+        color: KavachColors.washDanger,
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(26),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 130,
+                  height: 130,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: KavachColors.surface,
+                    border: Border.all(
+                        color: KavachColors.danger, width: 3),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x400D47A1),
+                        blurRadius: 28,
+                        offset: Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                      Icons.do_not_disturb_on_rounded,
+                      size: 64,
+                      color: KavachColors.danger),
+                ),
+                const SizedBox(height: 18),
+                Text(context.tr('hangup'),
+                    style: const TextStyle(
+                        fontSize: 40,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1,
+                        color: KavachColors.danger)),
+                const SizedBox(height: 6),
+                Text(context.tr('hangupSub'),
+                    style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w800,
+                        color: KavachColors.danger)),
+                const SizedBox(height: 14),
+                Text(
+                  overlayVerdict,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                      fontSize: 16,
+                      height: 1.5,
+                      color: KavachColors.danger),
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 14, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: KavachColors.surface,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                        color: KavachColors.danger
+                            .withValues(alpha: 0.4)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.family_restroom_rounded,
+                          color: KavachColors.danger),
+                      const SizedBox(width: 8),
+                      Text(context.tr('familyAlerted'),
+                          style: const TextStyle(
+                              color: KavachColors.danger,
+                              fontWeight: FontWeight.w800)),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 26),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      final sum = _summary(s);
+                      widget.session.stop();
+                      setState(() => _overlayDismissed = true);
+                      widget.onFinish(sum);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: KavachColors.danger,
+                      foregroundColor: Colors.white,
+                    ),
+                    child: Text(context.tr('hungUp')),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () =>
+                      setState(() => _overlayDismissed = true),
+                  child: Text(context.tr('keepListening'),
+                      style:
+                          const TextStyle(color: KavachColors.sub)),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
