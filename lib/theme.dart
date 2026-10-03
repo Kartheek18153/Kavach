@@ -89,6 +89,7 @@ ThemeData kavachTheme() {
     surface: KavachColors.surface,
     error: KavachColors.danger,
     onSurface: KavachColors.ink,
+    onSurfaceVariant: KavachColors.sub,
     onPrimary: Colors.white,
   );
 
@@ -96,6 +97,7 @@ ThemeData kavachTheme() {
   return base.copyWith(
     scaffoldBackgroundColor: KavachColors.bg0,
     colorScheme: scheme,
+    iconTheme: const IconThemeData(color: KavachColors.teal),
     appBarTheme: const AppBarTheme(
       backgroundColor: KavachColors.bg0,
       elevation: 0,
@@ -109,17 +111,66 @@ ThemeData kavachTheme() {
       ),
     ),
     textTheme: const TextTheme(
+      displayLarge: TextStyle(
+          fontSize: 34,
+          fontWeight: FontWeight.w800,
+          height: 1.15,
+          color: KavachColors.ink),
+      displayMedium: TextStyle(
+          fontSize: 30,
+          fontWeight: FontWeight.w800,
+          height: 1.15,
+          color: KavachColors.ink),
+      displaySmall: TextStyle(
+          fontSize: 26,
+          fontWeight: FontWeight.w800,
+          height: 1.2,
+          color: KavachColors.ink),
       headlineLarge: TextStyle(
-          fontSize: 30, fontWeight: FontWeight.w800, height: 1.15),
+          fontSize: 30,
+          fontWeight: FontWeight.w800,
+          height: 1.15,
+          color: KavachColors.ink),
       headlineMedium: TextStyle(
-          fontSize: 24, fontWeight: FontWeight.w800, height: 1.2),
-      titleLarge: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
-      titleMedium: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
-      bodyLarge: TextStyle(fontSize: 16, height: 1.45),
-      bodyMedium: TextStyle(fontSize: 14.5, height: 1.5),
-      labelLarge: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+          fontSize: 24,
+          fontWeight: FontWeight.w800,
+          height: 1.2,
+          color: KavachColors.ink),
+      headlineSmall: TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.w700,
+          color: KavachColors.ink),
+      titleLarge: TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.w700,
+          color: KavachColors.ink),
+      titleMedium: TextStyle(
+          fontSize: 17,
+          fontWeight: FontWeight.w600,
+          color: KavachColors.ink),
+      titleSmall: TextStyle(
+          fontSize: 15,
+          fontWeight: FontWeight.w700,
+          color: KavachColors.ink),
+      bodyLarge: TextStyle(
+          fontSize: 16, height: 1.45, color: KavachColors.ink),
+      bodyMedium: TextStyle(
+          fontSize: 14.5, height: 1.5, color: KavachColors.ink),
+      bodySmall: TextStyle(
+          fontSize: 13, height: 1.5, color: KavachColors.sub),
+      labelLarge: TextStyle(
+          fontSize: 15,
+          fontWeight: FontWeight.w700,
+          color: KavachColors.ink),
+      labelMedium: TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+          color: KavachColors.sub),
       labelSmall: TextStyle(
-          fontSize: 12, fontWeight: FontWeight.w600, letterSpacing: 0.6),
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 0.6,
+          color: KavachColors.sub),
     ),
     cardTheme: CardThemeData(
       color: KavachColors.surface,
@@ -146,6 +197,14 @@ ThemeData kavachTheme() {
       filled: true,
       fillColor: Colors.white,
       hintStyle: const TextStyle(color: KavachColors.sub, fontSize: 14),
+      labelStyle: const TextStyle(
+          color: KavachColors.sub,
+          fontSize: 14,
+          fontWeight: FontWeight.w600),
+      floatingLabelStyle: const TextStyle(
+          color: KavachColors.teal, fontWeight: FontWeight.w700),
+      prefixIconColor: KavachColors.sub,
+      suffixIconColor: KavachColors.sub,
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
