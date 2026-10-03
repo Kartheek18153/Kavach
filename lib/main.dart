@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 
 import 'demo/simulator.dart';
@@ -126,56 +124,16 @@ class _FloatingNav extends StatelessWidget {
       ),
       (Icons.summarize_outlined, Icons.summarize_rounded, 'tabReport'),
     ];
-    // Liquid-glass pill: frosted blur over scrolling content, with a
-    // solid fallback when the OS requests reduced transparency.
-    final reduceTransparency = MediaQuery.highContrastOf(context);
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 24),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(999),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(
-            sigmaX: reduceTransparency ? 0 : 4,
-            sigmaY: reduceTransparency ? 0 : 4,
+    // No outer shell — the buttons float directly over the content.
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        for (var i = 0; i < items.length; i++)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 3),
+            child: _pillItem(context, i, items[i]),
           ),
-          child: Container(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-            decoration: BoxDecoration(
-              color: reduceTransparency
-                  ? KavachColors.surface
-                  : KavachColors.surface.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(999),
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.35),
-                width: 1,
-              ),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x260D47A1),
-                  blurRadius: 6,
-                  offset: Offset(0, 2),
-                ),
-                BoxShadow(
-                  color: Color(0x330D47A1),
-                  blurRadius: 28,
-                  offset: Offset(0, 14),
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                for (var i = 0; i < items.length; i++)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 3),
-                    child: _pillItem(context, i, items[i]),
-                  ),
-              ],
-            ),
-          ),
-        ),
-      ),
+      ],
     );
   }
 
@@ -232,6 +190,13 @@ class _FloatingNav extends StatelessWidget {
         decoration: const BoxDecoration(
           color: Color(0xFFE9EEF5),
           shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: Color(0x260D47A1),
+              blurRadius: 10,
+              offset: Offset(0, 4),
+            ),
+          ],
         ),
         child: Icon(
           item.$1,
