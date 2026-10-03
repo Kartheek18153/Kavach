@@ -156,36 +156,17 @@ class _FamilyScreenState extends State<FamilyScreen> {
           const SizedBox(height: 18),
           SizedBox(
             width: double.infinity,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                gradient: const LinearGradient(
-                  colors: [KavachColors.blue, KavachColors.violet],
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: KavachColors.violet.withValues(alpha: 0.35),
-                    blurRadius: 18,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
-              ),
-              child: ElevatedButton(
-                onPressed: () {
-                  widget.onSaved();
-                  GuardianStore.name = _name.text.trim();
-                  GuardianStore.phone = _phone.text.trim();
-                  GuardianStore.chatId = _chatId.text.trim();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                          content: Text(context.tr('contactSaved'))));
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.transparent,
-                  shadowColor: Colors.transparent,
-                ),
-                child: Text(context.tr('saveContact')),
-              ),
+            child: ElevatedButton(
+              onPressed: () {
+                widget.onSaved();
+                GuardianStore.name = _name.text.trim();
+                GuardianStore.phone = _phone.text.trim();
+                GuardianStore.chatId = _chatId.text.trim();
+                ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                        content: Text(context.tr('contactSaved'))));
+              },
+              child: Text(context.tr('saveContact')),
             ),
           ),
         ],

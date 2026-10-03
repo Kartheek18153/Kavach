@@ -61,11 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
           height: 46,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(14),
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [KavachColors.blue, KavachColors.violet],
-            ),
+            color: KavachColors.blue,
             boxShadow: [
               BoxShadow(
                 color: KavachColors.blue.withValues(alpha: 0.45),
@@ -132,11 +128,7 @@ class _HomeScreenState extends State<HomeScreen> {
             height: 118,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              gradient: const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [KavachColors.blue, KavachColors.violet],
-              ),
+              color: KavachColors.blue,
               boxShadow: [
                 BoxShadow(
                   color: KavachColors.blue.withValues(alpha: 0.45),
@@ -165,29 +157,10 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 18),
           SizedBox(
             width: double.infinity,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                gradient: const LinearGradient(
-                  colors: [KavachColors.blue, KavachColors.violet],
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: KavachColors.violet.withValues(alpha: 0.4),
-                    blurRadius: 20,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
-              ),
-              child: ElevatedButton.icon(
-                onPressed: widget.onProtect,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.transparent,
-                  shadowColor: Colors.transparent,
-                ),
-                icon: const Icon(Icons.phone_in_talk_rounded),
-                label: Text(context.tr('protectBtn')),
-              ),
+            child: ElevatedButton.icon(
+              onPressed: widget.onProtect,
+              icon: const Icon(Icons.phone_in_talk_rounded),
+              label: Text(context.tr('protectBtn')),
             ),
           ),
           const SizedBox(height: 10),
