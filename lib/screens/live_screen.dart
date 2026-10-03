@@ -98,7 +98,7 @@ class _LiveScreenState extends State<LiveScreen> {
           body: Stack(
             children: [
               ListView(
-                padding: const EdgeInsets.fromLTRB(18, 6, 18, 24),
+                padding: const EdgeInsets.fromLTRB(18, 6, 18, 110),
                 children: [
                   _statusCard(s),
                   const SizedBox(height: 14),

@@ -26,7 +26,7 @@ class ReportScreen extends StatelessWidget {
       body: s == null
           ? _empty(context)
           : ListView(
-              padding: const EdgeInsets.fromLTRB(18, 6, 18, 24),
+              padding: const EdgeInsets.fromLTRB(18, 6, 18, 110),
               children: [
                 _verdictHeader(context, s),
                 const SizedBox(height: 14),

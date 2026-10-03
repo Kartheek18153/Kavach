@@ -87,35 +87,110 @@ class _KavachAppState extends State<KavachApp> {
                 ),
               ],
             ),
-            bottomNavigationBar: NavigationBar(
-              selectedIndex: _tab,
-              onDestinationSelected: (i) => setState(() => _tab = i),
-              destinations: [
-                NavigationDestination(
-                  icon: const Icon(Icons.shield_outlined),
-                  selectedIcon: const Icon(Icons.shield_rounded),
-                  label: context.tr('tabHome'),
-                ),
-                NavigationDestination(
-                  icon: const Icon(Icons.phone_in_talk_outlined),
-                  selectedIcon:
-                      const Icon(Icons.phone_in_talk_rounded),
-                  label: context.tr('tabLive'),
-                ),
-                NavigationDestination(
-                  icon: const Icon(Icons.family_restroom_outlined),
-                  selectedIcon:
-                      const Icon(Icons.family_restroom_rounded),
-                  label: context.tr('tabFamily'),
-                ),
-                NavigationDestination(
-                  icon: const Icon(Icons.summarize_outlined),
-                  selectedIcon: const Icon(Icons.summarize_rounded),
-                  label: context.tr('tabReport'),
-                ),
-              ],
+            bottomNavigationBar: null,
+            floatingActionButton: _FloatingNav(
+              index: _tab,
+              onSelect: (i) => setState(() => _tab = i),
             ),
+            floatingActionButtonLocation:
+                FloatingActionButtonLocation.centerFloat,
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Floating pill navigator with all four routes.
+class _FloatingNav extends StatelessWidget {
+  final int index;
+  final ValueChanged<int> onSelect;
+
+  const _FloatingNav({required this.index, required this.onSelect});
+
+  @override
+  Widget build(BuildContext context) {
+    const items = [
+      (Icons.shield_outlined, Icons.shield_rounded, 'tabHome'),
+      (
+        Icons.phone_in_talk_outlined,
+        Icons.phone_in_talk_rounded,
+        'tabLive'
+      ),
+      (
+        Icons.family_restroom_outlined,
+        Icons.family_restroom_rounded,
+        'tabFamily'
+      ),
+      (Icons.summarize_outlined, Icons.summarize_rounded, 'tabReport'),
+    ];
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 24),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      decoration: BoxDecoration(
+        color: KavachColors.surface,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: KavachColors.line),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x260D47A1),
+            blurRadius: 6,
+            offset: Offset(0, 2),
+          ),
+          BoxShadow(
+            color: Color(0x330D47A1),
+            blurRadius: 28,
+            offset: Offset(0, 14),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          for (var i = 0; i < items.length; i++)
+            _pillItem(context, i, items[i]),
+        ],
+      ),
+    );
+  }
+
+  Widget _pillItem(
+      BuildContext context,
+      int i,
+      (IconData, IconData, String) item,
+    ) {
+    final selected = i == index;
+    return InkWell(
+      borderRadius: BorderRadius.circular(999),
+      onTap: () => onSelect(i),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding:
+            const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color:
+              selected ? KavachColors.washTeal : Colors.transparent,
+          borderRadius: BorderRadius.circular(999),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              selected ? item.$2 : item.$1,
+              color: selected ? KavachColors.teal : KavachColors.sub,
+              size: 24,
+            ),
+            const SizedBox(height: 2),
+            Text(
+              context.tr(item.$3),
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+                color:
+                    selected ? KavachColors.teal : KavachColors.sub,
+              ),
+            ),
+          ],
         ),
       ),
     );

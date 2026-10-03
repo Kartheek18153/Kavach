@@ -39,7 +39,7 @@ class _FamilyScreenState extends State<FamilyScreen> {
         ],
       ),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(18, 6, 18, 24),
+        padding: const EdgeInsets.fromLTRB(18, 6, 18, 110),
         children: [
           GlassCard(
             borderColor: KavachColors.teal.withValues(alpha: 0.4),

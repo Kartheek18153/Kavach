@@ -30,7 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
         color: KavachColors.bg0,
         child: SafeArea(
           child: ListView(
-            padding: const EdgeInsets.fromLTRB(18, 8, 18, 24),
+            padding: const EdgeInsets.fromLTRB(18, 8, 18, 110),
             children: [
               _header(),
               const SizedBox(height: 14),
