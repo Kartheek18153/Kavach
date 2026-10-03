@@ -135,8 +135,8 @@ class _FloatingNav extends StatelessWidget {
         borderRadius: BorderRadius.circular(999),
         child: BackdropFilter(
           filter: ImageFilter.blur(
-            sigmaX: reduceTransparency ? 0 : 20,
-            sigmaY: reduceTransparency ? 0 : 20,
+            sigmaX: reduceTransparency ? 0 : 12,
+            sigmaY: reduceTransparency ? 0 : 12,
           ),
           child: Container(
             padding:
@@ -144,7 +144,7 @@ class _FloatingNav extends StatelessWidget {
             decoration: BoxDecoration(
               color: reduceTransparency
                   ? KavachColors.surface
-                  : KavachColors.surface.withValues(alpha: 0.55),
+                  : KavachColors.surface.withValues(alpha: 0.28),
               borderRadius: BorderRadius.circular(999),
               border: Border.all(
                 color: Colors.white.withValues(alpha: 0.65),
