@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import '../demo/simulator.dart';
 import '../lang.dart';
+import '../services/api.dart';
 import '../theme.dart';
 import '../widgets/cards.dart';
 import '../widgets/danger_meter.dart';
@@ -40,6 +41,16 @@ class _LiveScreenState extends State<LiveScreen> {
     }
     if (s.alerted && !_snackedAlert) {
       _snackedAlert = true;
+      // Real family alert through the backend (Telegram when configured).
+      final chatId = GuardianStore.chatId;
+      if (chatId.isNotEmpty) {
+        KavachApi.sendAlert(
+          chatId: chatId,
+          message:
+              'Kavach DANGER alert: ${s.scamType} (risk ${s.risk}/100). '
+              'Tell them to cut the call. Dial 1930 if money was shared.',
+        );
+      }
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(

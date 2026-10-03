@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../lang.dart';
+import '../services/api.dart';
 import '../theme.dart';
 import '../widgets/cards.dart';
 
@@ -107,9 +108,21 @@ class _FamilyScreenState extends State<FamilyScreen> {
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton.icon(
-                    onPressed: () => ScaffoldMessenger.of(context)
-                        .showSnackBar(SnackBar(
-                            content: Text(context.tr('testSent')))),
+                    onPressed: () async {
+                      final res = await KavachApi.sendAlert(
+                        chatId: _chatId.text.trim(),
+                        message:
+                            'Kavach test alert: family notifications work. Reply STOP to opt out.',
+                      );
+                      if (!context.mounted) return;
+                      final live = res['sent'] == true &&
+                          res['via'] == 'telegram';
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                              content: Text(context.tr(live
+                                  ? 'testSentLive'
+                                  : 'testSentDemo'))));
+                    },
                     icon: const Icon(Icons.bolt_rounded),
                     label: Text(context.tr('sendTest')),
                   ),
@@ -160,6 +173,9 @@ class _FamilyScreenState extends State<FamilyScreen> {
               child: ElevatedButton(
                 onPressed: () {
                   widget.onSaved();
+                  GuardianStore.name = _name.text.trim();
+                  GuardianStore.phone = _phone.text.trim();
+                  GuardianStore.chatId = _chatId.text.trim();
                   ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                           content: Text(context.tr('contactSaved'))));

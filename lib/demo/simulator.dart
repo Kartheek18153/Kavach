@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
+import '../services/api.dart';
 import '../theme.dart';
 
 /// One line of call transcript with a pre-scored danger weight.
@@ -136,7 +137,7 @@ class DemoSession extends ChangeNotifier implements ValueListenable<DemoState> {
     _timer = Timer.periodic(const Duration(seconds: 1), (_) => _onTick());
   }
 
-  void _onTick() {
+  void _onTick() async {
     if (!_state.running) return;
     _tick++;
     final elapsed = _state.elapsedSec + 1;
@@ -147,9 +148,20 @@ class DemoSession extends ChangeNotifier implements ValueListenable<DemoState> {
     if (_tick.isEven && _cursor < _script.length) {
       final s = _script[_cursor];
       _cursor++;
-      lines = [...lines, TranscriptLine(s.text, flagged: s.points > 0)];
-      risk = (_state.risk + s.points).clamp(0, 100);
-      _noteScriptGroups(s.text);
+      // Prefer backend scoring; fall back to the local rule engine.
+      final remote = await KavachApi.scoreLine(s.text);
+      int points;
+      if (remote != null) {
+        points = (remote['points'] as num?)?.toInt() ?? 0;
+        for (final g in (remote['groups'] as List? ?? const [])) {
+          _seen.add(g as String);
+        }
+      } else {
+        points = s.points;
+        _noteScriptGroups(s.text);
+      }
+      lines = [...lines, TranscriptLine(s.text, flagged: points > 0)];
+      risk = (_state.risk + points).clamp(0, 100);
       if (_hardTriggered()) risk = risk < 85 ? 85 : risk;
     }
 
@@ -238,15 +250,23 @@ class DemoSession extends ChangeNotifier implements ValueListenable<DemoState> {
   }
 
   /// Scores a manually typed line (fallback box when mic/audio fails).
-  void analyzeText(String text) {
+  Future<void> analyzeText(String text) async {
     final t = text.trim();
     if (t.isEmpty) return;
-    final lower = t.toLowerCase();
+    final remote = await KavachApi.scoreLine(t);
     int gained = 0;
-    for (final (name, pts, words) in keywordGroups) {
-      if (!_seen.contains(name) && words.any(lower.contains)) {
-        _seen.add(name);
-        gained += pts;
+    if (remote != null) {
+      gained = (remote['points'] as num?)?.toInt() ?? 0;
+      for (final g in (remote['groups'] as List? ?? const [])) {
+        _seen.add(g as String);
+      }
+    } else {
+      final lower = t.toLowerCase();
+      for (final (name, pts, words) in keywordGroups) {
+        if (!_seen.contains(name) && words.any(lower.contains)) {
+          _seen.add(name);
+          gained += pts;
+        }
       }
     }
     var risk = (_state.risk + gained).clamp(0, 100);

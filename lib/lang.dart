@@ -432,9 +432,19 @@ const Map<String, Map<AppLang, String>> _strings = {
     AppLang.hindi: 'टेस्ट अलर्ट भेजें',
   },
   'testSent': {
-    AppLang.english: 'Demo test alert sent to family ',
-    AppLang.telugu: 'కుటుంబానికి టెస్ట్ హెచ్చరిక పంపాం ',
-    AppLang.hindi: 'परिवार को डेमो टेस्ट अलर्ट भेजा ',
+    AppLang.english: 'Demo test alert sent to family',
+    AppLang.telugu: 'కుటుంబానికి టెస్ట్ హెచ్చరిక పంపాం',
+    AppLang.hindi: 'परिवार को डेमो टेस्ट अलर्ट भेजा',
+  },
+  'testSentLive': {
+    AppLang.english: 'Test alert delivered on Telegram',
+    AppLang.telugu: 'టెలిగ్రామ్‌లో టెస్ట్ హెచ్చరిక అందింది',
+    AppLang.hindi: 'टेलीग्राम पर टेस्ट अलर्ट पहुंचा',
+  },
+  'testSentDemo': {
+    AppLang.english: 'Backend or bot token missing - alert in demo log',
+    AppLang.telugu: 'బ్యాకెండ్ లేదా బాట్ టోకెన్ లేదు - హెచ్చరిక డెమో లాగ్‌లో ఉంది',
+    AppLang.hindi: 'बैकेंड या बॉट टोकन नहीं - अलर्ट डेमो लॉग में',
   },
   'safeWordTitle': {
     AppLang.english: 'Family safe word (stretch)',
