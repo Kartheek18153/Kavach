@@ -117,7 +117,7 @@ class ReportScreen extends StatelessWidget {
           ],
           const SizedBox(height: 8),
           Text(
-            '${context.tr('durationWord')} ${s['elapsedSec']}s • ${s['lines']} ${context.tr('linesWord')} • ${context.tr('familyWord')} $alerted',
+            '${context.tr('durationWord')} ${s['elapsedSec']}s | ${s['lines']} ${context.tr('linesWord')} | ${context.tr('familyWord')} $alerted',
             style: const TextStyle(
                 color: KavachColors.sub,
                 fontSize: 12.5,
@@ -130,7 +130,7 @@ class ReportScreen extends StatelessWidget {
 
   Widget _reportHelper(BuildContext context, Map<String, dynamic> s) {
     final text =
-        'Kavach report — ${DateTime.now().toLocal().toString().substring(0, 16)}\nType: ${s['scamType']}\nRisk: ${s['risk']}/100\nReasons: ${(s['reasons'] as List).join('; ')}';
+        'Kavach report - ${DateTime.now().toLocal().toString().substring(0, 16)}\nType: ${s['scamType']}\nRisk: ${s['risk']}/100\nReasons: ${(s['reasons'] as List).join('; ')}';
     return GlassCard(
       child: Column(
         children: [

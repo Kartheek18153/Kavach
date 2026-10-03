@@ -184,7 +184,7 @@ class _LiveScreenState extends State<LiveScreen> {
     final color = KavachColors.forLevel(s.level);
     final bigVerdict = context.appLang == AppLang.telugu || s.reasons.isEmpty
         ? s.reasonsTelugu
-        : s.reasons.join(' • ');
+        : s.reasons.join(' | ');
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
       padding: const EdgeInsets.all(16),
@@ -227,7 +227,7 @@ class _LiveScreenState extends State<LiveScreen> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('•  ',
+                  Text('-  ',
                       style: TextStyle(
                           color: color, fontWeight: FontWeight.w900)),
                   Expanded(
@@ -369,7 +369,7 @@ class _LiveScreenState extends State<LiveScreen> {
     final overlayVerdict =
         context.appLang == AppLang.telugu || s.reasons.isEmpty
             ? s.reasonsTelugu
-            : s.reasons.join(' • ');
+            : s.reasons.join(' | ');
     return Positioned.fill(
       child: Container(
         color: KavachColors.washDanger,

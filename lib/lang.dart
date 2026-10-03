@@ -154,9 +154,9 @@ const Map<String, Map<AppLang, String>> _strings = {
   },
   // Home
   'brandSub': {
-    AppLang.english: 'Kavach • Scam Call Shield',
-    AppLang.telugu: 'కవచ్ • స్కామ్ కాల్ షీల్డ్',
-    AppLang.hindi: 'कवच • स्कैम कॉल शील्ड',
+    AppLang.english: 'Kavach | Scam Call Shield',
+    AppLang.telugu: 'కవచ్ | స్కామ్ కాల్ షీల్డ్',
+    AppLang.hindi: 'कवच | स्कैम कॉल शील्ड',
   },
   'ready': {
     AppLang.english: 'READY',
@@ -170,11 +170,11 @@ const Map<String, Map<AppLang, String>> _strings = {
   },
   'heroSub': {
     AppLang.english:
-        'Tap Protect with speaker on — we warn you the moment it smells like fraud.',
+        'Tap Protect with speaker on - we warn you the moment it smells like fraud.',
     AppLang.telugu:
-        'స్పీకర్ ఆన్ చేసి Protect నొక్కండి — మోసం అనిపిస్తే వెంటనే హెచ్చరిస్తాం.',
+        'స్పీకర్ ఆన్ చేసి Protect నొక్కండి - మోసం అనిపిస్తే వెంటనే హెచ్చరిస్తాం.',
     AppLang.hindi:
-        'स्पीकर ऑन करके Protect दबाएं — धोखा लगे तो तुरंत चेताएंगे।',
+        'स्पीकर ऑन करके Protect दबाएं - धोखा लगे तो तुरंत चेताएंगे।',
   },
   'protectBtn': {
     AppLang.english: 'Protect this call',
@@ -197,9 +197,9 @@ const Map<String, Map<AppLang, String>> _strings = {
     AppLang.hindi: 'अभी सेट नहीं',
   },
   'connected': {
-    AppLang.english: 'Connected ✓',
-    AppLang.telugu: 'కనెక్ట్ అయింది ✓',
-    AppLang.hindi: 'जुड़ गया ✓',
+    AppLang.english: 'Connected ',
+    AppLang.telugu: 'కనెక్ట్ అయింది ',
+    AppLang.hindi: 'जुड़ गया ',
   },
   'lastScan': {
     AppLang.english: 'Last scan',
@@ -252,9 +252,9 @@ const Map<String, Map<AppLang, String>> _strings = {
     AppLang.hindi: 'पैसे गंवा दिए? अभी 1930 पर कॉल करें, फिर बैंक को।',
   },
   'privacyNote': {
-    AppLang.english: 'No recording — listens live on your phone only',
-    AppLang.telugu: 'రికార్డింగ్ ఉండదు — మీ ఫోన్‌లోనే ప్రత్యక్షంగా వింటుంది',
-    AppLang.hindi: 'रिकॉर्डिंग नहीं — सिर्फ आपके फोन पर लाइव सुनता है',
+    AppLang.english: 'No recording - listens live on your phone only',
+    AppLang.telugu: 'రికార్డింగ్ ఉండదు - మీ ఫోన్‌లోనే ప్రత్యక్షంగా వింటుంది',
+    AppLang.hindi: 'रिकॉर्डिंग नहीं - सिर्फ आपके फोन पर लाइव सुनता है',
   },
   'privacyTitle': {
     AppLang.english: 'Private by design',
@@ -263,11 +263,11 @@ const Map<String, Map<AppLang, String>> _strings = {
   },
   'privacyBody': {
     AppLang.english:
-        'Kavach never records, saves, or uploads your calls. It listens live on your device only while Protect is on — and forgets everything the moment the call ends.',
+        'Kavach never records, saves, or uploads your calls. It listens live on your device only while Protect is on - and forgets everything the moment the call ends.',
     AppLang.telugu:
-        'Kavach మీ కాల్స్‌ను రికార్డ్ చేయదు, సేవ్ చేయదు, అప్‌లోడ్ చేయదు. Protect ఆన్‌లో ఉన్నప్పుడు మాత్రమే మీ ఫోన్‌లోనే వింటుంది — కాల్ ముగియగానే అన్నీ మర్చిపోతుంది.',
+        'Kavach మీ కాల్స్‌ను రికార్డ్ చేయదు, సేవ్ చేయదు, అప్‌లోడ్ చేయదు. Protect ఆన్‌లో ఉన్నప్పుడు మాత్రమే మీ ఫోన్‌లోనే వింటుంది - కాల్ ముగియగానే అన్నీ మర్చిపోతుంది.',
     AppLang.hindi:
-        'कवच आपकी कॉल रिकॉर्ड, सेव या अपलोड नहीं करता। सिर्फ Protect ऑन रहने पर आपके डिवाइस पर लाइव सुनता है — कॉल खत्म होते ही सब भूल जाता है।',
+        'कवच आपकी कॉल रिकॉर्ड, सेव या अपलोड नहीं करता। सिर्फ Protect ऑन रहने पर आपके डिवाइस पर लाइव सुनता है - कॉल खत्म होते ही सब भूल जाता है।',
   },
   'privacyReport': {
     AppLang.english: 'Call audio was never recorded or saved.',
@@ -286,9 +286,9 @@ const Map<String, Map<AppLang, String>> _strings = {
     AppLang.hindi: 'पहचाना गया पैटर्न',
   },
   'listening': {
-    AppLang.english: 'Listening… keep it on speaker',
-    AppLang.telugu: 'వింటున్నాం… స్పీకర్ దగ్గర పెట్టండి',
-    AppLang.hindi: 'सुन रहे हैं… स्पीकर पास रखें',
+    AppLang.english: 'Listening... keep it on speaker',
+    AppLang.telugu: 'వింటున్నాం... స్పీకర్ దగ్గర పెట్టండి',
+    AppLang.hindi: 'सुन रहे हैं... स्पीकर पास रखें',
   },
   'callComplete': {
     AppLang.english: 'Call analysis complete',
@@ -336,14 +336,14 @@ const Map<String, Map<AppLang, String>> _strings = {
     AppLang.hindi: 'टाइप बैकअप (माइक न चले तो)',
   },
   'typedHint': {
-    AppLang.english: 'Type a line the caller said…',
-    AppLang.telugu: 'కాలర్ అన్న మాట టైప్ చేయండి…',
-    AppLang.hindi: 'कॉलर ने क्या कहा, लिखें…',
+    AppLang.english: 'Type a line the caller said...',
+    AppLang.telugu: 'కాలర్ అన్న మాట టైప్ చేయండి...',
+    AppLang.hindi: 'कॉलर ने क्या कहा, लिखें...',
   },
   'transcriptEmpty': {
-    AppLang.english: 'Transcript will appear here…',
-    AppLang.telugu: 'మాటలు ఇక్కడ కనిపిస్తాయి…',
-    AppLang.hindi: 'बातचीत यहां दिखेगी…',
+    AppLang.english: 'Transcript will appear here...',
+    AppLang.telugu: 'మాటలు ఇక్కడ కనిపిస్తాయి...',
+    AppLang.hindi: 'बातचीत यहां दिखेगी...',
   },
   'verdictTitle': {
     AppLang.english: 'Why this is flagged',
@@ -351,9 +351,9 @@ const Map<String, Map<AppLang, String>> _strings = {
     AppLang.hindi: 'इसे क्यों चिह्नित किया',
   },
   'familySent': {
-    AppLang.english: 'Family alert sent ✓ — guardian notified',
-    AppLang.telugu: 'కుటుంబ హెచ్చరిక పంపాం ✓ — రక్షకుడికి తెలిసింది',
-    AppLang.hindi: 'परिवार अलर्ट भेजा ✓ — अभिभावक को सूचित किया',
+    AppLang.english: 'Family alert sent  - guardian notified',
+    AppLang.telugu: 'కుటుంబ హెచ్చరిక పంపాం  - రక్షకుడికి తెలిసింది',
+    AppLang.hindi: 'परिवार अलर्ट भेजा  - अभिभावक को सूचित किया',
   },
   'hangup': {
     AppLang.english: 'HANG UP NOW',
@@ -366,9 +366,9 @@ const Map<String, Map<AppLang, String>> _strings = {
     AppLang.hindi: 'अभी फोन काट दें',
   },
   'hungUp': {
-    AppLang.english: 'I hung up — show report',
-    AppLang.telugu: 'కట్ చేశాను — రిపోర్ట్ చూపించు',
-    AppLang.hindi: 'मैंने काट दिया — रिपोर्ट दिखाएं',
+    AppLang.english: 'I hung up - show report',
+    AppLang.telugu: 'కట్ చేశాను - రిపోర్ట్ చూపించు',
+    AppLang.hindi: 'मैंने काट दिया - रिपोर्ट दिखाएं',
   },
   'keepListening': {
     AppLang.english: 'Keep listening',
@@ -376,9 +376,9 @@ const Map<String, Map<AppLang, String>> _strings = {
     AppLang.hindi: 'सुनते रहें',
   },
   'familyAlerted': {
-    AppLang.english: 'Family alerted ✓',
-    AppLang.telugu: 'కుటుంబానికి తెలిసింది ✓',
-    AppLang.hindi: 'परिवार सूचित ✓',
+    AppLang.english: 'Family alerted ',
+    AppLang.telugu: 'కుటుంబానికి తెలిసింది ',
+    AppLang.hindi: 'परिवार सूचित ',
   },
   // Family
   'familyTitle': {
@@ -390,7 +390,7 @@ const Map<String, Map<AppLang, String>> _strings = {
     AppLang.english:
         'On danger, your family gets an instant message with the scam type.',
     AppLang.telugu:
-        'Danger vasthe mee family ki ventane message velutundi — scam type tho saha.',
+        'Danger vasthe mee family ki ventane message velutundi - scam type tho saha.',
     AppLang.hindi: 'खतरा हुआ तो परिवार को स्कैम प्रकार सहित तुरंत संदेश जाएगा।',
   },
   'trustedContact': {
@@ -432,9 +432,9 @@ const Map<String, Map<AppLang, String>> _strings = {
     AppLang.hindi: 'टेस्ट अलर्ट भेजें',
   },
   'testSent': {
-    AppLang.english: 'Demo test alert sent to family ✓',
-    AppLang.telugu: 'కుటుంబానికి టెస్ట్ హెచ్చరిక పంపాం ✓',
-    AppLang.hindi: 'परिवार को डेमो टेस्ट अलर्ट भेजा ✓',
+    AppLang.english: 'Demo test alert sent to family ',
+    AppLang.telugu: 'కుటుంబానికి టెస్ట్ హెచ్చరిక పంపాం ',
+    AppLang.hindi: 'परिवार को डेमो टेस्ट अलर्ट भेजा ',
   },
   'safeWordTitle': {
     AppLang.english: 'Family safe word (stretch)',
@@ -459,9 +459,9 @@ const Map<String, Map<AppLang, String>> _strings = {
     AppLang.hindi: 'परिवार संपर्क सहेजें',
   },
   'contactSaved': {
-    AppLang.english: 'Family contact saved ✓',
-    AppLang.telugu: 'కుటుంబ సంప్రదింపు సేవ్ అయింది ✓',
-    AppLang.hindi: 'परिवार संपर्क सहेजा ✓',
+    AppLang.english: 'Family contact saved ',
+    AppLang.telugu: 'కుటుంబ సంప్రదింపు సేవ్ అయింది ',
+    AppLang.hindi: 'परिवार संपर्क सहेजा ',
   },
   // Report
   'reportTitle': {
@@ -498,9 +498,9 @@ const Map<String, Map<AppLang, String>> _strings = {
     AppLang.hindi: 'परिवार',
   },
   'alertedYes': {
-    AppLang.english: 'alerted ✓',
-    AppLang.telugu: 'తెలిసింది ✓',
-    AppLang.hindi: 'सूचित ✓',
+    AppLang.english: 'alerted ',
+    AppLang.telugu: 'తెలిసింది ',
+    AppLang.hindi: 'सूचित ',
   },
   'alertedNo': {
     AppLang.english: 'not alerted',
@@ -518,9 +518,9 @@ const Map<String, Map<AppLang, String>> _strings = {
     AppLang.hindi: '1930 पर कॉल करें',
   },
   'copied1930': {
-    AppLang.english: '1930 copied — dial it now',
-    AppLang.telugu: '1930 కాపీ అయింది — ఇప్పుడే డయల్ చేయండి',
-    AppLang.hindi: '1930 कॉपी — अभी डायल करें',
+    AppLang.english: '1930 copied - dial it now',
+    AppLang.telugu: '1930 కాపీ అయింది - ఇప్పుడే డయల్ చేయండి',
+    AppLang.hindi: '1930 कॉपी - अभी डायल करें',
   },
   'cyberPortal': {
     AppLang.english: 'Cyber portal',
@@ -538,9 +538,9 @@ const Map<String, Map<AppLang, String>> _strings = {
     AppLang.hindi: 'सारांश कॉपी करें',
   },
   'summaryCopied': {
-    AppLang.english: 'Summary copied ✓',
-    AppLang.telugu: 'సారాంశం కాపీ అయింది ✓',
-    AppLang.hindi: 'सारांश कॉपी ✓',
+    AppLang.english: 'Summary copied ',
+    AppLang.telugu: 'సారాంశం కాపీ అయింది ',
+    AppLang.hindi: 'सारांश कॉपी ',
   },
   'checklist': {
     AppLang.english: 'Safety checklist',
@@ -581,9 +581,9 @@ const Map<String, Map<AppLang, String>> _strings = {
         'स्कैमर पुलिस/CBI बनकर डराता है, गुप्त रखने को कहता है, फिर OTP/पैसे मांगता है। असली पुलिस फोन पर गिरफ्तारी की धमकी नहीं देती, OTP नहीं मांगती।',
   },
   'learnNote': {
-    AppLang.english: 'Remember: “{r}”.',
-    AppLang.telugu: 'గుర్తు పెట్టుకోండి: “{r}”.',
-    AppLang.hindi: 'याद रखें: “{r}”.',
+    AppLang.english: 'Remember: "{r}".',
+    AppLang.telugu: 'గుర్తు పెట్టుకోండి: "{r}".',
+    AppLang.hindi: 'याद रखें: "{r}".',
   },
   'startScan': {
     AppLang.english: 'Start new scan',

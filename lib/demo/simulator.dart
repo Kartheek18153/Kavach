@@ -35,7 +35,7 @@ class DemoState {
     this.lines = const [],
     this.risk = 0,
     this.level = RiskLevel.safe,
-    this.scamType = '—',
+    this.scamType = '-',
     this.reasons = const [],
     this.reasonsTelugu = '',
     this.alerted = false,
@@ -190,9 +190,9 @@ class DemoSession extends ChangeNotifier implements ValueListenable<DemoState> {
     if (_seen.contains('authority')) return 'Fake police / Digital arrest';
     if (_seen.contains('remote')) return 'Screen-share fraud';
     if (_seen.contains('sensitive') || _seen.contains('money')) {
-      return _demoScam ? 'Bank / OTP fraud' : 'Checking…';
+      return _demoScam ? 'Bank / OTP fraud' : 'Checking...';
     }
-    if (_seen.isEmpty) return '—';
+    if (_seen.isEmpty) return '-';
     return 'Suspicious pattern';
   }
 
@@ -205,7 +205,7 @@ class DemoSession extends ChangeNotifier implements ValueListenable<DemoState> {
       case 'secrecy':
         return 'Tells you to keep the call secret';
       case 'urgency':
-        return 'Creates false urgency (“right now”)';
+        return 'Creates false urgency ("right now")';
       case 'sensitive':
         return 'Asks for OTP / PIN / Aadhaar';
       case 'remote':
@@ -223,7 +223,7 @@ class DemoSession extends ChangeNotifier implements ValueListenable<DemoState> {
   String _reasonsTelugu() {
     if (_seen.isEmpty) return '';
     if (_seen.contains('authority') && _seen.contains('sensitive')) {
-      return 'Ee caller police ani cheppi OTP adugutunnadu. Idi scam — phone cut cheyyandi.';
+      return 'Ee caller police ani cheppi OTP adugutunnadu. Idi scam - phone cut cheyyandi.';
     }
     if (_seen.contains('authority')) {
       return 'Ee caller police / CBI ani cheptunnadu. Nijamaina police phone lo threat cheyyaru.';
@@ -234,7 +234,7 @@ class DemoSession extends ChangeNotifier implements ValueListenable<DemoState> {
     if (_seen.contains('remote')) {
       return 'Screen share app install cheyamante cheppakandi. Idi scam trick.';
     }
-    return 'Konchem anumananga undi — jagratta ga undandi.';
+    return 'Konchem anumananga undi - jagratta ga undandi.';
   }
 
   /// Scores a manually typed line (fallback box when mic/audio fails).
@@ -266,7 +266,7 @@ class DemoSession extends ChangeNotifier implements ValueListenable<DemoState> {
 
   void stop() {
     _timer?.cancel();
-    // Privacy: drop the live transcript the moment the call ends —
+    // Privacy: drop the live transcript the moment the call ends -
     // Kavach listens, it never records.
     _state = _state.copyWith(
         running: false, finished: true, lines: const []);

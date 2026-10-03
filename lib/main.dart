@@ -50,13 +50,13 @@ class _KavachAppState extends State<KavachApp> {
       _lastSummary = summary;
       _tab = 3;
     });
-    summary['label'] = '${summary['scamType']} • ${riskLabel(level, _lang)}';
+    summary['label'] = '${summary['scamType']} | ${riskLabel(level, _lang)}';
   }
 
   String? get _lastResult {
     final s = _lastSummary;
     if (s == null) return null;
-    return '${s['scamType']} • ${(s['level'] as RiskLevel).label}';
+    return '${s['scamType']} | ${(s['level'] as RiskLevel).label}';
   }
 
   @override
