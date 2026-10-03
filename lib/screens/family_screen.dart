@@ -32,17 +32,23 @@ class _FamilyScreenState extends State<FamilyScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(context.tr('familyTitle')),
-        actions: const [
-          LangButton(),
-          SizedBox(width: 8),
-        ],
-      ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(18, 6, 18, 110),
-        children: [
-          GlassCard(
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(18, 6, 18, 110),
+          children: [
+            Row(
+              children: [
+                Text(
+                  context.tr('familyTitle'),
+                  style: const TextStyle(
+                      fontSize: 20, fontWeight: FontWeight.w800),
+                ),
+                const Spacer(),
+                const LangButton(),
+              ],
+            ),
+            const SizedBox(height: 12),
+            GlassCard(
             borderColor: KavachColors.teal.withValues(alpha: 0.4),
             child: Row(
               children: [
@@ -170,6 +176,7 @@ class _FamilyScreenState extends State<FamilyScreen> {
             ),
           ),
         ],
+      ),
       ),
     );
   }

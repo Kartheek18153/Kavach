@@ -78,33 +78,15 @@ class _LiveScreenState extends State<LiveScreen> {
         final showOverlay =
             s.level == RiskLevel.danger && s.running && !_overlayDismissed;
         return Scaffold(
-          appBar: AppBar(
-            title: Row(
+          body: SafeArea(
+            child: Stack(
               children: [
-                _liveDot(s.running),
-                const SizedBox(width: 10),
-                Text(context.tr('liveTitle')),
-                const Spacer(),
-                Text(
-                  _fmtTime(s.elapsedSec),
-                  style: const TextStyle(
-                      color: KavachColors.sub,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600),
-                ),
-              ],
-            ),
-            actions: const [
-              LangButton(),
-              SizedBox(width: 8),
-            ],
-          ),
-          body: Stack(
-            children: [
-              ListView(
-                padding: const EdgeInsets.fromLTRB(18, 6, 18, 110),
-                children: [
-                  _statusCard(s),
+                ListView(
+                  padding:
+                      const EdgeInsets.fromLTRB(18, 6, 18, 110),
+                  children: [
+                    _topRow(s),
+                    _statusCard(s),
                   const SizedBox(height: 14),
                   GlassCard(
                     borderColor: KavachColors.forLevel(s.level)
@@ -140,8 +122,36 @@ class _LiveScreenState extends State<LiveScreen> {
               if (showOverlay) _dangerOverlay(s),
             ],
           ),
-        );
+        ),
+      );
       },
+    );
+  }
+
+  Widget _topRow(DemoState s) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(2, 6, 2, 12),
+      child: Row(
+        children: [
+          _liveDot(s.running),
+          const SizedBox(width: 10),
+          Text(
+            context.tr('liveTitle'),
+            style: const TextStyle(
+                fontSize: 20, fontWeight: FontWeight.w800),
+          ),
+          const Spacer(),
+          Text(
+            _fmtTime(s.elapsedSec),
+            style: const TextStyle(
+                color: KavachColors.sub,
+                fontSize: 14,
+                fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(width: 8),
+          const LangButton(),
+        ],
+      ),
     );
   }
 

@@ -16,19 +16,27 @@ class ReportScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final s = summary;
     return Scaffold(
-      appBar: AppBar(
-        title: Text(context.tr('reportTitle')),
-        actions: const [
-          LangButton(),
-          SizedBox(width: 8),
-        ],
-      ),
-      body: s == null
-          ? _empty(context)
-          : ListView(
-              padding: const EdgeInsets.fromLTRB(18, 6, 18, 110),
-              children: [
-                _verdictHeader(context, s),
+      body: SafeArea(
+        child: s == null
+            ? _empty(context)
+            : ListView(
+                padding:
+                    const EdgeInsets.fromLTRB(18, 6, 18, 110),
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        context.tr('reportTitle'),
+                        style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w800),
+                      ),
+                      const Spacer(),
+                      const LangButton(),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  _verdictHeader(context, s),
                 const SizedBox(height: 14),
                 SectionTitle(context.tr('reportHelp')),
                 _reportHelper(context, s),
@@ -66,6 +74,7 @@ class ReportScreen extends StatelessWidget {
                 ),
               ],
             ),
+      ),
     );
   }
 
