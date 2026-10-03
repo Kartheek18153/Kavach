@@ -351,11 +351,13 @@ class _LiveScreenState extends State<LiveScreen> {
       child: Container(
         color: KavachColors.washDanger,
         child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(26),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(26),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
                 Container(
                   width: 130,
                   height: 130,
@@ -452,6 +454,7 @@ class _LiveScreenState extends State<LiveScreen> {
           ),
         ),
       ),
+    ),
     );
   }
 }

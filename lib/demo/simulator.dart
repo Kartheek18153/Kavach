@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/scheduler.dart';
 
 import '../services/api.dart';
 import '../theme.dart';
@@ -88,6 +89,17 @@ class DemoSession extends ChangeNotifier implements ValueListenable<DemoState> {
   final Set<String> _seen = {};
   bool _demoScam = true;
 
+  /// Notifies listeners outside the build phase so timer ticks that land
+  /// mid-transition (tab switches) never throw "called during build".
+  void _safeNotify() {
+    if (SchedulerBinding.instance.schedulerPhase == SchedulerPhase.idle) {
+      notifyListeners();
+    } else {
+      SchedulerBinding.instance
+          .addPostFrameCallback((_) => notifyListeners());
+    }
+  }
+
   static const List<ScriptLine> scamScript = [
     ScriptLine('Hello, nenu Mumbai CBI office nundi matladutunnanu.', 20),
     ScriptLine('Mee Aadhaar number tho oka parcel customs lo dhorikindi.', 15),
@@ -133,7 +145,7 @@ class DemoSession extends ChangeNotifier implements ValueListenable<DemoState> {
     _seen.clear();
     _demoScam = isScam;
     _state = const DemoState(running: true);
-    notifyListeners();
+    _safeNotify();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) => _onTick());
   }
 
@@ -180,7 +192,7 @@ class DemoSession extends ChangeNotifier implements ValueListenable<DemoState> {
       finished: done,
       elapsedSec: elapsed,
     );
-    notifyListeners();
+    _safeNotify();
     if (done) _timer?.cancel();
   }
 
@@ -281,7 +293,7 @@ class DemoSession extends ChangeNotifier implements ValueListenable<DemoState> {
       reasonsTelugu: _reasonsTelugu(),
       alerted: _state.alerted || level == RiskLevel.danger,
     );
-    notifyListeners();
+    _safeNotify();
   }
 
   void stop() {
@@ -290,14 +302,14 @@ class DemoSession extends ChangeNotifier implements ValueListenable<DemoState> {
     // Kavach listens, it never records.
     _state = _state.copyWith(
         running: false, finished: true, lines: const []);
-    notifyListeners();
+    _safeNotify();
   }
 
   void reset() {
     _timer?.cancel();
     _seen.clear();
     _state = const DemoState();
-    notifyListeners();
+    _safeNotify();
   }
 
   @override
