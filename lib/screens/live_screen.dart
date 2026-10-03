@@ -7,8 +7,8 @@ import '../services/api.dart';
 import '../theme.dart';
 import '../widgets/cards.dart';
 import '../widgets/danger_meter.dart';
+import '../widgets/thinking_orb.dart';
 import '../widgets/transcript_list.dart';
-import '../widgets/waveform.dart';
 
 /// Live protection: meter, waveform, transcript, reasons, typed fallback.
 /// Shows a full-screen red overlay + vibration on danger.
@@ -95,7 +95,11 @@ class _LiveScreenState extends State<LiveScreen> {
                       children: [
                         DangerMeter(risk: s.risk, level: s.level),
                         const SizedBox(height: 12),
-                        Waveform(level: s.level, active: s.running),
+                        ThinkingOrb(
+                          state: orbStateForLevel(s.level,
+                              running: s.running),
+                          size: 96,
+                        ),
                         const SizedBox(height: 6),
                         Text(
                           s.running
