@@ -51,16 +51,38 @@ String riskLevelFor(int risk) {
   return 'safe';
 }
 
+/// Whole-word hit: letters on either side disqualify ('pin' != 'spinning',
+/// 'case' != 'suitcase'). Digits/symbols may touch ('₹50', 'Rs. 5000' hit).
+/// KEEP IN SYNC with _wordHit in lib/demo/simulator.dart.
+bool wordHit(String text, String word) {
+  final pattern =
+      '(?:^|[^A-Za-z])${RegExp.escape(word)}(?:[^A-Za-z]|\$)';
+  return RegExp(pattern, caseSensitive: false).hasMatch(text);
+}
+
 /// Groups matched by [text] that are not yet in [seen].
 List<(String, int)> matchGroups(String text, Set<String> seen) {
-  final t = text.toLowerCase();
   final out = <(String, int)>[];
   for (final (name, points, words) in keywordGroups) {
-    if (!seen.contains(name) && words.any(t.contains)) {
+    if (!seen.contains(name) && words.any((w) => wordHit(text, w))) {
       out.add((name, points));
     }
   }
   return out;
+}
+
+/// Repeat pressure bonus: urgency/threat hits after first detection add +5.
+/// Caller caps the running total (see ScoringSession.repeatBonus).
+int repeatBonusFor(String text, Set<String> alreadySeen) {
+  var rb = 0;
+  for (final (name, _, words) in keywordGroups) {
+    if ((name == 'urgency' || name == 'threat') &&
+        alreadySeen.contains(name) &&
+        words.any((w) => wordHit(text, w))) {
+      rb += 5;
+    }
+  }
+  return rb;
 }
 
 /// Safe-word discount: trusted family word lowers risk by 20.

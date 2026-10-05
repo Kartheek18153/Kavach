@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:kavach_backend/engine.dart';
 import 'package:kavach_backend/server.dart';
+import 'package:shelf/shelf.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -54,5 +57,47 @@ void main() {
     final removed = pruneSessions(sessions, maxAge: Duration.zero);
     expect(removed, 2);
     expect(sessions, isEmpty);
+  });
+
+  test('word boundaries stop false alarms', () {
+    expect(matchGroups('my spinning wheel is fine', <String>{}), isEmpty);
+    expect(matchGroups('found an old suitcase', <String>{}), isEmpty);
+    expect(matchGroups('share your PIN here', <String>{}).map((g) => g.$1),
+        contains('sensitive'));
+    expect(
+        matchGroups('send money to safe account, ₹50,000', <String>{})
+            .map((g) => g.$1),
+        contains('money'));
+  });
+
+  test('urgency repeats escalate then cap at +20', () async {
+    final sessions = <String, ScoringSession>{};
+    final router = buildRouter(sessions);
+    Future<Map<String, dynamic>> call(
+        String path, Map<String, Object?> body) async {
+      final res = await router.call(Request(
+        'POST',
+        Uri.parse('http://localhost$path'),
+        body: jsonEncode(body),
+        headers: {'content-type': 'application/json'},
+      ));
+      return jsonDecode(await res.readAsString()) as Map<String, dynamic>;
+    }
+
+    final started = await call('/api/session/start', {'mode': 'scam'});
+    final sid = started['sessionId'] as String;
+    final r1 =
+        await call('/api/score', {'sessionId': sid, 'text': 'do it immediately'});
+    expect(r1['risk'], 10);
+    final r2 = await call('/api/score',
+        {'sessionId': sid, 'text': 'ippude cheyyandi, immediately!'});
+    expect(r2['risk'], 15);
+
+    Map<String, dynamic> last = r2;
+    for (var i = 0; i < 10; i++) {
+      last = await call('/api/score',
+          {'sessionId': sid, 'text': 'tonight, ventane, immediately'});
+    }
+    expect(last['risk'], 30);
   });
 }

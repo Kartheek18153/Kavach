@@ -16,6 +16,7 @@ class ScoringSession {
   int risk = 0;
   bool alerted = false;
   int lines = 0;
+  int repeatBonus = 0;
   final DateTime startedAt = DateTime.now();
 
   Map<String, Object> state() {
@@ -122,10 +123,20 @@ Router buildRouter(
       return _json({'error': 'unknown sessionId'}, status: 404);
     }
     final seen = session?.seen ?? <String>{};
+    final wasSeen = Set<String>.of(seen);
     var gained = 0;
     for (final (name, points) in matchGroups(text, seen)) {
       seen.add(name);
       gained += points;
+    }
+    var repeated = 0;
+    if (session != null) {
+      final room = 20 - session.repeatBonus;
+      if (room > 0) {
+        repeated = repeatBonusFor(text, wasSeen);
+        if (repeated > room) repeated = room;
+        session.repeatBonus += repeated;
+      }
     }
     if (session == null) {
       final net = (gained - discount).clamp(0, 100);
@@ -136,7 +147,7 @@ Router buildRouter(
             .toList(growable: false),
       });
     }
-    var risk = (session.risk + gained - discount).clamp(0, 100);
+    var risk = (session.risk + gained + repeated - discount).clamp(0, 100);
     if (hardTriggered(seen) && risk < 85) risk = 85;
     session.risk = risk;
     session.lines += 1;
