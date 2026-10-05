@@ -13,8 +13,13 @@ import '../widgets/cards.dart';
 class ReportScreen extends StatefulWidget {
   final Map<String, dynamic>? summary;
   final VoidCallback onNewScan;
+  final VoidCallback onHistoryCleared;
 
-  const ReportScreen({super.key, this.summary, required this.onNewScan});
+  const ReportScreen(
+      {super.key,
+      this.summary,
+      required this.onNewScan,
+      required this.onHistoryCleared});
 
   @override
   State<ReportScreen> createState() => _ReportScreenState();
@@ -124,6 +129,14 @@ class _ReportScreenState extends State<ReportScreen> {
                     const SizedBox(height: 14),
                     SectionTitle(context.tr('pastScans')),
                     _historyCard(history),
+                    const SizedBox(height: 6),
+                    Center(
+                      child: TextButton.icon(
+                        onPressed: _confirmClearHistory,
+                        icon: const Icon(Icons.delete_outline_rounded),
+                        label: Text(context.tr('clearHistory')),
+                      ),
+                    ),
                   ],
                 ],
               ),
@@ -387,6 +400,34 @@ class _ReportScreenState extends State<ReportScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> _confirmClearHistory() async {
+    final yes = await showDialog<bool>(
+      context: context,
+      builder: (c) => AlertDialog(
+        title: Text(context.tr('clearHistTitle')),
+        content: Text(context.tr('clearHistBody')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(c).pop(false),
+            child: Text(context.tr('cancelBtn')),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(c).pop(true),
+            child: Text(context.tr('deleteBtn'),
+                style: const TextStyle(color: KavachColors.danger)),
+          ),
+        ],
+      ),
+    );
+    if (yes != true || !mounted) return;
+    await HistoryStore.clearHistory();
+    setState(() => _viewing = null);
+    widget.onHistoryCleared();
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.tr('historyCleared'))));
   }
 
   Widget _historyCard(List<Map<String, dynamic>> history) {

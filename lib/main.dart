@@ -64,6 +64,11 @@ class _KavachAppState extends State<KavachApp> {
     _session.startReal();
   }
 
+  void _practice() {
+    setState(() => _tab = 1);
+    _session.startScam();
+  }
+
   void _finish(Map<String, dynamic> summary) {
     final level = summary['level'] as RiskLevel;
     setState(() {
@@ -119,6 +124,9 @@ class _KavachAppState extends State<KavachApp> {
               children: [
                 HomeScreen(
                   onProtect: _protect,
+                  onPractice: _practice,
+                  onSetupFamily: () => setState(() => _tab = 2),
+                  onViewReport: () => setState(() => _tab = 3),
                   familySet: _familySet,
                   lastResult: _lastResult,
                 ),
@@ -129,6 +137,7 @@ class _KavachAppState extends State<KavachApp> {
                 ReportScreen(
                   summary: _lastSummary,
                   onNewScan: () => setState(() => _tab = 1),
+                  onHistoryCleared: () => setState(() => _lastSummary = null),
                 ),
               ],
             ),
