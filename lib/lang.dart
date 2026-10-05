@@ -592,6 +592,66 @@ const Map<String, Map<AppLang, String>> _strings = {
     AppLang.telugu: 'తాజాది',
     AppLang.hindi: 'ताज़ा',
   },
+  'memoryTitle': {
+    AppLang.english: 'Your protection',
+    AppLang.telugu: 'మీ రక్షణ',
+    AppLang.hindi: 'आपकी सुरक्षा',
+  },
+  'caughtMonth': {
+    AppLang.english: 'Scams caught this month',
+    AppLang.telugu: 'ఈ నెలలో పట్టిన స్కామ్‌లు',
+    AppLang.hindi: 'इस महीने पकड़े स्कैम',
+  },
+  'worstMonth': {
+    AppLang.english: 'Worst risk',
+    AppLang.telugu: 'అత్యధిక రిస్క్',
+    AppLang.hindi: 'सबसे बड़ा जोखिम',
+  },
+  'noneYet': {
+    AppLang.english: 'None yet',
+    AppLang.telugu: 'ఇంకా లేవు',
+    AppLang.hindi: 'अभी कोई नहीं',
+  },
+  'firstTitle': {
+    AppLang.english: 'Start in 2 minutes',
+    AppLang.telugu: '2 నిమిషాల్లో మొదలు',
+    AppLang.hindi: '2 मिनट में शुरू करें',
+  },
+  'firstBody': {
+    AppLang.english: 'Save your family contact, then practice with a demo scam call.',
+    AppLang.telugu: 'ముందు కుటుంబ సంప్రదింపు సేవ్ చేయండి, తర్వాత డెమో స్కామ్ కాల్‌తో ప్రాక్టీస్ చేయండి.',
+    AppLang.hindi: 'पहले परिवार संपर्क सहेजें, फिर डेमो स्कैम कॉल से अभ्यास करें।',
+  },
+  'goFamily': {
+    AppLang.english: 'Set up family',
+    AppLang.telugu: 'కుటుంబం సెట్ చేయండి',
+    AppLang.hindi: 'परिवार सेट करें',
+  },
+  'tryDemo': {
+    AppLang.english: 'Practice demo',
+    AppLang.telugu: 'ప్రాక్టీస్ డెమో',
+    AppLang.hindi: 'अभ्यास डेमो',
+  },
+  'clearHistory': {
+    AppLang.english: 'Clear history',
+    AppLang.telugu: 'చరిత్ర తొలగించండి',
+    AppLang.hindi: 'इतिहास साफ़ करें',
+  },
+  'clearHistTitle': {
+    AppLang.english: 'Clear past scans?',
+    AppLang.telugu: 'గత స్కాన్లు తొలగించాలా?',
+    AppLang.hindi: 'पिछले स्कैन साफ़ करें?',
+  },
+  'clearHistBody': {
+    AppLang.english: 'Your saved reports will be deleted from this phone.',
+    AppLang.telugu: 'మీ సేవ్ చేసిన రిపోర్టులు ఈ ఫోన్ నుండి తొలగుతాయి.',
+    AppLang.hindi: 'आपकी सहेजी रिपोर्ट इस फोन से हट जाएंगी।',
+  },
+  'historyCleared': {
+    AppLang.english: 'History cleared',
+    AppLang.telugu: 'చరిత్ర తొలగింది',
+    AppLang.hindi: 'इतिहास साफ़ हुआ',
+  },
   'originDemo': {
     AppLang.english: 'Practice demo',
     AppLang.telugu: 'ప్రాక్టీస్ డెమో',
