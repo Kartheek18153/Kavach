@@ -36,6 +36,7 @@ class _KavachAppState extends State<KavachApp> {
   void initState() {
     super.initState();
     _session = DemoSession();
+    _familySet = GuardianStore.isConnected;
     _lastSummary = _restoreLatest();
   }
 
@@ -60,7 +61,7 @@ class _KavachAppState extends State<KavachApp> {
     } catch (_) {
       // Permission plugin unavailable on desktop/web - continue demo.
     }
-    _session.startScam();
+    _session.startReal();
   }
 
   void _finish(Map<String, dynamic> summary) {
@@ -121,7 +122,8 @@ class _KavachAppState extends State<KavachApp> {
                 ),
                 LiveScreen(session: _session, onFinish: _finish),
                 FamilyScreen(
-                    onSaved: () => setState(() => _familySet = true)),
+                    onSaved: () => setState(
+                        () => _familySet = GuardianStore.isConnected)),
                 ReportScreen(
                   summary: _lastSummary,
                   onNewScan: () => setState(() => _tab = 1),

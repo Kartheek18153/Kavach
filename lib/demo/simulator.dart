@@ -32,6 +32,7 @@ class DemoState {
   final bool running;
   final bool finished;
   final int elapsedSec;
+  final bool isDemo;
 
   const DemoState({
     this.lines = const [],
@@ -44,6 +45,7 @@ class DemoState {
     this.running = false,
     this.finished = false,
     this.elapsedSec = 0,
+    this.isDemo = true,
   });
 
   DemoState copyWith({
@@ -57,6 +59,7 @@ class DemoState {
     bool? running,
     bool? finished,
     int? elapsedSec,
+    bool? isDemo,
   }) {
     return DemoState(
       lines: lines ?? this.lines,
@@ -69,6 +72,7 @@ class DemoState {
       running: running ?? this.running,
       finished: finished ?? this.finished,
       elapsedSec: elapsedSec ?? this.elapsedSec,
+      isDemo: isDemo ?? this.isDemo,
     );
   }
 }
@@ -89,6 +93,7 @@ class DemoSession extends ChangeNotifier implements ValueListenable<DemoState> {
   final Set<String> _seen = {};
   bool _demoScam = true;
   String? _sessionId;
+  int _repeatBonus = 0;
 
   /// Notifies listeners outside the build phase so timer ticks that land
   /// mid-transition (tab switches) never throw "called during build".
@@ -140,7 +145,12 @@ class DemoSession extends ChangeNotifier implements ValueListenable<DemoState> {
 
   void startNormal() => _start(normalScript, isScam: false);
 
-  void _start(List<ScriptLine> script, {required bool isScam}) {
+  /// Real protection mode: empty transcript waiting for live words
+  /// (typed now, mic later). Never auto-finishes — ends on stop/reset.
+  void startReal() => _start(const [], isScam: true, demo: false);
+
+  void _start(List<ScriptLine> script,
+      {required bool isScam, bool demo = true}) {
     _timer?.cancel();
     _endSessionFireForget();
     _script = script;
@@ -149,7 +159,8 @@ class DemoSession extends ChangeNotifier implements ValueListenable<DemoState> {
     _seen.clear();
     _demoScam = isScam;
     _sessionId = null;
-    _state = const DemoState(running: true);
+    _repeatBonus = 0;
+    _state = DemoState(running: true, isDemo: demo);
     _safeNotify();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) => _onTick());
     // Open a stateful backend session when reachable; ticks fall back
@@ -231,7 +242,8 @@ class DemoSession extends ChangeNotifier implements ValueListenable<DemoState> {
 
     final level = riskLevelFor(risk);
     final alerted = _state.alerted || level == RiskLevel.danger;
-    final done = _cursor >= _script.length;
+    // Real mode stays live until the user ends it; demos finish the script.
+    final done = _state.isDemo && _cursor >= _script.length;
     _state = _state.copyWith(
       lines: lines,
       risk: risk,
@@ -249,10 +261,46 @@ class DemoSession extends ChangeNotifier implements ValueListenable<DemoState> {
   }
 
   void _noteScriptGroups(String text) {
-    final t = text.toLowerCase();
     for (final (name, _, words) in keywordGroups) {
-      if (words.any(t.contains)) _seen.add(name);
+      if (words.any((w) => _wordHit(text, w))) _seen.add(name);
     }
+  }
+
+  /// Whole-word hit mirroring wordHit in backend/lib/engine.dart —
+  /// KEEP IN SYNC (same pattern, same boundary rule).
+  static bool _wordHit(String text, String word) {
+    final pattern =
+        '(?:^|[^A-Za-z])${RegExp.escape(word)}(?:[^A-Za-z]|\$)';
+    return RegExp(pattern, caseSensitive: false).hasMatch(text);
+  }
+
+  /// Local scoring for typed/real words when the backend is unreachable:
+  /// first-hit group points plus +5 per urgency/threat repeat (cap +20).
+  int _localGained(String text) {
+    final wasSeen = Set<String>.of(_seen);
+    var gained = 0;
+    for (final (name, pts, words) in keywordGroups) {
+      if (!wasSeen.contains(name) &&
+          words.any((w) => _wordHit(text, w))) {
+        _seen.add(name);
+        gained += pts;
+      }
+    }
+    var rb = 0;
+    for (final (name, _, words) in keywordGroups) {
+      if ((name == 'urgency' || name == 'threat') &&
+          wasSeen.contains(name) &&
+          words.any((w) => _wordHit(text, w))) {
+        rb += 5;
+      }
+    }
+    final room = 20 - _repeatBonus;
+    if (room > 0 && rb > 0) {
+      final add = rb > room ? room : rb;
+      _repeatBonus += add;
+      gained += add;
+    }
+    return gained;
   }
 
   bool _hardTriggered() {
@@ -346,13 +394,7 @@ class DemoSession extends ChangeNotifier implements ValueListenable<DemoState> {
         _seen.add(g as String);
       }
     } else {
-      final lower = t.toLowerCase();
-      for (final (name, pts, words) in keywordGroups) {
-        if (!_seen.contains(name) && words.any(lower.contains)) {
-          _seen.add(name);
-          gained += pts;
-        }
-      }
+      gained = _localGained(t);
     }
     var risk = (_state.risk + gained).clamp(0, 100);
     if (_safeWordHit(t)) risk = (risk - 20).clamp(0, 100);
@@ -384,6 +426,7 @@ class DemoSession extends ChangeNotifier implements ValueListenable<DemoState> {
     _timer?.cancel();
     _endSessionFireForget();
     _seen.clear();
+    _repeatBonus = 0;
     _state = const DemoState();
     _safeNotify();
   }

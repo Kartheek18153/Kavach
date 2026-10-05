@@ -165,6 +165,8 @@ class _LiveScreenState extends State<LiveScreen> {
             style: const TextStyle(
                 fontSize: 20, fontWeight: FontWeight.w800),
           ),
+          const SizedBox(width: 8),
+          if (s.running || s.finished) _modeChip(s.isDemo),
           const Spacer(),
           Text(
             _fmtTime(s.elapsedSec),
@@ -176,6 +178,25 @@ class _LiveScreenState extends State<LiveScreen> {
           const SizedBox(width: 8),
           const LangButton(),
         ],
+      ),
+    );
+  }
+
+  /// Honest mode label: green LIVE for real sessions, amber DEMO for scripts.
+  Widget _modeChip(bool isDemo) {
+    final bg = isDemo ? KavachColors.washCaution : KavachColors.washSafe;
+    final fg = isDemo ? KavachColors.caution : KavachColors.safe;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: fg.withValues(alpha: 0.5)),
+      ),
+      child: Text(
+        isDemo ? 'DEMO' : 'LIVE',
+        style: TextStyle(
+            fontSize: 11, fontWeight: FontWeight.w900, color: fg),
       ),
     );
   }
@@ -287,12 +308,10 @@ class _LiveScreenState extends State<LiveScreen> {
             children: [
               Expanded(
                 child: ElevatedButton.icon(
-                  onPressed: s.running
-                      ? null
-                      : () {
-                          _snackedAlert = false;
-                          widget.session.startScam();
-                        },
+                  onPressed: () {
+                    _snackedAlert = false;
+                    widget.session.startScam();
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor:
                         KavachColors.danger.withValues(alpha: 0.85),
@@ -305,12 +324,10 @@ class _LiveScreenState extends State<LiveScreen> {
               const SizedBox(width: 10),
               Expanded(
                 child: ElevatedButton.icon(
-                  onPressed: s.running
-                      ? null
-                      : () {
-                          _snackedAlert = false;
-                          widget.session.startNormal();
-                        },
+                  onPressed: () {
+                    _snackedAlert = false;
+                    widget.session.startNormal();
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor:
                         KavachColors.safe.withValues(alpha: 0.85),
