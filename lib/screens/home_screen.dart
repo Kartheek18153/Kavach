@@ -4,15 +4,23 @@ import '../lang.dart';
 import '../theme.dart';
 import '../widgets/cards.dart';
 
+import '../services/api.dart';
+
 /// Home: hero shield, big Protect button, language picker, status, 1930 strip.
 class HomeScreen extends StatefulWidget {
   final VoidCallback onProtect;
+  final VoidCallback onPractice;
+  final VoidCallback onSetupFamily;
+  final VoidCallback onViewReport;
   final bool familySet;
   final String? lastResult;
 
   const HomeScreen({
     super.key,
     required this.onProtect,
+    required this.onPractice,
+    required this.onSetupFamily,
+    required this.onViewReport,
     required this.familySet,
     this.lastResult,
   });
@@ -34,11 +42,17 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               _header(),
               const SizedBox(height: 14),
+              if (!widget.familySet && HistoryStore.entries.isEmpty)
+                _firstRunCard(),
+              if (!widget.familySet && HistoryStore.entries.isEmpty)
+                const SizedBox(height: 14),
               _heroCard(),
               const SizedBox(height: 14),
               _languageCard(),
               const SizedBox(height: 14),
               _statusRow(),
+              const SizedBox(height: 14),
+              _memoryCard(),
               const SizedBox(height: 14),
               _privacyCard(),
               const SizedBox(height: 14),
@@ -269,6 +283,7 @@ class _HomeScreenState extends State<HomeScreen> {
         const SizedBox(width: 12),
         Expanded(
           child: GlassCard(
+            onTap: widget.lastResult == null ? null : widget.onViewReport,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -291,6 +306,99 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _firstRunCard() {
+    return GlassCard(
+      borderColor: KavachColors.teal.withValues(alpha: 0.4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(context.tr('firstTitle'),
+              style:
+                  const TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+          const SizedBox(height: 6),
+          Text(context.tr('firstBody'),
+              style: const TextStyle(
+                  color: KavachColors.sub, fontSize: 13.5, height: 1.5)),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: widget.onSetupFamily,
+                  child: Text(context.tr('goFamily')),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: widget.onPractice,
+                  child: Text(context.tr('tryDemo')),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _memoryCard() {
+    final caught = HistoryStore.monthDangers;
+    final worst = HistoryStore.monthWorst;
+    return GlassCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(context.tr('memoryTitle'),
+              style:
+                  const TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(
+                child: _stat(
+                    '$caught', context.tr('caughtMonth'), KavachColors.danger),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _stat(
+                    worst == 0 ? context.tr('noneYet') : '$worst/100',
+                    context.tr('worstMonth'),
+                    KavachColors.teal),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _stat(String value, String label, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: KavachColors.surface2,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: KavachColors.line),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(value,
+              style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w900,
+                  color: color)),
+          Text(label,
+              style: const TextStyle(
+                  color: KavachColors.sub,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600)),
+        ],
+      ),
     );
   }
 
