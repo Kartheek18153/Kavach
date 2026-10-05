@@ -91,4 +91,32 @@ void main() {
       expect(GuardianStore.phone, '');
     });
   });
+
+  group('history', () {
+    test('keeps latest 20 with newest first', () async {
+      SharedPreferences.setMockInitialValues({});
+      HistoryStore.entries = [];
+      for (var i = 0; i < 22; i++) {
+        await HistoryStore.add({
+          'scamType': 'Type $i',
+          'risk': i,
+          'level': 'safe',
+          'reasons': <String>[],
+          'reasonsTelugu': '',
+          'alerted': false,
+          'elapsedSec': i,
+          'lines': 1,
+          'isDemo': true,
+          'smsSent': false,
+        });
+      }
+      expect(HistoryStore.entries, hasLength(20));
+      expect(HistoryStore.entries.first['scamType'], 'Type 21');
+      expect(HistoryStore.entries.first['demo'], isTrue);
+
+      await HistoryStore.load();
+      expect(HistoryStore.entries, hasLength(20));
+      expect(HistoryStore.entries.first['scamType'], 'Type 21');
+    });
+  });
 }
