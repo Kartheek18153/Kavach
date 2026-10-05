@@ -577,6 +577,41 @@ const Map<String, Map<AppLang, String>> _strings = {
     AppLang.telugu: 'సారాంశం కాపీ అయింది ',
     AppLang.hindi: 'सारांश कॉपी ',
   },
+  'shareReport': {
+    AppLang.english: 'Share',
+    AppLang.telugu: 'షేర్',
+    AppLang.hindi: 'शेयर करें',
+  },
+  'pastScans': {
+    AppLang.english: 'Past scans',
+    AppLang.telugu: 'గత స్కాన్లు',
+    AppLang.hindi: 'पिछले स्कैन',
+  },
+  'viewLatest': {
+    AppLang.english: 'Latest',
+    AppLang.telugu: 'తాజాది',
+    AppLang.hindi: 'ताज़ा',
+  },
+  'originDemo': {
+    AppLang.english: 'Practice demo',
+    AppLang.telugu: 'ప్రాక్టీస్ డెమో',
+    AppLang.hindi: 'अभ्यास डेमो',
+  },
+  'originLive': {
+    AppLang.english: 'Live call',
+    AppLang.telugu: 'ప్రత్యక్ష కాల్',
+    AppLang.hindi: 'लाइव कॉल',
+  },
+  'smsYes': {
+    AppLang.english: 'SMS sent',
+    AppLang.telugu: 'SMS పంపాం',
+    AppLang.hindi: 'SMS भेजा',
+  },
+  'smsNo': {
+    AppLang.english: 'no SMS',
+    AppLang.telugu: 'SMS లేదు',
+    AppLang.hindi: 'SMS नहीं',
+  },
   'checklist': {
     AppLang.english: 'Safety checklist',
     AppLang.telugu: 'భద్రతా జాబితా',
@@ -614,6 +649,30 @@ const Map<String, Map<AppLang, String>> _strings = {
         'Scammer police/CBI ani cheppi bayapettistadu, secret ga unchamani cheptadu, tarvata OTP/money adugutadu. Nijamaina police phone lo arrest threat ivvaru, OTP adagaru.',
     AppLang.hindi:
         'स्कैमर पुलिस/CBI बनकर डराता है, गुप्त रखने को कहता है, फिर OTP/पैसे मांगता है। असली पुलिस फोन पर गिरफ्तारी की धमकी नहीं देती, OTP नहीं मांगती।',
+  },
+  'learnScreen': {
+    AppLang.english:
+        'The scammer asks you to install apps like AnyDesk and share your screen, then watches you type OTPs and passwords. No real bank or officer ever needs your screen.',
+    AppLang.telugu:
+        'Scammer AnyDesk lanti app install chesi screen share adugutadu, tarvata OTP/password chustadu. Nijamaina bank/officer screen adagaru.',
+    AppLang.hindi:
+        'स्कैमर AnyDesk जैसा ऐप इंस्टॉल कराकर स्क्रीन शेयर मांगता है, फिर OTP/पासवर्ड देखता है। असली बैंक/अधिकारी स्क्रीन नहीं मांगते।',
+  },
+  'learnOtp': {
+    AppLang.english:
+        'The scammer poses as your bank, says your account is blocked, and asks for the OTP or PIN that just arrived. Banks never ask for OTP on a call.',
+    AppLang.telugu:
+        'Scammer bank ani cheppi account block ani bayapettistadu, vachina OTP/PIN adugutadu. Bank eppudu phone lo OTP adagadu.',
+    AppLang.hindi:
+        'स्कैमर बैंक बनकर खाता ब्लॉक होने का डर दिखाता है और आया OTP/PIN मांगता है। बैंक फोन पर OTP कभी नहीं मांगता।',
+  },
+  'learnGeneric': {
+    AppLang.english:
+        'Scammers rush you, scare you, and ask for codes or money. Slow down, hang up, and call back on an official number.',
+    AppLang.telugu:
+        'Scammerlu bayapetti, tondarapetti, OTP/dabbulu adugutaru. Haste padakandi, cut chesi official number ki call cheyyandi.',
+    AppLang.hindi:
+        'स्कैमर डराते हैं, जल्दी मचाते हैं, OTP/पैसे मांगते हैं। रुकें, काटें, आधिकारिक नंबर पर वापस कॉल करें।',
   },
   'learnNote': {
     AppLang.english: 'Remember: "{r}".',
