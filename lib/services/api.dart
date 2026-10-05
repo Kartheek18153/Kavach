@@ -121,6 +121,37 @@ class HistoryStore {
     if (s.contains('caution')) return 'caution';
     return 'safe';
   }
+
+  /// Wipes the stored call history (device only).
+  static Future<void> clearHistory() async {
+    entries = [];
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_key);
+  }
+
+  static String get _month => DateTime.now().toIso8601String().substring(0, 7);
+
+  static Iterable<Map<String, dynamic>> get _live =>
+      entries.where((e) => e['demo'] != true);
+
+  static bool _thisMonth(Map<String, dynamic> e) =>
+      '${e['ts'] ?? ''}'.startsWith(_month);
+
+  /// Live danger hits this month — the scoreboard number.
+  static int get monthDangers =>
+      _live.where((e) => e['level'] == 'danger' && _thisMonth(e)).length;
+
+  /// Worst live risk this month (0 when none).
+  static int get monthWorst {
+    var w = 0;
+    for (final e in _live) {
+      if (_thisMonth(e)) {
+        final r = (e['risk'] as num? ?? 0).toInt();
+        if (r > w) w = r;
+      }
+    }
+    return w;
+  }
 }
 
 /// Thin client for the Kavach backend (`backend/`).
