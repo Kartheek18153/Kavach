@@ -340,10 +340,10 @@ const Map<String, Map<AppLang, String>> _strings = {
     AppLang.telugu: 'ఎందుకు గుర్తించాం',
     AppLang.hindi: 'इसे क्यों चिह्नित किया',
   },
-  'familySent': {
-    AppLang.english: 'Family alert sent  - guardian notified',
-    AppLang.telugu: 'కుటుంబ హెచ్చరిక పంపాం  - రక్షకుడికి తెలిసింది',
-    AppLang.hindi: 'परिवार अलर्ट भेजा  - अभिभावक को सूचित किया',
+  'dangerNow': {
+    AppLang.english: 'Danger — warn your family right now',
+    AppLang.telugu: 'ప్రమాదం — వెంటనే కుటుంబాన్ని హెచ్చరించండి',
+    AppLang.hindi: 'खतरा — अभी परिवार को सचेत करें',
   },
   'hangup': {
     AppLang.english: 'HANG UP NOW',
@@ -365,10 +365,18 @@ const Map<String, Map<AppLang, String>> _strings = {
     AppLang.telugu: 'వింటూ ఉండు',
     AppLang.hindi: 'सुनते रहें',
   },
-  'familyAlerted': {
-    AppLang.english: 'Family alerted ',
-    AppLang.telugu: 'కుటుంబానికి తెలిసింది ',
-    AppLang.hindi: 'परिवार सूचित ',
+  'cutFirst': {
+    AppLang.english: '1. Cut the real phone call now  2. Then tap below',
+    AppLang.telugu: '1. ముందు నిజమైన కాల్ కట్ చేయండి  2. తర్వాత కింద నొక్కండి',
+    AppLang.hindi: '1. पहले असली कॉल काटें  2. फिर नीचे दबाएं',
+  },
+  'smsDangerBody': {
+    AppLang.english:
+        'Kavach DANGER: {type} risk {risk}/100. Cut the call now. Dial 1930 if money was shared.',
+    AppLang.telugu:
+        'Kavach ప్రమాదం: {type} రిస్క్ {risk}/100. వెంటనే కాల్ కట్ చేయండి. డబ్బు విషయం ఉంటే 1930కి కాల్ చేయండి.',
+    AppLang.hindi:
+        'Kavach खतरा: {type} जोखिम {risk}/100। अभी कॉल काटें। पैसे की बात हो तो 1930 पर कॉल करें।',
   },
   'smsAlert': {
     AppLang.english: 'Alert family via SMS',

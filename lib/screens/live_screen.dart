@@ -1,3 +1,4 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -27,18 +28,34 @@ class _LiveScreenState extends State<LiveScreen> {
   RiskLevel _prevLevel = RiskLevel.safe;
   bool _snackedAlert = false;
   bool _overlayDismissed = false;
+  String? _dismissedSig;
   final _typed = TextEditingController();
+  final _alarm = AudioPlayer();
+  bool _alarmPlaying = false;
 
   @override
   void dispose() {
     _typed.dispose();
+    _alarm.dispose();
     super.dispose();
   }
+
+  static String _sig(DemoState s) => '${s.risk}|${s.reasons.join(';')}';
 
   void _watchLevel(DemoState s) {
     if (s.level == RiskLevel.danger && _prevLevel != RiskLevel.danger) {
       HapticFeedback.vibrate();
       _overlayDismissed = false;
+      _dismissedSig = null;
+    }
+    // New tricks while dismissed re-raise the overlay + alarm.
+    if (s.level == RiskLevel.danger &&
+        s.running &&
+        _overlayDismissed &&
+        _dismissedSig != _sig(s)) {
+      HapticFeedback.vibrate();
+      _overlayDismissed = false;
+      _dismissedSig = null;
     }
     if (s.alerted && !_snackedAlert) {
       _snackedAlert = true;
@@ -47,7 +64,7 @@ class _LiveScreenState extends State<LiveScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             backgroundColor: KavachColors.danger,
-            content: Text(context.tr('familySent'),
+            content: Text(context.tr('dangerNow'),
                 style: const TextStyle(fontWeight: FontWeight.w700)),
           ),
         );
@@ -56,7 +73,30 @@ class _LiveScreenState extends State<LiveScreen> {
     _prevLevel = s.level;
   }
 
-  Future<void> _smsFamily(DemoState s) async {    final phone = GuardianStore.phone.trim();
+  /// Loops the alarm beep while the red overlay is up, stops otherwise.
+  void _driveAlarm(bool show) {
+    if (show && !_alarmPlaying) {
+      _alarmPlaying = true;
+      _alarm.setReleaseMode(ReleaseMode.loop).then((_) {
+        if (_alarmPlaying) _alarm.play(AssetSource('alert_beep.wav'));
+      }).catchError((_) {
+        _alarmPlaying = false;
+      });
+    } else if (!show && _alarmPlaying) {
+      _alarmPlaying = false;
+      _alarm.stop();
+    }
+  }
+
+  void _dismissOverlay(DemoState s) {
+    setState(() {
+      _overlayDismissed = true;
+      _dismissedSig = _sig(s);
+    });
+  }
+
+  Future<void> _smsFamily(DemoState s) async {
+    final phone = GuardianStore.phone.trim();
     if (phone.isEmpty) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -65,7 +105,7 @@ class _LiveScreenState extends State<LiveScreen> {
       return;
     }
     final body = Uri.encodeComponent(
-        'Kavach DANGER: ${s.scamType} risk ${s.risk}/100. Cut the call. Dial 1930 if money shared.');
+        context.trP('smsDangerBody', {'type': s.scamType, 'risk': '${s.risk}'}));
     final uri = Uri.parse('sms:$phone?body=$body');
     try {
       if (await launchUrl(uri)) return;
@@ -102,6 +142,7 @@ class _LiveScreenState extends State<LiveScreen> {
         _watchLevel(s);
         final showOverlay =
             s.level == RiskLevel.danger && s.running && !_overlayDismissed;
+        _driveAlarm(showOverlay);
         return Scaffold(
           body: SafeArea(
             child: Stack(
@@ -481,13 +522,16 @@ class _LiveScreenState extends State<LiveScreen> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.family_restroom_rounded,
+                      const Icon(Icons.touch_app_rounded,
                           color: KavachColors.danger),
                       const SizedBox(width: 8),
-                      Text(context.tr('familyAlerted'),
-                          style: const TextStyle(
-                              color: KavachColors.danger,
-                              fontWeight: FontWeight.w800)),
+                      Flexible(
+                        child: Text(context.tr('cutFirst'),
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                                color: KavachColors.danger,
+                                fontWeight: FontWeight.w800)),
+                      ),
                     ],
                   ),
                 ),
@@ -506,6 +550,8 @@ class _LiveScreenState extends State<LiveScreen> {
                   child: ElevatedButton(
                     onPressed: () {
                       final sum = _summary(s);
+                      _alarmPlaying = false;
+                      _alarm.stop();
                       widget.session.stop();
                       setState(() => _overlayDismissed = true);
                       widget.onFinish(sum);
@@ -518,8 +564,7 @@ class _LiveScreenState extends State<LiveScreen> {
                   ),
                 ),
                 TextButton(
-                  onPressed: () =>
-                      setState(() => _overlayDismissed = true),
+                  onPressed: () => _dismissOverlay(s),
                   child: Text(context.tr('keepListening'),
                       style:
                           const TextStyle(color: KavachColors.sub)),
