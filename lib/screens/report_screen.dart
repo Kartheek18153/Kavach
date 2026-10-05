@@ -1,24 +1,64 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../lang.dart';
+import '../services/api.dart';
 import '../theme.dart';
 import '../widgets/cards.dart';
 
-/// After-call report: verdict, 1930 helper, checklist, learning card.
-class ReportScreen extends StatelessWidget {
+/// After-call report: verdict, 1930 helper, checklist, per-scam learning,
+/// share, and browsable past scans.
+class ReportScreen extends StatefulWidget {
   final Map<String, dynamic>? summary;
   final VoidCallback onNewScan;
 
   const ReportScreen({super.key, this.summary, required this.onNewScan});
 
   @override
+  State<ReportScreen> createState() => _ReportScreenState();
+}
+
+class _ReportScreenState extends State<ReportScreen> {
+  Map<String, dynamic>? _viewing;
+
+  @override
+  void didUpdateWidget(covariant ReportScreen old) {
+    super.didUpdateWidget(old);
+    if (!identical(widget.summary, old.summary)) _viewing = null;
+  }
+
+  Map<String, dynamic>? get _shown => _viewing ?? widget.summary;
+
+  RiskLevel _levelFrom(Object? v) {
+    if (v == 'danger') return RiskLevel.danger;
+    if (v == 'caution') return RiskLevel.caution;
+    return RiskLevel.safe;
+  }
+
+  Map<String, dynamic> _restore(Map<String, dynamic> e) {
+    return {
+      'risk': e['risk'] ?? 0,
+      'level': e['level'] is RiskLevel ? e['level'] : _levelFrom(e['level']),
+      'scamType': e['scamType'] ?? '-',
+      'reasons': List.from(e['reasons'] ?? const []),
+      'reasonsTelugu': e['reasonsTelugu'] ?? '',
+      'alerted': e['alerted'] ?? false,
+      'elapsedSec': e['elapsedSec'] ?? 0,
+      'lines': e['lines'] ?? 0,
+      'isDemo': e['demo'] ?? e['isDemo'] ?? false,
+      'smsSent': e['smsSent'] ?? false,
+    };
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final s = summary;
+    final s = _shown;
+    final history = HistoryStore.entries;
     return Scaffold(
       body: SafeArea(
-        child: s == null
+        child: s == null && history.isEmpty
             ? _empty(context)
             : ListView(
                 padding:
@@ -33,48 +73,60 @@ class ReportScreen extends StatelessWidget {
                             fontWeight: FontWeight.w800),
                       ),
                       const Spacer(),
+                      if (_viewing != null)
+                        TextButton(
+                          onPressed: () => setState(() => _viewing = null),
+                          child: Text(context.tr('viewLatest')),
+                        ),
                       const LangButton(),
                     ],
                   ),
-                  const SizedBox(height: 12),
-                  _verdictHeader(context, s),
-                const SizedBox(height: 14),
-                SectionTitle(context.tr('reportHelp')),
-                _reportHelper(context, s),
-                const SizedBox(height: 14),
-                SectionTitle(context.tr('checklist')),
-                _checklist(context),
-                const SizedBox(height: 14),
-                SectionTitle(context.tr('learnTitle')),
-                _learningCard(context, s),
-                const SizedBox(height: 18),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    onPressed: onNewScan,
-                    icon: const Icon(Icons.shield_rounded),
-                    label: Text(context.tr('startScan')),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.lock_rounded,
-                        size: 14, color: KavachColors.sub),
-                    const SizedBox(width: 6),
-                    Flexible(
-                      child: Text(
-                        context.tr('privacyReport'),
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                            color: KavachColors.sub, fontSize: 12.5),
+                  if (s != null) ...[
+                    const SizedBox(height: 12),
+                    _verdictHeader(context, s),
+                    const SizedBox(height: 14),
+                    SectionTitle(context.tr('reportHelp')),
+                    _reportHelper(context, s),
+                    const SizedBox(height: 14),
+                    SectionTitle(context.tr('checklist')),
+                    _checklist(context),
+                    const SizedBox(height: 14),
+                    SectionTitle(context.tr('learnTitle')),
+                    _learningCard(context, s),
+                    const SizedBox(height: 18),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: widget.onNewScan,
+                        icon: const Icon(Icons.shield_rounded),
+                        label: Text(context.tr('startScan')),
                       ),
                     ),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.lock_rounded,
+                            size: 14, color: KavachColors.sub),
+                        const SizedBox(width: 6),
+                        Flexible(
+                          child: Text(
+                            context.tr('privacyReport'),
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                                color: KavachColors.sub, fontSize: 12.5),
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
-                ),
-              ],
-            ),
+                  if (history.isNotEmpty) ...[
+                    const SizedBox(height: 14),
+                    SectionTitle(context.tr('pastScans')),
+                    _historyCard(history),
+                  ],
+                ],
+              ),
       ),
     );
   }
@@ -99,6 +151,12 @@ class ReportScreen extends StatelessWidget {
     final alerted = s['alerted'] == true
         ? context.tr('alertedYes')
         : context.tr('alertedNo');
+    final origin = s['isDemo'] == true
+        ? context.tr('originDemo')
+        : context.tr('originLive');
+    final sms = s['smsSent'] == true
+        ? context.tr('smsYes')
+        : context.tr('smsNo');
     return GlassCard(
       borderColor: color.withValues(alpha: 0.5),
       child: Column(
@@ -128,6 +186,14 @@ class ReportScreen extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             '${context.tr('durationWord')} ${s['elapsedSec']}s | ${s['lines']} ${context.tr('linesWord')} | ${context.tr('familyWord')} $alerted',
+            style: const TextStyle(
+                color: KavachColors.sub,
+                fontSize: 12.5,
+                fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            '$origin | SMS $sms',
             style: const TextStyle(
                 color: KavachColors.sub,
                 fontSize: 12.5,
@@ -219,18 +285,29 @@ class ReportScreen extends StatelessWidget {
                 style: const TextStyle(fontSize: 13, height: 1.6)),
           ),
           const SizedBox(height: 8),
-          SizedBox(
-            width: double.infinity,
-            child: TextButton.icon(
-              onPressed: () {
-                Clipboard.setData(ClipboardData(text: text));
-                ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                        content: Text(context.tr('summaryCopied'))));
-              },
-              icon: const Icon(Icons.copy_rounded),
-              label: Text(context.tr('copySummary')),
-            ),
+          Row(
+            children: [
+              Expanded(
+                child: TextButton.icon(
+                  onPressed: () {
+                    Clipboard.setData(ClipboardData(text: text));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                            content: Text(context.tr('summaryCopied'))));
+                  },
+                  icon: const Icon(Icons.copy_rounded),
+                  label: Text(context.tr('copySummary')),
+                ),
+              ),
+              Expanded(
+                child: TextButton.icon(
+                  onPressed: () =>
+                      SharePlus.instance.share(ShareParams(text: text)),
+                  icon: const Icon(Icons.share_rounded),
+                  label: Text(context.tr('shareReport')),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -263,6 +340,16 @@ class ReportScreen extends StatelessWidget {
     );
   }
 
+  String _learnKey(String scamType) {
+    final t = scamType.toLowerCase();
+    if (t.contains('screen')) return 'learnScreen';
+    if (t.contains('otp') || t.contains('bank')) return 'learnOtp';
+    if (t.contains('police') || t.contains('arrest') || t.contains('cbi')) {
+      return 'learnBody';
+    }
+    return 'learnGeneric';
+  }
+
   Widget _learningCard(BuildContext context, Map<String, dynamic> s) {
     return GlassCard(
       borderColor: KavachColors.violet.withValues(alpha: 0.45),
@@ -283,7 +370,7 @@ class ReportScreen extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            context.tr('learnBody'),
+            context.tr(_learnKey('${s['scamType']}')),
             style: const TextStyle(
                 color: KavachColors.sub, fontSize: 14, height: 1.6),
           ),
@@ -299,6 +386,41 @@ class ReportScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _historyCard(List<Map<String, dynamic>> history) {
+    return GlassCard(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Column(
+        children: [
+          for (var i = 0; i < history.length; i++)
+            _historyRow(history[i], i == 0),
+        ],
+      ),
+    );
+  }
+
+  Widget _historyRow(Map<String, dynamic> e, bool latest) {
+    final level = _levelFrom(e['level']);
+    final color = KavachColors.forLevel(level);
+    final ts = '${e['ts'] ?? ''}';
+    final when = ts.length >= 16 ? ts.substring(0, 16) : ts;
+    return ListTile(
+      dense: true,
+      onTap: () => setState(() => _viewing = _restore(e)),
+      leading: Container(
+        width: 12,
+        height: 12,
+        decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+      ),
+      title: Text('${e['scamType'] ?? '-'}${latest ? ' •' : ''}',
+          style: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.w600)),
+      subtitle: Text(
+        '$when • ${e['risk'] ?? 0}/100${e['demo'] == true ? ' • demo' : ''}',
+        style: const TextStyle(color: KavachColors.sub, fontSize: 12.5),
+      ),
+      trailing: const Icon(Icons.chevron_right_rounded),
     );
   }
 }
