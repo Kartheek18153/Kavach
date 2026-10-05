@@ -440,6 +440,56 @@ const Map<String, Map<AppLang, String>> _strings = {
     AppLang.telugu: 'కుటుంబ సంప్రదింపు సేవ్ అయింది ',
     AppLang.hindi: 'परिवार संपर्क सहेजा ',
   },
+  'invalidName': {
+    AppLang.english: 'Enter a name (2+ letters)',
+    AppLang.telugu: 'పేరు రాయండి (2+ అక్షరాలు)',
+    AppLang.hindi: 'नाम लिखें (2+ अक्षर)',
+  },
+  'invalidPhone': {
+    AppLang.english: 'Enter a valid 10-digit mobile number',
+    AppLang.telugu: 'సరైన 10-అంకెల మొబైల్ నంబర్ రాయండి',
+    AppLang.hindi: 'सही 10 अंकों का मोबाइल नंबर लिखें',
+  },
+  'invalidSafeWord': {
+    AppLang.english: 'Use one word, 4+ letters, no spaces',
+    AppLang.telugu: 'ఒకే పదం, 4+ అక్షరాలు, ఖాళీలు వద్దు',
+    AppLang.hindi: 'एक शब्द, 4+ अक्षर, बिना स्पेस',
+  },
+  'safeWordHelp': {
+    AppLang.english: 'Pick a word only family knows, e.g. KAVACHAM. Say it on a doubt call — if they can’t say it, hang up.',
+    AppLang.telugu: 'కుటుంబానికి మాత్రమే తెలిసిన పదం ఎంచుకోండి, ఉదా. KAVACHAM. అనుమానం వస్తే అడగండి — చెప్పలేకపోతే కట్ చేయండి.',
+    AppLang.hindi: 'सिर्फ परिवार को पता शब्द चुनें, जैसे KAVACHAM। शक हो तो पूछें — न बता पाए तो काट दें।',
+  },
+  'clearContact': {
+    AppLang.english: 'Remove contact',
+    AppLang.telugu: 'సంప్రదింపు తొలగించండి',
+    AppLang.hindi: 'संपर्क हटाएं',
+  },
+  'contactCleared': {
+    AppLang.english: 'Family contact removed',
+    AppLang.telugu: 'కుటుంబ సంప్రదింపు తొలగింది',
+    AppLang.hindi: 'परिवार संपर्क हटाया',
+  },
+  'clearTitle': {
+    AppLang.english: 'Remove family contact?',
+    AppLang.telugu: 'కుటుంబ సంప్రదింపు తొలగించాలా?',
+    AppLang.hindi: 'परिवार संपर्क हटाएं?',
+  },
+  'clearBody': {
+    AppLang.english: 'Alerts and safe-word checks stop working until you save again.',
+    AppLang.telugu: 'మళ్లీ సేవ్ చేసేవరకు హెచ్చరికలు, సేఫ్ పదం పనిచేయవు.',
+    AppLang.hindi: 'दोबारा सेव करने तक अलर्ट और सेफ शब्द काम नहीं करेंगे।',
+  },
+  'cancelBtn': {
+    AppLang.english: 'Cancel',
+    AppLang.telugu: 'రద్దు',
+    AppLang.hindi: 'रद्द करें',
+  },
+  'deleteBtn': {
+    AppLang.english: 'Remove',
+    AppLang.telugu: 'తొలగించు',
+    AppLang.hindi: 'हटाएं',
+  },
   // Report
   'reportTitle': {
     AppLang.english: 'After-call report',
