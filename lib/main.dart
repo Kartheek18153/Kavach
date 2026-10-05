@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import 'demo/simulator.dart';
 import 'lang.dart';
@@ -6,9 +7,13 @@ import 'screens/family_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/live_screen.dart';
 import 'screens/report_screen.dart';
+import 'services/api.dart';
 import 'theme.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await GuardianStore.load();
+  await HistoryStore.load();
   runApp(const KavachApp());
 }
 
@@ -31,6 +36,7 @@ class _KavachAppState extends State<KavachApp> {
   void initState() {
     super.initState();
     _session = DemoSession();
+    _lastSummary = _restoreLatest();
   }
 
   @override
@@ -39,8 +45,21 @@ class _KavachAppState extends State<KavachApp> {
     super.dispose();
   }
 
-  void _protect() {
+  Future<void> _protect() async {
     setState(() => _tab = 1);
+    // Runtime mic permission for future live audio; demo runs regardless.
+    try {
+      final st = await Permission.microphone.request();
+      if (!st.isGranted && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text(
+                  'Mic denied - running demo mode. Enable mic for live detection.')),
+        );
+      }
+    } catch (_) {
+      // Permission plugin unavailable on desktop/web - continue demo.
+    }
     _session.startScam();
   }
 
@@ -51,6 +70,28 @@ class _KavachAppState extends State<KavachApp> {
       _tab = 3;
     });
     summary['label'] = '${summary['scamType']} | ${riskLabel(level, _lang)}';
+    HistoryStore.add(summary);
+  }
+
+  Map<String, dynamic>? _restoreLatest() {
+    if (HistoryStore.entries.isEmpty) return null;
+    final e = HistoryStore.entries.first;
+    return {
+      'risk': e['risk'] ?? 0,
+      'level': _levelFrom(e['level']),
+      'scamType': e['scamType'] ?? '-',
+      'reasons': List.from(e['reasons'] ?? const []),
+      'reasonsTelugu': e['reasonsTelugu'] ?? '',
+      'alerted': e['alerted'] ?? false,
+      'elapsedSec': e['elapsedSec'] ?? 0,
+      'lines': e['lines'] ?? 0,
+    };
+  }
+
+  RiskLevel _levelFrom(Object? v) {
+    if (v == 'danger') return RiskLevel.danger;
+    if (v == 'caution') return RiskLevel.caution;
+    return RiskLevel.safe;
   }
 
   String? get _lastResult {

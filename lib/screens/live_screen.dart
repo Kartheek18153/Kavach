@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../demo/simulator.dart';
 import '../lang.dart';
@@ -26,6 +27,13 @@ class _LiveScreenState extends State<LiveScreen> {
   RiskLevel _prevLevel = RiskLevel.safe;
   bool _snackedAlert = false;
   bool _overlayDismissed = false;
+  final _typed = TextEditingController();
+
+  @override
+  void dispose() {
+    _typed.dispose();
+    super.dispose();
+  }
 
   void _watchLevel(DemoState s) {
     if (s.level == RiskLevel.danger && _prevLevel != RiskLevel.danger) {
@@ -34,16 +42,6 @@ class _LiveScreenState extends State<LiveScreen> {
     }
     if (s.alerted && !_snackedAlert) {
       _snackedAlert = true;
-      // Real family alert through the backend (Telegram when configured).
-      final chatId = GuardianStore.chatId;
-      if (chatId.isNotEmpty) {
-        KavachApi.sendAlert(
-          chatId: chatId,
-          message:
-              'Kavach DANGER alert: ${s.scamType} (risk ${s.risk}/100). '
-              'Tell them to cut the call. Dial 1930 if money was shared.',
-        );
-      }
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
@@ -56,6 +54,33 @@ class _LiveScreenState extends State<LiveScreen> {
       });
     }
     _prevLevel = s.level;
+  }
+
+  Future<void> _smsFamily(DemoState s) async {    final phone = GuardianStore.phone.trim();
+    if (phone.isEmpty) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.tr('smsNoContact'))),
+      );
+      return;
+    }
+    final body = Uri.encodeComponent(
+        'Kavach DANGER: ${s.scamType} risk ${s.risk}/100. Cut the call. Dial 1930 if money shared.');
+    final uri = Uri.parse('sms:$phone?body=$body');
+    try {
+      if (await launchUrl(uri)) return;
+    } catch (_) {}
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(context.tr('smsNoContact'))),
+    );
+  }
+
+  Future<void> _submitTyped() async {
+    final t = _typed.text.trim();
+    if (t.isEmpty) return;
+    _typed.clear();
+    await widget.session.analyzeText(t);
   }
 
   Map<String, dynamic> _summary(DemoState s) => {
@@ -301,6 +326,30 @@ class _LiveScreenState extends State<LiveScreen> {
           Row(
             children: [
               Expanded(
+                child: TextField(
+                  controller: _typed,
+                  minLines: 1,
+                  maxLines: 3,
+                  textInputAction: TextInputAction.send,
+                  onSubmitted: (_) => _submitTyped(),
+                  decoration: InputDecoration(
+                    hintText: context.tr('typeWhatYouHear'),
+                    prefixIcon: const Icon(Icons.keyboard_rounded),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              IconButton.filled(
+                onPressed: _submitTyped,
+                icon: const Icon(Icons.send_rounded),
+                tooltip: 'Analyze',
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(
                 child: OutlinedButton.icon(
                   onPressed: (!s.running && s.finished) || s.lines.isNotEmpty
                       ? () {
@@ -426,6 +475,15 @@ class _LiveScreenState extends State<LiveScreen> {
                   ),
                 ),
                 const SizedBox(height: 26),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () => _smsFamily(s),
+                    icon: const Icon(Icons.sms_rounded),
+                    label: Text(context.tr('smsAlert')),
+                  ),
+                ),
+                const SizedBox(height: 10),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(

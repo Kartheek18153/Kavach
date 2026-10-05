@@ -88,6 +88,7 @@ class DemoSession extends ChangeNotifier implements ValueListenable<DemoState> {
   int _tick = 0;
   final Set<String> _seen = {};
   bool _demoScam = true;
+  String? _sessionId;
 
   /// Notifies listeners outside the build phase so timer ticks that land
   /// mid-transition (tab switches) never throw "called during build".
@@ -123,8 +124,10 @@ class DemoSession extends ChangeNotifier implements ValueListenable<DemoState> {
   ];
 
   /// Keyword groups mirroring the backend rule engine, for typed input.
+  /// KEEP IN SYNC with backend/lib/engine.dart (same names, points, words,
+  /// thresholds 31/61, hard-trigger, safe-word -20).
   static const List<(String, int, List<String>)> keywordGroups = [
-    ('authority', 20, ['cbi', 'police', 'customs', 'trai', 'rbi', 'court', 'officer', 'cbi']),
+    ('authority', 20, ['cbi', 'police', 'customs', 'trai', 'rbi', 'court', 'officer']),
     ('threat', 25, ['arrest', 'warrant', 'case', 'jail', 'legal']),
     ('secrecy', 25, ['secret', 'cheppakandi', 'cut cheyyakandi', 'disconnect']),
     ('urgency', 10, ['immediately', 'ippude', 'one hour', 'tonight', 'ventane']),
@@ -139,14 +142,33 @@ class DemoSession extends ChangeNotifier implements ValueListenable<DemoState> {
 
   void _start(List<ScriptLine> script, {required bool isScam}) {
     _timer?.cancel();
+    _endSessionFireForget();
     _script = script;
     _cursor = 0;
     _tick = 0;
     _seen.clear();
     _demoScam = isScam;
+    _sessionId = null;
     _state = const DemoState(running: true);
     _safeNotify();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) => _onTick());
+    // Open a stateful backend session when reachable; ticks fall back
+    // to local scoring until the id arrives.
+    KavachApi.startSession(isScam: isScam).then((id) {
+      if (id != null && _state.running) _sessionId = id;
+    });
+  }
+
+  void _endSessionFireForget() {
+    final id = _sessionId;
+    _sessionId = null;
+    if (id != null) KavachApi.endSession(id);
+  }
+
+  bool _safeWordHit(String text) {
+    final w = GuardianStore.safeWord.trim().toLowerCase();
+    if (w.isEmpty) return false;
+    return text.toLowerCase().contains(w);
   }
 
   void _onTick() async {
@@ -160,7 +182,36 @@ class DemoSession extends ChangeNotifier implements ValueListenable<DemoState> {
     if (_tick.isEven && _cursor < _script.length) {
       final s = _script[_cursor];
       _cursor++;
-      // Prefer backend scoring; fall back to the local rule engine.
+      // Prefer stateful backend session; then stateless; then local rules.
+      final sid = _sessionId;
+      if (sid != null) {
+        final st = await KavachApi.scoreInSession(sessionId: sid, text: s.text);
+        if (st != null) {
+          final r = (st['risk'] as num?)?.toInt() ?? _state.risk;
+          final synced = (st['reasons'] as List? ?? const []).map((e) => '$e').toList();
+          // Keep local _seen roughly in sync for offline fallback continuity.
+          _noteScriptGroups(s.text);
+          lines = [...lines, TranscriptLine(s.text, flagged: ((st['points'] as num?)?.toInt() ?? 0) > 0)];
+          risk = r;
+          final lvl = riskLevelFor(risk);
+          final doneEarly = _cursor >= _script.length;
+          _state = _state.copyWith(
+            lines: lines,
+            risk: risk,
+            level: lvl,
+            scamType: '${st['scamType'] ?? _scamType()}',
+            reasons: synced.isNotEmpty ? synced : _reasons(),
+            reasonsTelugu: '${st['reasonsTelugu'] ?? _reasonsTelugu()}',
+            alerted: (st['alerted'] == true) || _state.alerted || lvl == RiskLevel.danger,
+            running: !doneEarly,
+            finished: doneEarly,
+            elapsedSec: elapsed,
+          );
+          _safeNotify();
+          if (doneEarly) _timer?.cancel();
+          return;
+        }
+      }
       final remote = await KavachApi.scoreLine(s.text);
       int points;
       if (remote != null) {
@@ -174,6 +225,7 @@ class DemoSession extends ChangeNotifier implements ValueListenable<DemoState> {
       }
       lines = [...lines, TranscriptLine(s.text, flagged: points > 0)];
       risk = (_state.risk + points).clamp(0, 100);
+      if (_safeWordHit(s.text)) risk = (risk - 20).clamp(0, 100);
       if (_hardTriggered()) risk = risk < 85 ? 85 : risk;
     }
 
@@ -265,6 +317,27 @@ class DemoSession extends ChangeNotifier implements ValueListenable<DemoState> {
   Future<void> analyzeText(String text) async {
     final t = text.trim();
     if (t.isEmpty) return;
+    final sid = _sessionId;
+    if (sid != null) {
+      final st = await KavachApi.scoreInSession(sessionId: sid, text: t);
+      if (st != null) {
+        _noteScriptGroups(t);
+        final r = (st['risk'] as num?)?.toInt() ?? _state.risk;
+        final lvl = riskLevelFor(r);
+        _state = _state.copyWith(
+          lines: [..._state.lines,
+            TranscriptLine(t, flagged: ((st['points'] as num?)?.toInt() ?? 0) > 0)],
+          risk: r,
+          level: lvl,
+          scamType: '${st['scamType'] ?? _scamType()}',
+          reasons: ((st['reasons'] as List?) ?? const []).map((e) => '$e').toList(),
+          reasonsTelugu: '${st['reasonsTelugu'] ?? _reasonsTelugu()}',
+          alerted: (st['alerted'] == true) || _state.alerted || lvl == RiskLevel.danger,
+        );
+        _safeNotify();
+        return;
+      }
+    }
     final remote = await KavachApi.scoreLine(t);
     int gained = 0;
     if (remote != null) {
@@ -282,6 +355,7 @@ class DemoSession extends ChangeNotifier implements ValueListenable<DemoState> {
       }
     }
     var risk = (_state.risk + gained).clamp(0, 100);
+    if (_safeWordHit(t)) risk = (risk - 20).clamp(0, 100);
     if (_hardTriggered() && risk < 85) risk = 85;
     final level = riskLevelFor(risk);
     _state = _state.copyWith(
@@ -298,6 +372,7 @@ class DemoSession extends ChangeNotifier implements ValueListenable<DemoState> {
 
   void stop() {
     _timer?.cancel();
+    _endSessionFireForget();
     // Privacy: drop the live transcript the moment the call ends -
     // Kavach listens, it never records.
     _state = _state.copyWith(
@@ -307,6 +382,7 @@ class DemoSession extends ChangeNotifier implements ValueListenable<DemoState> {
 
   void reset() {
     _timer?.cancel();
+    _endSessionFireForget();
     _seen.clear();
     _state = const DemoState();
     _safeNotify();
@@ -315,6 +391,7 @@ class DemoSession extends ChangeNotifier implements ValueListenable<DemoState> {
   @override
   void dispose() {
     _timer?.cancel();
+    _endSessionFireForget();
     super.dispose();
   }
 }
