@@ -1,17 +1,42 @@
-# kavach
+# Kavach — Scam Call Shield
 
-A new Flutter project.
+Telugu-first live scam-call protection (Flutter + Dart Shelf backend).
+Listens with you on speaker, scores fraud patterns live, warns on danger.
 
-## Getting Started
+## Features
+- Home / Live / Family / Report flow with EN/TE/HI
+- Live danger meter (Safe 0-30 / Caution 31-60 / Danger 61+), waveform, transcript
+- Rule engine: authority/threat/secrecy/urgency/sensitive/remote/money + hard-trigger + safe-word -20
+- Stateful backend sessions with offline local fallback
+- Family: guardian name/phone/safe-word (persisted), SMS alert via `sms:` intent
+- Report: tap to dial 1930, open cybercrime.gov.in, copy summary, call history (last 20)
+- Privacy: no recording, transcript cleared on hang-up
 
-This project is a starting point for a Flutter application.
+## Run app
+```sh
+flutter pub get
+flutter run
+# Android emulator -> local backend:
+flutter run --dart-define=KAVACH_API=http://10.0.2.2:8080
+# Real device (same Wi-Fi, use PC LAN IP):
+flutter run --dart-define=KAVACH_API=http://192.168.1.10:8080
+```
 
-A few resources to get you started if this is your first Flutter project:
+## Run backend
+```sh
+cd backend
+dart pub get
+dart run bin/server.dart
+```
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+## API
+- `GET /health`
+- `POST /api/session/start` `{"mode":"scam"|"normal"}`
+- `POST /api/score` `{"sessionId":"...","text":"...","safeWord":"..."}`
+- `POST /api/session/end` `{"sessionId":"..."}`
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Tests
+```sh
+flutter test
+cd backend && dart test
+```
