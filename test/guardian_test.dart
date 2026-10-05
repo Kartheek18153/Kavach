@@ -1,4 +1,7 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:kavach/lang.dart';
+import 'package:kavach/screens/home_screen.dart';
 import 'package:kavach/services/api.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -117,6 +120,75 @@ void main() {
       await HistoryStore.load();
       expect(HistoryStore.entries, hasLength(20));
       expect(HistoryStore.entries.first['scamType'], 'Type 21');
+    });
+  });
+
+  group('memory', () {
+    test('scoreboard counts live dangers this month only', () {
+      final m = DateTime.now().toIso8601String().substring(0, 7);
+      HistoryStore.entries = <Map<String, dynamic>>[
+        {'ts': '$m-10T10:00:00', 'level': 'danger', 'risk': 92},
+        {
+          'ts': '$m-11T10:00:00',
+          'level': 'danger',
+          'risk': 70,
+          'demo': true
+        },
+        {'ts': '$m-12T10:00:00', 'level': 'caution', 'risk': 40},
+        {
+          'ts': '2000-01-01T00:00:00',
+          'level': 'danger',
+          'risk': 100,
+        },
+      ];
+      expect(HistoryStore.monthDangers, 1);
+      expect(HistoryStore.monthWorst, 92);
+      HistoryStore.entries = [];
+      expect(HistoryStore.monthDangers, 0);
+      expect(HistoryStore.monthWorst, 0);
+    });
+
+    testWidgets('first-run hint shows when empty', (t) async {
+      HistoryStore.entries = [];
+      await t.pumpWidget(LangScope(
+        lang: AppLang.english,
+        onLang: (_) {},
+        child: MaterialApp(
+          home: HomeScreen(
+            onProtect: () {},
+            onPractice: () {},
+            onSetupFamily: () {},
+            onViewReport: () {},
+            familySet: false,
+          ),
+        ),
+      ));
+      expect(find.text('Start in 2 minutes'), findsOneWidget);
+      expect(find.text('Practice demo'), findsOneWidget);
+    });
+
+    testWidgets('memory card hides first-run when connected', (t) async {
+      HistoryStore.entries = [];
+      await t.pumpWidget(LangScope(
+        lang: AppLang.english,
+        onLang: (_) {},
+        child: MaterialApp(
+          home: HomeScreen(
+            onProtect: () {},
+            onPractice: () {},
+            onSetupFamily: () {},
+            onViewReport: () {},
+            familySet: true,
+          ),
+        ),
+      ));
+      expect(find.text('Start in 2 minutes'), findsNothing);
+      await t.dragUntilVisible(
+        find.text('Your protection'),
+        find.byType(ListView),
+        const Offset(0, -200),
+      );
+      expect(find.text('Your protection'), findsOneWidget);
     });
   });
 }
