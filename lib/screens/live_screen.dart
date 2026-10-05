@@ -26,7 +26,9 @@ class LiveScreen extends StatefulWidget {
 
 class _LiveScreenState extends State<LiveScreen> {
   RiskLevel _prevLevel = RiskLevel.safe;
+  bool _prevRunning = false;
   bool _snackedAlert = false;
+  bool _smsOpened = false;
   bool _overlayDismissed = false;
   String? _dismissedSig;
   final _typed = TextEditingController();
@@ -71,6 +73,8 @@ class _LiveScreenState extends State<LiveScreen> {
       });
     }
     _prevLevel = s.level;
+    if (s.running && !_prevRunning) _smsOpened = false;
+    _prevRunning = s.running;
   }
 
   /// Loops the alarm beep while the red overlay is up, stops otherwise.
@@ -108,7 +112,10 @@ class _LiveScreenState extends State<LiveScreen> {
         context.trP('smsDangerBody', {'type': s.scamType, 'risk': '${s.risk}'}));
     final uri = Uri.parse('sms:$phone?body=$body');
     try {
-      if (await launchUrl(uri)) return;
+      if (await launchUrl(uri)) {
+        _smsOpened = true;
+        return;
+      }
     } catch (_) {}
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
@@ -132,6 +139,8 @@ class _LiveScreenState extends State<LiveScreen> {
         'alerted': s.alerted,
         'elapsedSec': s.elapsedSec,
         'lines': s.lines.length,
+        'isDemo': s.isDemo,
+        'smsSent': _smsOpened,
       };
 
   @override
