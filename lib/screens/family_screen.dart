@@ -5,7 +5,7 @@ import '../services/api.dart';
 import '../theme.dart';
 import '../widgets/cards.dart';
 
-/// Family contact setup: guardian number, Telegram link, safe word.
+/// Family contact setup: guardian number, safe word.
 class FamilyScreen extends StatefulWidget {
   final VoidCallback onSaved;
   const FamilyScreen({super.key, required this.onSaved});
@@ -15,16 +15,14 @@ class FamilyScreen extends StatefulWidget {
 }
 
 class _FamilyScreenState extends State<FamilyScreen> {
-  final _name = TextEditingController(text: '');
-  final _phone = TextEditingController(text: '');
-  final _chatId = TextEditingController(text: '');
-  final _safeWord = TextEditingController(text: '');
+  final _name = TextEditingController(text: GuardianStore.name);
+  final _phone = TextEditingController(text: GuardianStore.phone);
+  final _safeWord = TextEditingController(text: GuardianStore.safeWord);
 
   @override
   void dispose() {
     _name.dispose();
     _phone.dispose();
-    _chatId.dispose();
     _safeWord.dispose();
     super.dispose();
   }
@@ -91,52 +89,6 @@ class _FamilyScreenState extends State<FamilyScreen> {
             ),
           ),
           const SizedBox(height: 14),
-          SectionTitle(context.tr('telegramTitle')),
-          GlassCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  context.tr('telegramSteps'),
-                  style: const TextStyle(
-                      color: KavachColors.sub, fontSize: 13.5, height: 1.7),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: _chatId,
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                    labelText: context.tr('chatIdLabel'),
-                    prefixIcon: const Icon(Icons.send_rounded),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton.icon(
-                    onPressed: () async {
-                      final res = await KavachApi.sendAlert(
-                        chatId: _chatId.text.trim(),
-                        message:
-                            'Kavach test alert: family notifications work. Reply STOP to opt out.',
-                      );
-                      if (!context.mounted) return;
-                      final live = res['sent'] == true &&
-                          res['via'] == 'telegram';
-                      ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                              content: Text(context.tr(live
-                                  ? 'testSentLive'
-                                  : 'testSentDemo'))));
-                    },
-                    icon: const Icon(Icons.bolt_rounded),
-                    label: Text(context.tr('sendTest')),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 14),
           SectionTitle(context.tr('safeWordTitle')),
           GlassCard(
             child: Column(
@@ -163,14 +115,15 @@ class _FamilyScreenState extends State<FamilyScreen> {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: () {
-                widget.onSaved();
+              onPressed: () async {
                 GuardianStore.name = _name.text.trim();
                 GuardianStore.phone = _phone.text.trim();
-                GuardianStore.chatId = _chatId.text.trim();
+                GuardianStore.safeWord = _safeWord.text.trim();
+                await GuardianStore.save();
+                widget.onSaved();
+                if (!context.mounted) return;
                 ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                        content: Text(context.tr('contactSaved'))));
+                    SnackBar(content: Text(context.tr('contactSaved'))));
               },
               child: Text(context.tr('saveContact')),
             ),

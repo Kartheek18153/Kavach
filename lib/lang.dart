@@ -370,6 +370,21 @@ const Map<String, Map<AppLang, String>> _strings = {
     AppLang.telugu: 'కుటుంబానికి తెలిసింది ',
     AppLang.hindi: 'परिवार सूचित ',
   },
+  'smsAlert': {
+    AppLang.english: 'Alert family via SMS',
+    AppLang.telugu: 'కుటుంబానికి SMS చేయండి',
+    AppLang.hindi: 'परिवार को SMS करें',
+  },
+  'smsNoContact': {
+    AppLang.english: 'Set family contact first',
+    AppLang.telugu: 'ముందు కుటుంబ సంప్రదింపు సెట్ చేయండి',
+    AppLang.hindi: 'पहले परिवार संपर्क सेट करें',
+  },
+  'typeWhatYouHear': {
+    AppLang.english: 'Type what you hear...',
+    AppLang.telugu: 'మీరు విన్నది టైప్ చేయండి...',
+    AppLang.hindi: 'जो सुन रहे हैं लिखें...',
+  },
   // Family
   'familyTitle': {
     AppLang.english: 'Family alert',
@@ -397,44 +412,6 @@ const Map<String, Map<AppLang, String>> _strings = {
     AppLang.english: 'Phone number',
     AppLang.telugu: 'ఫోన్ నంబర్',
     AppLang.hindi: 'फोन नंबर',
-  },
-  'telegramTitle': {
-    AppLang.english: 'Telegram alert (free, instant)',
-    AppLang.telugu: 'టెలిగ్రామ్ హెచ్చరిక (ఉచితం, వెంటనే)',
-    AppLang.hindi: 'टेलीग्राम अलर्ट (मुफ्त, तुरंत)',
-  },
-  'telegramSteps': {
-    AppLang.english:
-        '1. Create a bot with BotFather\n2. Ask the family member to open it and press Start\n3. Paste their chat ID here',
-    AppLang.telugu:
-        '1. BotFather tho bot create cheyyandi\n2. Family member bot ni open chesi Start nokkandi\n3. Valla chat ID ikkada paste cheyyandi',
-    AppLang.hindi:
-        '1. BotFather से बॉट बनाएं\n2. परिवार सदस्य से उसे खोलकर Start दबाने को कहें\n3. उनका चैट ID यहां चिपकाएं',
-  },
-  'chatIdLabel': {
-    AppLang.english: 'Telegram chat ID',
-    AppLang.telugu: 'టెలిగ్రామ్ చాట్ ID',
-    AppLang.hindi: 'टेलीग्राम चैट ID',
-  },
-  'sendTest': {
-    AppLang.english: 'Send test alert',
-    AppLang.telugu: 'టెస్ట్ హెచ్చరిక పంపండి',
-    AppLang.hindi: 'टेस्ट अलर्ट भेजें',
-  },
-  'testSent': {
-    AppLang.english: 'Demo test alert sent to family',
-    AppLang.telugu: 'కుటుంబానికి టెస్ట్ హెచ్చరిక పంపాం',
-    AppLang.hindi: 'परिवार को डेमो टेस्ट अलर्ट भेजा',
-  },
-  'testSentLive': {
-    AppLang.english: 'Test alert delivered on Telegram',
-    AppLang.telugu: 'టెలిగ్రామ్‌లో టెస్ట్ హెచ్చరిక అందింది',
-    AppLang.hindi: 'टेलीग्राम पर टेस्ट अलर्ट पहुंचा',
-  },
-  'testSentDemo': {
-    AppLang.english: 'Backend or bot token missing - alert in demo log',
-    AppLang.telugu: 'బ్యాకెండ్ లేదా బాట్ టోకెన్ లేదు - హెచ్చరిక డెమో లాగ్‌లో ఉంది',
-    AppLang.hindi: 'बैकेंड या बॉट टोकन नहीं - अलर्ट डेमो लॉग में',
   },
   'safeWordTitle': {
     AppLang.english: 'Family safe word (stretch)',
