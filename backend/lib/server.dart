@@ -4,7 +4,6 @@ import 'dart:math';
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 
-import 'alerts.dart';
 import 'engine.dart';
 
 /// In-memory scoring session: accumulates seen groups and risk.
@@ -40,6 +39,34 @@ String _newId() {
   return base64UrlEncode(bytes).replaceAll('=', '');
 }
 
+/// Removes sessions older than [maxAge] and caps the map at [maxSessions]
+/// by evicting oldest first. Returns number removed.
+int pruneSessions(
+  Map<String, ScoringSession> sessions, {
+  Duration maxAge = const Duration(minutes: 30),
+  int maxSessions = 500,
+}) {
+  final now = DateTime.now();
+  final expired = sessions.entries
+      .where((e) => now.difference(e.value.startedAt) >= maxAge)
+      .map((e) => e.key)
+      .toList();
+  for (final k in expired) {
+    sessions.remove(k);
+  }
+  var removed = expired.length;
+  if (sessions.length > maxSessions) {
+    final sorted = sessions.entries.toList()
+      ..sort((a, b) => a.value.startedAt.compareTo(b.value.startedAt));
+    final overflow = sessions.length - maxSessions;
+    for (var i = 0; i < overflow; i++) {
+      sessions.remove(sorted[i].key);
+      removed++;
+    }
+  }
+  return removed;
+}
+
 Response _json(Object body, {int status = 200}) => Response(
       status,
       body: jsonEncode(body),
@@ -57,7 +84,6 @@ Future<Map<String, dynamic>> _readJson(Request req) async {
 /// Builds the API router. [sessions] is shared mutable state.
 Router buildRouter(
   Map<String, ScoringSession> sessions,
-  AlertDispatcher alerts,
 ) {
   final router = Router();
 
@@ -66,7 +92,6 @@ Router buildRouter(
       'ok': true,
       'service': 'kavach-backend',
       'sessions': sessions.length,
-      'telegram': alerts.configured,
     });
   });
 
@@ -81,13 +106,15 @@ Router buildRouter(
   });
 
   // Score one transcript line inside a session.
-  // {"sessionId": "...", "text": "..."} — omit sessionId for stateless.
+  // {"sessionId": "...", "text": "...", "safeWord": "..."} — omit sessionId for stateless.
   router.post('/api/score', (Request req) async {
     final body = await _readJson(req);
     final text = (body['text'] as String? ?? '').trim();
     if (text.isEmpty) {
       return _json({'error': 'text is required'}, status: 400);
     }
+    final safeWord = (body['safeWord'] as String? ?? '').trim();
+    final discount = safeWordBonus(text, safeWord);
     final sessionId = body['sessionId'] as String?;
     final session =
         sessionId == null ? null : sessions[sessionId];
@@ -101,14 +128,15 @@ Router buildRouter(
       gained += points;
     }
     if (session == null) {
+      final net = (gained - discount).clamp(0, 100);
       return _json({
-        'points': gained,
+        'points': net,
         'groups': matchGroups(text, <String>{})
             .map((g) => g.$1)
             .toList(growable: false),
       });
     }
-    var risk = (session.risk + gained).clamp(0, 100);
+    var risk = (session.risk + gained - discount).clamp(0, 100);
     if (hardTriggered(seen) && risk < 85) risk = 85;
     session.risk = risk;
     session.lines += 1;
@@ -135,16 +163,6 @@ Router buildRouter(
           .difference(session.startedAt)
           .inSeconds,
     });
-  });
-
-  // Family alert: {"chatId": "...", "message": "..."}.
-  router.post('/api/alert', (Request req) async {
-    final body = await _readJson(req);
-    final result = await alerts.sendAlert(
-      chatId: (body['chatId'] as String? ?? '').trim(),
-      message: (body['message'] as String? ?? '').trim(),
-    );
-    return _json(result);
   });
 
   return router;

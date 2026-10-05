@@ -1,6 +1,6 @@
 /// Rule engine ported from the Flutter demo simulator.
-/// Scores transcript lines against keyword groups mirroring the
-/// production rule engine, and derives risk level, scam type and reasons.
+/// KEEP IN SYNC with lib/demo/simulator.dart (same groups, points,
+/// thresholds 31/61, hard-trigger, safe-word -20).
 library;
 
 /// One keyword group: name, danger points, trigger words.
@@ -61,6 +61,13 @@ List<(String, int)> matchGroups(String text, Set<String> seen) {
     }
   }
   return out;
+}
+
+/// Safe-word discount: trusted family word lowers risk by 20.
+int safeWordBonus(String text, String safeWord) {
+  final w = safeWord.trim().toLowerCase();
+  if (w.isEmpty) return 0;
+  return text.toLowerCase().contains(w) ? 20 : 0;
 }
 
 /// Hard-trigger rule: authority + sensitive/money, or secrecy + money.

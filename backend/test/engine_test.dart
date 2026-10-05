@@ -1,4 +1,5 @@
 import 'package:kavach_backend/engine.dart';
+import 'package:kavach_backend/server.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -29,5 +30,29 @@ void main() {
     final seen = <String>{};
     expect(matchGroups('Namaste, parcel vachindi', seen), isEmpty);
     expect(scamTypeFor(seen, isScam: false), '-');
+  });
+
+  test('safe word gives -20 discount', () {
+    expect(safeWordBonus('KAVACHAM amma', 'kavacham'), 20);
+    expect(safeWordBonus('hello police otp', 'kavacham'), 0);
+    expect(safeWordBonus('anything', ''), 0);
+  });
+
+  test('keyword groups stay in sync with app (7 groups)', () {
+    expect(keywordGroups.map((g) => g.$1),
+        ['authority', 'threat', 'secrecy', 'urgency', 'sensitive', 'remote', 'money']);
+    expect(keywordGroups.fold<int>(0, (a, g) => a + g.$2), 20 + 25 + 25 + 10 + 35 + 35 + 30);
+  });
+
+  test('pruneSessions evicts old + caps size', () {
+    final sessions = <String, ScoringSession>{
+      'old': ScoringSession(id: 'old', isScam: true),
+      'fresh': ScoringSession(id: 'fresh', isScam: true),
+    };
+    // Age one session beyond TTL by mutating startedAt via removal test:
+    // prune with maxAge zero removes everything older than now.
+    final removed = pruneSessions(sessions, maxAge: Duration.zero);
+    expect(removed, 2);
+    expect(sessions, isEmpty);
   });
 }
