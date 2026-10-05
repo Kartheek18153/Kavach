@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../lang.dart';
 import '../theme.dart';
@@ -137,6 +138,37 @@ class ReportScreen extends StatelessWidget {
     );
   }
 
+  Future<void> _dial1930(BuildContext context) async {
+    final uri = Uri(scheme: 'tel', path: '1930');
+    try {
+      if (await launchUrl(uri)) return;
+    } catch (_) {
+      // Fall through to clipboard fallback.
+    }
+    if (!context.mounted) return;
+    await Clipboard.setData(const ClipboardData(text: '1930'));
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.tr('copied1930'))));
+  }
+
+  Future<void> _openPortal(BuildContext context) async {
+    final uri = Uri.parse('https://cybercrime.gov.in');
+    try {
+      if (await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+        return;
+      }
+    } catch (_) {
+      // Fall through to clipboard fallback.
+    }
+    if (!context.mounted) return;
+    await Clipboard.setData(
+        const ClipboardData(text: 'https://cybercrime.gov.in'));
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.tr('portalCopied'))));
+  }
+
   Widget _reportHelper(BuildContext context, Map<String, dynamic> s) {
     final text =
         'Kavach report - ${DateTime.now().toLocal().toString().substring(0, 16)}\nType: ${s['scamType']}\nRisk: ${s['risk']}/100\nReasons: ${(s['reasons'] as List).join('; ')}';
@@ -147,14 +179,7 @@ class ReportScreen extends StatelessWidget {
             children: [
               Expanded(
                 child: ElevatedButton.icon(
-                  onPressed: () {
-                    Clipboard.setData(
-                        const ClipboardData(text: '1930'));
-                    ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                            content:
-                                Text(context.tr('copied1930'))));
-                  },
+                  onPressed: () => _dial1930(context),
                   style: ElevatedButton.styleFrom(
                     backgroundColor:
                         KavachColors.danger.withValues(alpha: 0.9),
@@ -167,14 +192,7 @@ class ReportScreen extends StatelessWidget {
               const SizedBox(width: 10),
               Expanded(
                 child: OutlinedButton.icon(
-                  onPressed: () {
-                    Clipboard.setData(const ClipboardData(
-                        text: 'https://cybercrime.gov.in'));
-                    ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                            content:
-                                Text(context.tr('portalCopied'))));
-                  },
+                  onPressed: () => _openPortal(context),
                   icon: const Icon(Icons.open_in_new_rounded),
                   label: Text(context.tr('cyberPortal')),
                 ),
