@@ -23,12 +23,47 @@ class GuardianStore {
     safeWord = prefs.getString(_keySafeWord) ?? '';
   }
 
-  /// Saves all guardian fields to disk.
+  /// Saves all guardian fields to disk (phone stored normalized).
   static Future<void> save() async {
+    phone = normalizePhone(phone);
+    safeWord = safeWord.trim().toUpperCase();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_keyName, name);
     await prefs.setString(_keyPhone, phone);
     await prefs.setString(_keySafeWord, safeWord);
+  }
+
+  /// True when a usable family contact exists (survives restarts).
+  static bool get isConnected =>
+      isValidName(name) && isValidPhone(phone);
+
+  /// Strips spaces/dashes, drops leading +91/91/0. Returns 10 digits or ''.
+  static String normalizePhone(String raw) {
+    var d = raw.replaceAll(RegExp(r'\D'), '');
+    if (d.length == 12 && d.startsWith('91')) d = d.substring(2);
+    if (d.length == 11 && d.startsWith('0')) d = d.substring(1);
+    return d;
+  }
+
+  /// Valid Indian mobile: 10 digits starting 6-9.
+  static bool isValidPhone(String raw) {
+    final d = normalizePhone(raw);
+    return d.length == 10 && RegExp(r'^[6-9]').hasMatch(d);
+  }
+
+  /// Pretty display: '+91 98765 43210' for stored 10-digit numbers.
+  static String displayPhone(String stored) {
+    final d = normalizePhone(stored);
+    if (d.length != 10) return stored;
+    return '+91 ${d.substring(0, 5)} ${d.substring(5)}';
+  }
+
+  static bool isValidName(String v) => v.trim().length >= 2;
+
+  /// One word, 4+ letters — easy to say on a call, hard to guess.
+  static bool isValidSafeWord(String v) {
+    final t = v.trim();
+    return t.length >= 4 && !t.contains(RegExp(r'\s'));
   }
 
   /// Clears all persisted data.
