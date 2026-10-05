@@ -61,8 +61,11 @@ it straight to WhatsApp/family/police. Below sits the list of your
 past scans — tap any to re-open it.
 
 ### 7. Next time
-The app remembers your last 20 checks and your family details, so next
-time a suspicious call comes, you just tap Protect again.
+Home greets you with a protection scoreboard (live scams caught this
+month, worst risk) and a tappable last-scan card that jumps to its
+report. Fresh installs get a 2-minute starter card: set up family, then
+practice with a demo. Past scans can be cleared with one confirm. So
+next time a suspicious call comes, you just tap Protect again.
 
 The whole loop: set family once → tap Protect on speaker →
 watch the meter → hang up on red → get help from the report.
@@ -143,6 +146,17 @@ watch the meter → hang up on red → get help from the report.
 - Honest verdict line: live-vs-demo origin + SMS sent vs not.
 - Test: history keeps latest 20 newest-first, survives reload.
 
+### Step 7 — Memory for next time (BUILT, tested)
+- Home scoreboard: live scams caught this month (demos excluded) +
+  worst monthly risk, pure local math over stored history.
+- Tappable last-scan card jumps to its report; practice-demo entry
+  point and family-setup shortcut on Home; first-run starter card only
+  on fresh installs (no family + no scans).
+- Clear-history with confirm on the Report tab; also clears the
+  in-memory latest so Home never shows a ghost.
+- Tests: scoreboard counts live-this-month only, first-run card
+  shows/hides correctly.
+
 ### Key Q&A decisions recorded
 - **AI or not:** decided NO. Scammer controls the transcript (spoken
   prompt-injection), cloud AI breaks the never-uploads promise, needs
@@ -191,17 +205,18 @@ watch the meter → hang up on red → get help from the report.
   (clipboard fallback), copyable + shareable summary, per-scam learning,
   past-scans browser, checklist.
 - **History:** last 20 reports persisted with origin + SMS flag, last
-  result restored on launch, browsable from the Report tab.
+  result restored on launch, browsable + clearable from the Report tab.
+- **Home memory:** monthly scoreboard (live dangers, worst risk),
+  tappable last scan, first-run starter card.
 - **Permissions:** mic requested on Protect (runs regardless);
   Android mic/phone-state declarations + iOS mic strings present.
 - **Privacy:** no recording; transcript cleared on hang-up.
-- **Tests:** app 16/16 green, backend 9/9 green; both analyzers clean.
+- **Tests:** app 19/19 green, backend 9/9 green; both analyzers clean.
 
 ## Still manual / future
 Mic streaming (typed fallback only); SMS needs the user tapping Send;
-Step-2 call detection + speaker check unbuilt; no call-history screen
-(only last result shown); stock icon/splash/version. iOS can never
-auto-detect calls.
+Step-2 call detection + speaker check unbuilt; stock icon/splash/version.
+iOS can never auto-detect calls.
 
 ## Build log (one commit at a time)
 1. `f6a7214` Remove Telegram alerts from backend
@@ -219,4 +234,6 @@ auto-detect calls.
 12. `92bc7b2` WORKFLOW.md full picture (v1)
 13. `1ee1ea3` Step 5 red-alert overhaul + `74dc3ff` WORKFLOW v2 (pushed)
 14. Step 6 (report history, per-scam learning, share, honest details) —
-    code pushed; doc update here.
+    6 commits, code pushed.
+15. Step 7 (scoreboard, tappable last scan, clear history, first-run) —
+    5 commits, code pushed; doc update here.
