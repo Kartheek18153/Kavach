@@ -86,6 +86,8 @@ class _KavachAppState extends State<KavachApp> {
       'alerted': e['alerted'] ?? false,
       'elapsedSec': e['elapsedSec'] ?? 0,
       'lines': e['lines'] ?? 0,
+      'isDemo': e['demo'] ?? false,
+      'smsSent': e['smsSent'] ?? false,
     };
   }
 

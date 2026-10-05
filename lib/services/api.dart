@@ -107,6 +107,8 @@ class HistoryStore {
       'alerted': summary['alerted'] == true,
       'elapsedSec': (summary['elapsedSec'] as num? ?? 0).toInt(),
       'lines': (summary['lines'] as num? ?? 0).toInt(),
+      'demo': summary['isDemo'] == true,
+      'smsSent': summary['smsSent'] == true,
     };
     entries = [entry, ...entries].take(20).toList();
     final prefs = await SharedPreferences.getInstance();
