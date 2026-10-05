@@ -50,11 +50,15 @@ banner says "warn your family now," honestly.
 
 ### 6. After the call
 You land on the Report screen. It shows what kind of scam it was, the
-danger score, and why it was flagged. It gives you a safety list
-(never share OTP, never install such apps, never send money on a call).
+danger score, and why it was flagged — plus whether this was a live
+call or a practice demo, and whether the family SMS actually went out.
+It gives you a safety list (never share OTP, never install such apps,
+never send money on a call). The "how this scam works" card matches
+the actual scam type (digital-arrest, screen-share, or OTP fraud).
 If money was involved, one tap calls 1930 (the fraud helpline) and
-another opens the cybercrime website. You can copy the whole report to
-share with family or police.
+another opens the cybercrime website. You can copy the report or share
+it straight to WhatsApp/family/police. Below sits the list of your
+past scans — tap any to re-open it.
 
 ### 7. Next time
 The app remembers your last 20 checks and your family details, so next
@@ -130,6 +134,15 @@ watch the meter → hang up on red → get help from the report.
   language, hang-up stops sound instantly, offline/airplane still
   works via local engine.
 
+### Step 6 — After-call report + 1930 help (BUILT, tested)
+- Past-scans list on the Report tab (tap any to re-open, Latest button
+  to return); history persists demo origin + SMS flag.
+- Learning card matches the scam type (arrest / screen-share / OTP /
+  generic fallback), EN/TE/HI.
+- Share sheet (`share_plus`) next to Copy for WhatsApp/family/police.
+- Honest verdict line: live-vs-demo origin + SMS sent vs not.
+- Test: history keeps latest 20 newest-first, survives reload.
+
 ### Key Q&A decisions recorded
 - **AI or not:** decided NO. Scammer controls the transcript (spoken
   prompt-injection), cloud AI breaks the never-uploads promise, needs
@@ -175,8 +188,10 @@ watch the meter → hang up on red → get help from the report.
   localized SMS, re-alert on new tricks, honest wording, private
   transcript wipe on hang-up.
 - **Report:** tap-to-dial `tel:1930`, external cybercrime portal link
-  (clipboard fallback), copyable summary, checklist, learning card.
-- **History:** last 20 reports persisted, last result restored on launch.
+  (clipboard fallback), copyable + shareable summary, per-scam learning,
+  past-scans browser, checklist.
+- **History:** last 20 reports persisted with origin + SMS flag, last
+  result restored on launch, browsable from the Report tab.
 - **Permissions:** mic requested on Protect (runs regardless);
   Android mic/phone-state declarations + iOS mic strings present.
 - **Privacy:** no recording; transcript cleared on hang-up.
@@ -202,5 +217,6 @@ auto-detect calls.
 10. `02971ac` Step 3: real-mode LIVE session + DEMO badge
 11. `0ca99dc` Step 4: backend boundaries + repeats
 12. `92bc7b2` WORKFLOW.md full picture (v1)
-+ Uncommitted: Step-1 hardening is committed; Step-3/4/5 builds
-  (real mode, boundaries, red-alert overhaul) await one-by-one commits.
+13. `1ee1ea3` Step 5 red-alert overhaul + `74dc3ff` WORKFLOW v2 (pushed)
+14. Step 6 (report history, per-scam learning, share, honest details) —
+    code pushed; doc update here.
