@@ -34,16 +34,21 @@ void main() {
     s.dispose();
   });
 
-  test('whole words only, repeats escalate', () async {
+  test('whole words only, repeats dedup, new tactics add up', () async {
     final s = DemoSession();
     s.startReal();
     await s.analyzeText('my spinning wheel is fine');
     expect(s.state.risk, 0);
     expect(s.state.lines.single.flagged, isFalse);
-    await s.analyzeText('do it immediately');
-    expect(s.state.risk, 10);
-    await s.analyzeText('hurry, immediately!');
-    expect(s.state.risk, 15);
+    await s.analyzeText('take immediate action now');
+    final first = s.state.risk;
+    expect(first, greaterThan(0));
+    // Same span twice: deduped, score does not climb.
+    await s.analyzeText('hurry, take immediate action!');
+    expect(s.state.risk, first);
+    // A new tactic family on top raises the score.
+    await s.analyzeText('I am calling from the CBI office');
+    expect(s.state.risk, greaterThan(first));
     s.dispose();
   });
 }

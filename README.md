@@ -6,7 +6,10 @@ Listens with you on speaker, scores fraud patterns live, warns on danger.
 ## Features
 - Home / Live / Family / Report flow with EN/TE/HI
 - Live danger meter (Safe 0-30 / Caution 31-60 / Danger 61+), waveform, transcript
-- Rule engine: authority/threat/secrecy/urgency/sensitive/remote/money + hard-trigger + safe-word -20
+- Rule engine: Tier-1 tactic engine (ported from KAVACH_IQOO, Apache-2.0) —
+  5 tactic families, 180 trilingual markers (EN/Hinglish/Devanagari),
+  40 negative guards, decay + diversity rule; danger needs 3+ families.
+- Corpus-tested: 10 scam scripts reach Danger, 8 legit calls stay silent.
 - Stateful backend sessions with offline local fallback
 - Family: guardian name/phone/safe-word (persisted), SMS alert via `sms:` intent
 - Report: tap to dial 1930, open cybercrime.gov.in, copy summary, call history (last 20)

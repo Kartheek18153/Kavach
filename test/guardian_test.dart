@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kavach/lang.dart';
-import 'package:kavach/screens/home_screen.dart';
+import 'package:kavach/screens/dashboard_screen.dart';
 import 'package:kavach/services/api.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -148,13 +148,13 @@ void main() {
       expect(HistoryStore.monthWorst, 0);
     });
 
-    testWidgets('first-run hint shows when empty', (t) async {
+    testWidgets('dashboard shows shield and protect when empty', (t) async {
       HistoryStore.entries = [];
       await t.pumpWidget(LangScope(
         lang: AppLang.english,
         onLang: (_) {},
         child: MaterialApp(
-          home: HomeScreen(
+          home: DashboardScreen(
             onProtect: () {},
             onPractice: () {},
             onSetupFamily: () {},
@@ -163,17 +163,23 @@ void main() {
           ),
         ),
       ));
-      expect(find.text('Start in 2 minutes'), findsOneWidget);
-      expect(find.text('Practice demo'), findsOneWidget);
+      expect(find.text('Security shield'), findsOneWidget);
+      expect(find.text('Protect this call'), findsOneWidget);
+      await t.dragUntilVisible(
+        find.text('Safety tools'),
+        find.byType(ListView),
+        const Offset(0, -200),
+      );
+      expect(find.text('Safety tools'), findsOneWidget);
     });
 
-    testWidgets('memory card hides first-run when connected', (t) async {
+    testWidgets('dashboard shows connected family badge', (t) async {
       HistoryStore.entries = [];
       await t.pumpWidget(LangScope(
         lang: AppLang.english,
         onLang: (_) {},
         child: MaterialApp(
-          home: HomeScreen(
+          home: DashboardScreen(
             onProtect: () {},
             onPractice: () {},
             onSetupFamily: () {},
@@ -182,13 +188,19 @@ void main() {
           ),
         ),
       ));
-      expect(find.text('Start in 2 minutes'), findsNothing);
+      expect(find.text('Security shield'), findsOneWidget);
       await t.dragUntilVisible(
-        find.text('Your protection'),
+        find.text('Connected '),
         find.byType(ListView),
         const Offset(0, -200),
       );
-      expect(find.text('Your protection'), findsOneWidget);
+      expect(find.text('Connected '), findsOneWidget);
+      await t.dragUntilVisible(
+        find.text('Recent activity'),
+        find.byType(ListView),
+        const Offset(0, -200),
+      );
+      expect(find.text('Recent activity'), findsOneWidget);
     });
   });
 }

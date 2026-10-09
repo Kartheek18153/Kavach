@@ -5,19 +5,22 @@ import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 
 import 'engine.dart';
+import 'tactic_engine.dart' as te;
 
-/// In-memory scoring session: accumulates seen groups and risk.
+/// In-memory scoring session: Tier-1 tactic engine over the transcript.
 class ScoringSession {
   ScoringSession({required this.id, required this.isScam});
 
   final String id;
   final bool isScam;
+  final te.TacticSession tactics = te.TacticSession();
   final Set<String> seen = {};
   int risk = 0;
   bool alerted = false;
   int lines = 0;
-  int repeatBonus = 0;
   final DateTime startedAt = DateTime.now();
+
+  int _nowMs() => DateTime.now().difference(startedAt).inMilliseconds;
 
   Map<String, Object> state() {
     final level = riskLevelFor(risk);
@@ -122,39 +125,26 @@ Router buildRouter(
     if (sessionId != null && session == null) {
       return _json({'error': 'unknown sessionId'}, status: 404);
     }
-    final seen = session?.seen ?? <String>{};
-    final wasSeen = Set<String>.of(seen);
-    var gained = 0;
-    for (final (name, points) in matchGroups(text, seen)) {
-      seen.add(name);
-      gained += points;
-    }
-    var repeated = 0;
-    if (session != null) {
-      final room = 20 - session.repeatBonus;
-      if (room > 0) {
-        repeated = repeatBonusFor(text, wasSeen);
-        if (repeated > room) repeated = room;
-        session.repeatBonus += repeated;
-      }
-    }
     if (session == null) {
-      final net = (gained - discount).clamp(0, 100);
+      final tmp = te.TacticSession();
+      final n = tmp.addWindow(text, 0);
+      final snap = tmp.scoreAt(0);
+      final net = (snap.score - discount).clamp(0, 100);
       return _json({
-        'points': net,
-        'groups': matchGroups(text, <String>{})
-            .map((g) => g.$1)
-            .toList(growable: false),
+        'points': n > 0 ? net : 0,
+        'groups': snap.families.toList(growable: false),
       });
     }
-    var risk = (session.risk + gained + repeated - discount).clamp(0, 100);
-    if (hardTriggered(seen) && risk < 85) risk = 85;
+    final newSignals = session.tactics.addWindow(text, session._nowMs());
+    final snap = session.tactics.scoreAt(session._nowMs());
+    session.seen.addAll(snap.families);
+    final risk = (snap.score - discount).clamp(0, 100);
     session.risk = risk;
     session.lines += 1;
     if (riskLevelFor(risk) == 'danger') session.alerted = true;
     return _json({
-      'points': gained,
-      'flagged': gained > 0,
+      'points': newSignals,
+      'flagged': newSignals > 0,
       ...session.state(),
     });
   });

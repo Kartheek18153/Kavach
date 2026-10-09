@@ -2,15 +2,16 @@ import 'dart:convert';
 
 import 'package:kavach_backend/engine.dart';
 import 'package:kavach_backend/server.dart';
+import 'package:kavach_backend/tactic_engine.dart';
+import 'package:kavach_backend/tactic_lexicon_data.dart';
 import 'package:shelf/shelf.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test('OTP line scores sensitive points', () {
-    final seen = <String>{};
-    final groups = matchGroups('Share the OTP 3274 I sent', seen);
-    expect(groups.map((g) => g.$1), contains('sensitive'));
-    expect(groups.fold<int>(0, (a, g) => a + g.$2), 35);
+  test('OTP line fires the credential family', () {
+    final snap = TacticSession.scoreTextOnce('Share the OTP 3274 I sent');
+    expect(snap.families, contains('CREDENTIAL_EXTRACTION'));
+    expect(snap.score, greaterThan(0));
   });
 
   test('risk bands match app thresholds', () {
@@ -22,17 +23,16 @@ void main() {
     expect(riskLevelFor(100), 'danger');
   });
 
-  test('authority plus OTP hard-triggers', () {
-    final seen = {'authority', 'sensitive'};
-    expect(hardTriggered(seen), isTrue);
+  test('authority plus OTP is a digital-arrest headline', () {
+    final seen = {'AUTHORITY_IMPERSONATION', 'CREDENTIAL_EXTRACTION'};
     expect(scamTypeFor(seen, isScam: true), 'Fake police / Digital arrest');
     expect(reasonsTeluguFor(seen), isNotEmpty);
   });
 
   test('clean chat stays safe', () {
-    final seen = <String>{};
-    expect(matchGroups('Namaste, parcel vachindi', seen), isEmpty);
-    expect(scamTypeFor(seen, isScam: false), '-');
+    final snap = TacticSession.scoreTextOnce('Namaste, parcel vachindi');
+    expect(snap.score, 0);
+    expect(TacticSession.scoreTextOnce('Namaste, parcel vachindi').band, 'safe');
   });
 
   test('safe word gives -20 discount', () {
@@ -41,10 +41,16 @@ void main() {
     expect(safeWordBonus('anything', ''), 0);
   });
 
-  test('keyword groups stay in sync with app (7 groups)', () {
-    expect(keywordGroups.map((g) => g.$1),
-        ['authority', 'threat', 'secrecy', 'urgency', 'sensitive', 'remote', 'money']);
-    expect(keywordGroups.fold<int>(0, (a, g) => a + g.$2), 20 + 25 + 25 + 10 + 35 + 35 + 30);
+  test('lexicon loads 5 families, 180 markers, 40 guards', () {
+    expect(tacticFamilies.map((f) => f.id), [
+      'AUTHORITY_IMPERSONATION',
+      'ISOLATION_AND_SECRECY',
+      'URGENCY_AND_THREAT',
+      'CREDENTIAL_EXTRACTION',
+      'REMOTE_ACCESS_AND_TRANSFER'
+    ]);
+    expect(tacticFamilies.fold<int>(0, (a, f) => a + f.markers.length), 180);
+    expect(negativeGuards, hasLength(40));
   });
 
   test('pruneSessions evicts old + caps size', () {
@@ -52,7 +58,6 @@ void main() {
       'old': ScoringSession(id: 'old', isScam: true),
       'fresh': ScoringSession(id: 'fresh', isScam: true),
     };
-    // Age one session beyond TTL by mutating startedAt via removal test:
     // prune with maxAge zero removes everything older than now.
     final removed = pruneSessions(sessions, maxAge: Duration.zero);
     expect(removed, 2);
@@ -60,17 +65,26 @@ void main() {
   });
 
   test('word boundaries stop false alarms', () {
-    expect(matchGroups('my spinning wheel is fine', <String>{}), isEmpty);
-    expect(matchGroups('found an old suitcase', <String>{}), isEmpty);
-    expect(matchGroups('share your PIN here', <String>{}).map((g) => g.$1),
-        contains('sensitive'));
     expect(
-        matchGroups('send money to safe account, ₹50,000', <String>{})
-            .map((g) => g.$1),
-        contains('money'));
+        TacticSession.scoreTextOnce('my spinning wheel is fine').score, 0);
+    expect(
+        TacticSession.scoreTextOnce('found an old suitcase').score, 0);
+    expect(
+        TacticSession.scoreTextOnce('share your UPI PIN here').families,
+        contains('CREDENTIAL_EXTRACTION'));
   });
 
-  test('urgency repeats escalate then cap at +20', () async {
+  test('single loud family caps below danger (diversity rule)', () {
+    final session = TacticSession();
+    for (var i = 0; i < 10; i++) {
+      session.addWindow('please tell me your otp now, the otp code', i * 6000);
+    }
+    final snap = session.scoreAt(10 * 6000);
+    expect(snap.families, ['CREDENTIAL_EXTRACTION']);
+    expect(snap.band, isNot('danger'));
+  });
+
+  test('session scores a scam exchange to danger', () async {
     final sessions = <String, ScoringSession>{};
     final router = buildRouter(sessions);
     Future<Map<String, dynamic>> call(
@@ -86,18 +100,19 @@ void main() {
 
     final started = await call('/api/session/start', {'mode': 'scam'});
     final sid = started['sessionId'] as String;
-    final r1 =
-        await call('/api/score', {'sessionId': sid, 'text': 'do it immediately'});
-    expect(r1['risk'], 10);
-    final r2 = await call('/api/score',
-        {'sessionId': sid, 'text': 'ippude cheyyandi, immediately!'});
-    expect(r2['risk'], 15);
-
-    Map<String, dynamic> last = r2;
-    for (var i = 0; i < 10; i++) {
-      last = await call('/api/score',
-          {'sessionId': sid, 'text': 'tonight, ventane, immediately'});
-    }
-    expect(last['risk'], 30);
+    await call('/api/score', {
+      'sessionId': sid,
+      'text': 'I am calling from the CBI, your Aadhaar is linked to a parcel'
+    });
+    await call('/api/score', {
+      'sessionId': sid,
+      'text': 'do not tell anyone, stay on the call, arrest warrant issued'
+    });
+    final last = await call('/api/score', {
+      'sessionId': sid,
+      'text': 'share your OTP now to verify and transfer the amount'
+    });
+    expect(last['level'], 'danger');
+    expect(last['alerted'], isTrue);
   });
 }

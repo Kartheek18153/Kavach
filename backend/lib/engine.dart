@@ -1,88 +1,15 @@
-/// Rule engine ported from the Flutter demo simulator.
-/// KEEP IN SYNC with lib/demo/simulator.dart (same groups, points,
-/// thresholds 31/61, hard-trigger, safe-word -20).
+/// Scoring helpers on top of the Tier-1 tactic engine.
+/// KEEP IN SYNC with lib/demo/simulator.dart + lib/services/tactic_engine.dart
+/// (same lexicon, bands 31/61, diversity rule, safe-word -20).
 library;
 
-/// One keyword group: name, danger points, trigger words.
-typedef KeywordGroup = (String name, int points, List<String> words);
-
-const List<KeywordGroup> keywordGroups = [
-  (
-    'authority',
-    20,
-    ['cbi', 'police', 'customs', 'trai', 'rbi', 'court', 'officer']
-  ),
-  (
-    'threat',
-    25,
-    ['arrest', 'warrant', 'case', 'jail', 'legal']
-  ),
-  (
-    'secrecy',
-    25,
-    ['secret', 'cheppakandi', 'cut cheyyakandi', 'disconnect']
-  ),
-  (
-    'urgency',
-    10,
-    ['immediately', 'ippude', 'one hour', 'tonight', 'ventane']
-  ),
-  (
-    'sensitive',
-    35,
-    ['otp', 'pin', 'cvv', 'aadhaar', 'aadhar', 'password', 'card']
-  ),
-  (
-    'remote',
-    35,
-    ['anydesk', 'teamviewer', 'screen share', 'screen']
-  ),
-  (
-    'money',
-    30,
-    ['safe account', 'transfer', 'refund', 'upi', '₹', 'rs.']
-  ),
-];
+import 'tactic_engine.dart' as te;
 
 /// Risk band thresholds shared with the app.
 String riskLevelFor(int risk) {
   if (risk >= 61) return 'danger';
   if (risk >= 31) return 'caution';
   return 'safe';
-}
-
-/// Whole-word hit: letters on either side disqualify ('pin' != 'spinning',
-/// 'case' != 'suitcase'). Digits/symbols may touch ('₹50', 'Rs. 5000' hit).
-/// KEEP IN SYNC with _wordHit in lib/demo/simulator.dart.
-bool wordHit(String text, String word) {
-  final pattern =
-      '(?:^|[^A-Za-z])${RegExp.escape(word)}(?:[^A-Za-z]|\$)';
-  return RegExp(pattern, caseSensitive: false).hasMatch(text);
-}
-
-/// Groups matched by [text] that are not yet in [seen].
-List<(String, int)> matchGroups(String text, Set<String> seen) {
-  final out = <(String, int)>[];
-  for (final (name, points, words) in keywordGroups) {
-    if (!seen.contains(name) && words.any((w) => wordHit(text, w))) {
-      out.add((name, points));
-    }
-  }
-  return out;
-}
-
-/// Repeat pressure bonus: urgency/threat hits after first detection add +5.
-/// Caller caps the running total (see ScoringSession.repeatBonus).
-int repeatBonusFor(String text, Set<String> alreadySeen) {
-  var rb = 0;
-  for (final (name, _, words) in keywordGroups) {
-    if ((name == 'urgency' || name == 'threat') &&
-        alreadySeen.contains(name) &&
-        words.any((w) => wordHit(text, w))) {
-      rb += 5;
-    }
-  }
-  return rb;
 }
 
 /// Safe-word discount: trusted family word lowers risk by 20.
@@ -92,60 +19,14 @@ int safeWordBonus(String text, String safeWord) {
   return text.toLowerCase().contains(w) ? 20 : 0;
 }
 
-/// Hard-trigger rule: authority + sensitive/money, or secrecy + money.
-bool hardTriggered(Set<String> seen) {
-  return (seen.contains('authority') &&
-          (seen.contains('sensitive') || seen.contains('money'))) ||
-      (seen.contains('secrecy') && seen.contains('money'));
-}
+/// Scam-type headline from matched tactic families.
+String scamTypeFor(Set<String> families, {required bool isScam}) =>
+    te.scamTypeForFamilies(families, isScam: isScam);
 
-String scamTypeFor(Set<String> seen, {required bool isScam}) {
-  if (seen.contains('authority')) return 'Fake police / Digital arrest';
-  if (seen.contains('remote')) return 'Screen-share fraud';
-  if (seen.contains('sensitive') || seen.contains('money')) {
-    return isScam ? 'Bank / OTP fraud' : 'Checking...';
-  }
-  if (seen.isEmpty) return '-';
-  return 'Suspicious pattern';
-}
+/// One verdict reason per matched family.
+List<String> reasonsFor(Set<String> families) =>
+    te.reasonsForFamilies(families);
 
-String groupReason(String name) {
-  switch (name) {
-    case 'authority':
-      return 'Caller claims to be police / CBI / customs';
-    case 'threat':
-      return 'Threatens arrest or legal action';
-    case 'secrecy':
-      return 'Tells you to keep the call secret';
-    case 'urgency':
-      return 'Creates false urgency ("right now")';
-    case 'sensitive':
-      return 'Asks for OTP / PIN / Aadhaar';
-    case 'remote':
-      return 'Asks to install a screen-sharing app';
-    case 'money':
-      return 'Asks to transfer money / UPI';
-    default:
-      return name;
-  }
-}
-
-List<String> reasonsFor(Set<String> seen) =>
-    seen.map(groupReason).toList(growable: false);
-
-String reasonsTeluguFor(Set<String> seen) {
-  if (seen.isEmpty) return '';
-  if (seen.contains('authority') && seen.contains('sensitive')) {
-    return 'Ee caller police ani cheppi OTP adugutunnadu. Idi scam - phone cut cheyyandi.';
-  }
-  if (seen.contains('authority')) {
-    return 'Ee caller police / CBI ani cheptunnadu. Nijamaina police phone lo threat cheyyaru.';
-  }
-  if (seen.contains('sensitive') || seen.contains('money')) {
-    return 'OTP / PIN / dabbulu adige call scam ayyundavachu. Evariki cheppakandi ani ante inka danger.';
-  }
-  if (seen.contains('remote')) {
-    return 'Screen share app install cheyamante cheppakandi. Idi scam trick.';
-  }
-  return 'Konchem anumananga undi - jagratta ga undandi.';
-}
+/// Telugu verdict summary keyed on families.
+String reasonsTeluguFor(Set<String> families) =>
+    te.reasonsTeluguForFamilies(families);

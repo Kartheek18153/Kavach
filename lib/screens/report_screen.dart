@@ -67,7 +67,7 @@ class _ReportScreenState extends State<ReportScreen> {
             ? _empty(context)
             : ListView(
                 padding:
-                    const EdgeInsets.fromLTRB(18, 6, 18, 110),
+                    const EdgeInsets.fromLTRB(18, 6, 18, 24),
                 children: [
                   Row(
                     children: [

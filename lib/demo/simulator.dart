@@ -4,9 +4,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/scheduler.dart';
 
 import '../services/api.dart';
+import '../services/tactic_engine.dart';
 import '../theme.dart';
 
-/// One line of call transcript with a pre-scored danger weight.
+/// One line of call transcript.
+/// [points] is kept for fixture readability only - live scoring always runs
+/// the Tier-1 tactic engine over [text].
 class ScriptLine {
   final String text;
   final int points;
@@ -90,10 +93,10 @@ class DemoSession extends ChangeNotifier implements ValueListenable<DemoState> {
   List<ScriptLine> _script = const [];
   int _cursor = 0;
   int _tick = 0;
-  final Set<String> _seen = {};
+  late TacticSession _tactics;
+  final Set<String> _seenFamilies = {};
   bool _demoScam = true;
   String? _sessionId;
-  int _repeatBonus = 0;
 
   /// Notifies listeners outside the build phase so timer ticks that land
   /// mid-transition (tab switches) never throw "called during build".
@@ -128,19 +131,8 @@ class DemoSession extends ChangeNotifier implements ValueListenable<DemoState> {
     ScriptLine('Thank you sir, delivery complete ayyindi.', 0),
   ];
 
-  /// Keyword groups mirroring the backend rule engine, for typed input.
-  /// KEEP IN SYNC with backend/lib/engine.dart (same names, points, words,
-  /// thresholds 31/61, hard-trigger, safe-word -20).
-  static const List<(String, int, List<String>)> keywordGroups = [
-    ('authority', 20, ['cbi', 'police', 'customs', 'trai', 'rbi', 'court', 'officer']),
-    ('threat', 25, ['arrest', 'warrant', 'case', 'jail', 'legal']),
-    ('secrecy', 25, ['secret', 'cheppakandi', 'cut cheyyakandi', 'disconnect']),
-    ('urgency', 10, ['immediately', 'ippude', 'one hour', 'tonight', 'ventane']),
-    ('sensitive', 35, ['otp', 'pin', 'cvv', 'aadhaar', 'aadhar', 'password', 'card']),
-    ('remote', 35, ['anydesk', 'teamviewer', 'screen share', 'screen']),
-    ('money', 30, ['safe account', 'transfer', 'refund', 'upi', '₹', 'rs.']),
-  ];
-
+  /// Local scoring runs the Tier-1 tactic engine (tactic_engine.dart) -
+  /// same lexicon, decay and diversity rule as the backend.
   void startScam() => _start(scamScript, isScam: true);
 
   void startNormal() => _start(normalScript, isScam: false);
@@ -156,10 +148,11 @@ class DemoSession extends ChangeNotifier implements ValueListenable<DemoState> {
     _script = script;
     _cursor = 0;
     _tick = 0;
-    _seen.clear();
+    _tactics = TacticSession();
+    _seenFamilies.clear();
     _demoScam = isScam;
     _sessionId = null;
-    _repeatBonus = 0;
+    _seenFamilies.clear();
     _state = DemoState(running: true, isDemo: demo);
     _safeNotify();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) => _onTick());
@@ -188,20 +181,23 @@ class DemoSession extends ChangeNotifier implements ValueListenable<DemoState> {
     final elapsed = _state.elapsedSec + 1;
     List<TranscriptLine> lines = _state.lines;
     int risk = _state.risk;
+    final nowMs = elapsed * 1000;
 
     // New transcript chunk roughly every 2 seconds (3-4 sec audio windows).
     if (_tick.isEven && _cursor < _script.length) {
       final s = _script[_cursor];
       _cursor++;
-      // Prefer stateful backend session; then stateless; then local rules.
+      // Prefer stateful backend session; then stateless; then local engine.
       final sid = _sessionId;
       if (sid != null) {
         final st = await KavachApi.scoreInSession(sessionId: sid, text: s.text);
         if (st != null) {
           final r = (st['risk'] as num?)?.toInt() ?? _state.risk;
           final synced = (st['reasons'] as List? ?? const []).map((e) => '$e').toList();
-          // Keep local _seen roughly in sync for offline fallback continuity.
-          _noteScriptGroups(s.text);
+          // Keep the local engine fed so offline fallback stays continuous.
+          _tactics.addWindow(s.text, nowMs);
+          _seenFamilies
+              .addAll(_tactics.scoreAt(nowMs).families);
           lines = [...lines, TranscriptLine(s.text, flagged: ((st['points'] as num?)?.toInt() ?? 0) > 0)];
           risk = r;
           final lvl = riskLevelFor(risk);
@@ -224,20 +220,21 @@ class DemoSession extends ChangeNotifier implements ValueListenable<DemoState> {
         }
       }
       final remote = await KavachApi.scoreLine(s.text);
-      int points;
+      int newSignals;
       if (remote != null) {
-        points = (remote['points'] as num?)?.toInt() ?? 0;
+        newSignals = (remote['points'] as num?)?.toInt() ?? 0;
         for (final g in (remote['groups'] as List? ?? const [])) {
-          _seen.add(g as String);
+          _seenFamilies.add(g as String);
         }
+        _tactics.addWindow(s.text, nowMs);
       } else {
-        points = s.points;
-        _noteScriptGroups(s.text);
+        newSignals = _tactics.addWindow(s.text, nowMs);
       }
-      lines = [...lines, TranscriptLine(s.text, flagged: points > 0)];
-      risk = (_state.risk + points).clamp(0, 100);
+      lines = [...lines, TranscriptLine(s.text, flagged: newSignals > 0)];
+      final snap = _tactics.scoreAt(nowMs);
+      _seenFamilies.addAll(snap.families);
+      risk = snap.score;
       if (_safeWordHit(s.text)) risk = (risk - 20).clamp(0, 100);
-      if (_hardTriggered()) risk = risk < 85 ? 85 : risk;
     }
 
     final level = riskLevelFor(risk);
@@ -260,116 +257,24 @@ class DemoSession extends ChangeNotifier implements ValueListenable<DemoState> {
     if (done) _timer?.cancel();
   }
 
-  void _noteScriptGroups(String text) {
-    for (final (name, _, words) in keywordGroups) {
-      if (words.any((w) => _wordHit(text, w))) _seen.add(name);
-    }
-  }
+  String _scamType() =>
+      scamTypeForFamilies(_seenFamilies, isScam: _demoScam);
 
-  /// Whole-word hit mirroring wordHit in backend/lib/engine.dart —
-  /// KEEP IN SYNC (same pattern, same boundary rule).
-  static bool _wordHit(String text, String word) {
-    final pattern =
-        '(?:^|[^A-Za-z])${RegExp.escape(word)}(?:[^A-Za-z]|\$)';
-    return RegExp(pattern, caseSensitive: false).hasMatch(text);
-  }
+  List<String> _reasons() => reasonsForFamilies(_seenFamilies);
 
-  /// Local scoring for typed/real words when the backend is unreachable:
-  /// first-hit group points plus +5 per urgency/threat repeat (cap +20).
-  int _localGained(String text) {
-    final wasSeen = Set<String>.of(_seen);
-    var gained = 0;
-    for (final (name, pts, words) in keywordGroups) {
-      if (!wasSeen.contains(name) &&
-          words.any((w) => _wordHit(text, w))) {
-        _seen.add(name);
-        gained += pts;
-      }
-    }
-    var rb = 0;
-    for (final (name, _, words) in keywordGroups) {
-      if ((name == 'urgency' || name == 'threat') &&
-          wasSeen.contains(name) &&
-          words.any((w) => _wordHit(text, w))) {
-        rb += 5;
-      }
-    }
-    final room = 20 - _repeatBonus;
-    if (room > 0 && rb > 0) {
-      final add = rb > room ? room : rb;
-      _repeatBonus += add;
-      gained += add;
-    }
-    return gained;
-  }
-
-  bool _hardTriggered() {
-    final s = _seen;
-    return (s.contains('authority') &&
-            (s.contains('sensitive') || s.contains('money'))) ||
-        (s.contains('secrecy') && s.contains('money'));
-  }
-
-  String _scamType() {
-    if (_seen.contains('authority')) return 'Fake police / Digital arrest';
-    if (_seen.contains('remote')) return 'Screen-share fraud';
-    if (_seen.contains('sensitive') || _seen.contains('money')) {
-      return _demoScam ? 'Bank / OTP fraud' : 'Checking...';
-    }
-    if (_seen.isEmpty) return '-';
-    return 'Suspicious pattern';
-  }
-
-  String _groupReason(String name) {
-    switch (name) {
-      case 'authority':
-        return 'Caller claims to be police / CBI / customs';
-      case 'threat':
-        return 'Threatens arrest or legal action';
-      case 'secrecy':
-        return 'Tells you to keep the call secret';
-      case 'urgency':
-        return 'Creates false urgency ("right now")';
-      case 'sensitive':
-        return 'Asks for OTP / PIN / Aadhaar';
-      case 'remote':
-        return 'Asks to install a screen-sharing app';
-      case 'money':
-        return 'Asks to transfer money / UPI';
-      default:
-        return name;
-    }
-  }
-
-  List<String> _reasons() =>
-      _seen.map(_groupReason).toList(growable: false);
-
-  String _reasonsTelugu() {
-    if (_seen.isEmpty) return '';
-    if (_seen.contains('authority') && _seen.contains('sensitive')) {
-      return 'Ee caller police ani cheppi OTP adugutunnadu. Idi scam - phone cut cheyyandi.';
-    }
-    if (_seen.contains('authority')) {
-      return 'Ee caller police / CBI ani cheptunnadu. Nijamaina police phone lo threat cheyyaru.';
-    }
-    if (_seen.contains('sensitive') || _seen.contains('money')) {
-      return 'OTP / PIN / dabbulu adige call scam ayyundavachu. Evariki cheppakandi ani ante inka danger.';
-    }
-    if (_seen.contains('remote')) {
-      return 'Screen share app install cheyamante cheppakandi. Idi scam trick.';
-    }
-    return 'Konchem anumananga undi - jagratta ga undandi.';
-  }
+  String _reasonsTelugu() => reasonsTeluguForFamilies(_seenFamilies);
 
   /// Scores a manually typed line (fallback box when mic/audio fails).
   Future<void> analyzeText(String text) async {
     final t = text.trim();
     if (t.isEmpty) return;
     final sid = _sessionId;
+    final nowMs = _state.elapsedSec * 1000;
     if (sid != null) {
       final st = await KavachApi.scoreInSession(sessionId: sid, text: t);
       if (st != null) {
-        _noteScriptGroups(t);
+        _tactics.addWindow(t, nowMs);
+        _seenFamilies.addAll(_tactics.scoreAt(nowMs).families);
         final r = (st['risk'] as num?)?.toInt() ?? _state.risk;
         final lvl = riskLevelFor(r);
         _state = _state.copyWith(
@@ -387,21 +292,23 @@ class DemoSession extends ChangeNotifier implements ValueListenable<DemoState> {
       }
     }
     final remote = await KavachApi.scoreLine(t);
-    int gained = 0;
+    int newSignals;
     if (remote != null) {
-      gained = (remote['points'] as num?)?.toInt() ?? 0;
+      newSignals = (remote['points'] as num?)?.toInt() ?? 0;
       for (final g in (remote['groups'] as List? ?? const [])) {
-        _seen.add(g as String);
+        _seenFamilies.add(g as String);
       }
+      _tactics.addWindow(t, nowMs);
     } else {
-      gained = _localGained(t);
+      newSignals = _tactics.addWindow(t, nowMs);
     }
-    var risk = (_state.risk + gained).clamp(0, 100);
+    final snap = _tactics.scoreAt(nowMs);
+    _seenFamilies.addAll(snap.families);
+    var risk = snap.score;
     if (_safeWordHit(t)) risk = (risk - 20).clamp(0, 100);
-    if (_hardTriggered() && risk < 85) risk = 85;
     final level = riskLevelFor(risk);
     _state = _state.copyWith(
-      lines: [..._state.lines, TranscriptLine(t, flagged: gained > 0)],
+      lines: [..._state.lines, TranscriptLine(t, flagged: newSignals > 0)],
       risk: risk,
       level: level,
       scamType: _scamType(),
@@ -425,8 +332,8 @@ class DemoSession extends ChangeNotifier implements ValueListenable<DemoState> {
   void reset() {
     _timer?.cancel();
     _endSessionFireForget();
-    _seen.clear();
-    _repeatBonus = 0;
+    _tactics = TacticSession();
+    _seenFamilies.clear();
     _state = const DemoState();
     _safeNotify();
   }

@@ -1,11 +1,13 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../demo/simulator.dart';
 import '../lang.dart';
 import '../services/api.dart';
+import '../services/live_audio.dart';
 import '../theme.dart';
 import '../widgets/cards.dart';
 import '../widgets/danger_meter.dart';
@@ -34,11 +36,17 @@ class _LiveScreenState extends State<LiveScreen> {
   final _typed = TextEditingController();
   final _alarm = AudioPlayer();
   bool _alarmPlaying = false;
+  final _audio = LiveAudioListener();
+  bool _audioOn = false;
+  bool _audioTried = false;
+  String _partial = '';
+  String? _audioNote;
 
   @override
   void dispose() {
     _typed.dispose();
     _alarm.dispose();
+    _audio.stop();
     super.dispose();
   }
 
@@ -73,8 +81,83 @@ class _LiveScreenState extends State<LiveScreen> {
       });
     }
     _prevLevel = s.level;
-    if (s.running && !_prevRunning) _smsOpened = false;
+    if (s.running && !_prevRunning) {
+      _smsOpened = false;
+      // Fresh session: allow the mic loop to start again.
+      _audioTried = false;
+      _audioNote = null;
+      _partial = '';
+    }
     _prevRunning = s.running;
+  }
+
+  /// Keeps the mic loop in step with the session, outside the build phase.
+  void _syncAudio(DemoState s) {
+    if (s.running && !s.isDemo && !_audioTried) {
+      _audioTried = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _startAudio();
+      });
+    } else if (!s.running && (_audioOn || _audioTried)) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _stopAudio();
+      });
+    }
+  }
+
+  Future<void> _startAudio() async {
+    if (_audioOn) return;
+    final lang = context.appLang;
+    bool granted = false;
+    try {
+      granted = await Permission.microphone.isGranted;
+    } catch (_) {}
+    if (!mounted) return;
+    if (!granted) {
+      setState(() => _audioNote = context.tr('liveMicDenied'));
+      return;
+    }
+    _audio.onPartial = (p) {
+      if (mounted && p != _partial) setState(() => _partial = p);
+    };
+    _audio.onFinal = (t) {
+      if (!mounted) return;
+      setState(() => _partial = '');
+      if (widget.session.state.running) widget.session.analyzeText(t);
+    };
+    _audio.onError = (_) {
+      if (mounted) {
+        setState(() {
+          _audioOn = false;
+          _audioNote = context.tr('liveNoStt');
+        });
+      }
+    };
+    final ok = await _audio.init();
+    if (!mounted) return;
+    if (!ok) {
+      setState(() => _audioNote = context.tr('liveNoStt'));
+      return;
+    }
+    if (!widget.session.state.running) return;
+    final started =
+        await _audio.start(localeChain: sttLocaleFallbacks(lang));
+    if (!mounted) return;
+    setState(() {
+      _audioOn = started;
+      _audioNote = started ? null : context.tr('liveNoStt');
+    });
+  }
+
+  Future<void> _stopAudio() async {
+    _audioTried = true;
+    if (!_audioOn && _partial.isEmpty) return;
+    await _audio.stop();
+    if (!mounted) return;
+    setState(() {
+      _audioOn = false;
+      _partial = '';
+    });
   }
 
   /// Loops the alarm beep while the red overlay is up, stops otherwise.
@@ -149,6 +232,7 @@ class _LiveScreenState extends State<LiveScreen> {
       valueListenable: widget.session,
       builder: (context, s, _) {
         _watchLevel(s);
+        _syncAudio(s);
         final showOverlay =
             s.level == RiskLevel.danger && s.running && !_overlayDismissed;
         _driveAlarm(showOverlay);
@@ -158,7 +242,7 @@ class _LiveScreenState extends State<LiveScreen> {
               children: [
                 ListView(
                   padding:
-                      const EdgeInsets.fromLTRB(18, 6, 18, 110),
+                      const EdgeInsets.fromLTRB(18, 6, 18, 24),
                   children: [
                     _topRow(s),
                     _statusCard(s),
@@ -185,6 +269,8 @@ class _LiveScreenState extends State<LiveScreen> {
                     ),
                   ),
                   const SizedBox(height: 14),
+                  if (!s.isDemo) _audioCard(s),
+                  if (!s.isDemo) const SizedBox(height: 14),
                   if (s.reasonsTelugu.isNotEmpty || s.reasons.isNotEmpty)
                     _verdictCard(s),
                   SectionTitle(context.tr('liveTranscript')),
@@ -345,6 +431,96 @@ class _LiveScreenState extends State<LiveScreen> {
                 ],
               ),
             ),
+        ],
+      ),
+    );
+  }
+
+  Widget _audioCard(DemoState s) {
+    final active = _audioOn && s.running;
+    return GlassCard(
+      borderColor: active
+          ? KavachColors.danger.withValues(alpha: 0.5)
+          : KavachColors.teal.withValues(alpha: 0.4),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      child: Row(
+        children: [
+          IconButton.filled(
+            onPressed: !s.running
+                ? null
+                : () {
+                    if (_audioOn) {
+                      _stopAudio();
+                    } else {
+                      _audioTried = true;
+                      _startAudio();
+                    }
+                  },
+            icon: Icon(active ? Icons.mic_rounded : Icons.mic_off_rounded),
+            style: IconButton.styleFrom(
+              backgroundColor: active
+                  ? KavachColors.danger
+                  : KavachColors.surface2,
+              foregroundColor:
+                  active ? Colors.white : KavachColors.sub,
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: active
+                            ? KavachColors.danger
+                            : KavachColors.sub,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        _audioNote ?? context.tr('liveListening'),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 13.5),
+                      ),
+                    ),
+                  ],
+                ),
+                if (_audioOn && _audio.activeLocale.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 2, left: 14),
+                    child: Text(
+                      _audio.activeLocale,
+                      style: const TextStyle(
+                          color: KavachColors.sub,
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                if (_partial.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    '${context.tr('liveHeard')}: $_partial',
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                        color: KavachColors.sub,
+                        fontSize: 13,
+                        fontStyle: FontStyle.italic),
+                  ),
+                ],
+              ],
+            ),
+          ),
         ],
       ),
     );

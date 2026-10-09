@@ -94,7 +94,7 @@ class _FamilyScreenState extends State<FamilyScreen> {
     return Scaffold(
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(18, 6, 18, 110),
+          padding: const EdgeInsets.fromLTRB(18, 6, 18, 24),
           children: [
             Row(
               children: [

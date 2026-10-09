@@ -744,4 +744,504 @@ const Map<String, Map<AppLang, String>> _strings = {
     AppLang.telugu: 'కొత్త స్కాన్ మొదలు',
     AppLang.hindi: 'नया स्कैन शुरू करें',
   },
+  'liveListening': {
+    AppLang.english: 'Listening live — keep the call on speaker',
+    AppLang.telugu: 'ప్రత్యక్షంగా వింటున్నాం — కాల్ స్పీకర్‌పైనే ఉంచండి',
+    AppLang.hindi: 'लाइव सुन रहे हैं — कॉल स्पीकर पर रखें',
+  },
+  'liveHeard': {
+    AppLang.english: 'Heard',
+    AppLang.telugu: 'విన్నది',
+    AppLang.hindi: 'सुना',
+  },
+  'liveNoStt': {
+    AppLang.english: 'Voice typing unavailable — type what you hear below.',
+    AppLang.telugu: 'వాయిస్ టైపింగ్ లేదు — కింద విన్నది టైప్ చేయండి.',
+    AppLang.hindi: 'वॉइस टाइपिंग नहीं है — नीचे जो सुनें लिखें।',
+  },
+  'liveMicDenied': {
+    AppLang.english: 'Mic off — type what you hear below.',
+    AppLang.telugu: 'మైక్ ఆఫ్ — కింద విన్నది టైప్ చేయండి.',
+    AppLang.hindi: 'माइक बंद — नीचे जो सुनें लिखें।',
+  },
+  // Dashboard
+  // Dashboard
+  'shieldTitle': {
+    AppLang.english: 'Security shield',
+    AppLang.telugu: 'భద్రతా కవచం',
+    AppLang.hindi: 'सुरक्षा कवच',
+  },
+  'shieldSub': {
+    AppLang.english: 'Calls, links, QR, UPI, SMS — one shield for all fraud.',
+    AppLang.telugu: 'కాల్స్, లింకులు, QR, UPI, SMS — అన్ని మోసాలకు ఒకే కవచం.',
+    AppLang.hindi: 'कॉल, लिंक, QR, UPI, SMS — हर धोखे के लिए एक कवच।',
+  },
+  'toolsTitle': {
+    AppLang.english: 'Safety tools',
+    AppLang.telugu: 'భద్రతా పరికరాలు',
+    AppLang.hindi: 'सुरक्षा उपकरण',
+  },
+  'recentTitle': {
+    AppLang.english: 'Recent activity',
+    AppLang.telugu: 'ఇటీవలి కార్యకలాపం',
+    AppLang.hindi: 'हाल की गतिविधि',
+  },
+  'viewAll': {
+    AppLang.english: 'View all',
+    AppLang.telugu: 'అన్నీ చూడండి',
+    AppLang.hindi: 'सभी देखें',
+  },
+  'noActivity': {
+    AppLang.english: 'Nothing scanned yet — run your first check.',
+    AppLang.telugu: 'ఇంకా ఏమీ స్కాన్ చేయలేదు — మొదటి తనిఖీ చేయండి.',
+    AppLang.hindi: 'अभी कुछ स्कैन नहीं — पहली जांच करें।',
+  },
+  'scansMonth': {
+    AppLang.english: 'Checks this month',
+    AppLang.telugu: 'ఈ నెల తనిఖీలు',
+    AppLang.hindi: 'इस महीने जांचें',
+  },
+  // Scan hub + tools
+  'scanSub': {
+    AppLang.english: 'Paste a link, QR text, UPI ID or message — Kavach scores the danger offline.',
+    AppLang.telugu: 'లింక్, QR టెక్స్ట్, UPI ID లేదా మెసేజ్ ఇవ్వండి — Kavach ఆఫ్‌లైన్‌లో రిస్క్ చెప్తుంది.',
+    AppLang.hindi: 'लिंक, QR टेक्स्ट, UPI ID या संदेश दें — कवच ऑफलाइन जोखिम बताएगा।',
+  },
+  'toolUrl': {
+    AppLang.english: 'Link scanner',
+    AppLang.telugu: 'లింక్ స్కానర్',
+    AppLang.hindi: 'लिंक स्कैनर',
+  },
+  'toolUrlSub': {
+    AppLang.english: 'Phishing & fake sites',
+    AppLang.telugu: 'నకిలీ సైట్లు',
+    AppLang.hindi: 'नकली साइटें',
+  },
+  'toolQrUpi': {
+    AppLang.english: 'QR & UPI check',
+    AppLang.telugu: 'QR & UPI తనిఖీ',
+    AppLang.hindi: 'QR और UPI जांच',
+  },
+  'toolQrUpiSub': {
+    AppLang.english: 'Codes, IDs & payment links',
+    AppLang.telugu: 'కోడ్‌లు, IDలు & పేమెంట్ లింకులు',
+    AppLang.hindi: 'कोड, ID और पेमेंट लिंक',
+  },
+  'qrUpiHint': {
+    AppLang.english: 'Paste QR text, UPI ID (name@bank) or payment link...',
+    AppLang.telugu: 'QR టెక్స్ట్, UPI ID (name@bank) లేదా పేమెంట్ లింక్ ఇవ్వండి...',
+    AppLang.hindi: 'QR टेक्स्ट, UPI ID (name@bank) या पेमेंट लिंक डालें...',
+  },
+  'autoKind': {
+    AppLang.english: 'Detected: {kind}',
+    AppLang.telugu: 'గుర్తించింది: {kind}',
+    AppLang.hindi: 'पहचाना: {kind}',
+  },
+  'toolSim': {
+    AppLang.english: 'SIM-swap check',
+    AppLang.telugu: 'SIM మార్పు తనిఖీ',
+    AppLang.hindi: 'SIM-बदलाव जांच',
+  },
+  'toolSimSub': {
+    AppLang.english: 'Is your number safe?',
+    AppLang.telugu: 'మీ నంబర్ సురక్షితమేనా?',
+    AppLang.hindi: 'क्या आपका नंबर सुरक्षित है?',
+  },
+  'toolSms': {
+    AppLang.english: 'SMS analyzer',
+    AppLang.telugu: 'SMS విశ్లేషణ',
+    AppLang.hindi: 'SMS विश्लेषण',
+  },
+  'toolSmsSub': {
+    AppLang.english: 'Fake bank & prize texts',
+    AppLang.telugu: 'నకిలీ బ్యాంక్ మెసేజ్‌లు',
+    AppLang.hindi: 'नकली बैंक संदेश',
+  },
+  'analyzeBtn': {
+    AppLang.english: 'Check now',
+    AppLang.telugu: 'ఇప్పుడే తనిఖీ',
+    AppLang.hindi: 'अभी जांचें',
+  },
+  'savedNote': {
+    AppLang.english: 'Saved to History automatically.',
+    AppLang.telugu: 'చరిత్రలో ఆటోమేటిక్‌గా సేవ్ అయింది.',
+    AppLang.hindi: 'इतिहास में अपने आप सहेजा गया।',
+  },
+  'urlHint': {
+    AppLang.english: 'Paste the link here...',
+    AppLang.telugu: 'లింక్ ఇక్కడ ఇవ్వండి...',
+    AppLang.hindi: 'लिंक यहां डालें...',
+  },
+  'smsHint': {
+    AppLang.english: 'Paste the full message here...',
+    AppLang.telugu: 'పూర్తి మెసేజ్ ఇక్కడ ఇవ్వండి...',
+    AppLang.hindi: 'पूरा संदेश यहां डालें...',
+  },
+  'repChecking': {
+    AppLang.english: 'Checking domain reputation…',
+    AppLang.telugu: 'డొమైన్ ఖ్యాతి చూస్తున్నాం…',
+    AppLang.hindi: 'डोमेन प्रतिष्ठा जांच रहे हैं…',
+  },
+  'repOffline': {
+    AppLang.english: 'Offline — link checks only.',
+    AppLang.telugu: 'ఆఫ్‌లైన్ — లింక్ తనిఖీ మాత్రమే.',
+    AppLang.hindi: 'ऑफलाइन — सिर्फ लिंक जांच।',
+  },
+  'repAge': {
+    AppLang.english: 'Domain age',
+    AppLang.telugu: 'డొమైన్ వయసు',
+    AppLang.hindi: 'डोमेन आयु',
+  },
+  'repRegistrar': {
+    AppLang.english: 'Registrar',
+    AppLang.telugu: 'రిజిస్ట్రార్',
+    AppLang.hindi: 'रजिस्ट्रार',
+  },
+  'repGrade': {
+    AppLang.english: 'Health grade',
+    AppLang.telugu: 'హెల్త్ గ్రేడ్',
+    AppLang.hindi: 'हेल्थ ग्रेड',
+  },
+  'repBlacklist': {
+    AppLang.english: 'Blacklists',
+    AppLang.telugu: 'బ్లాక్‌లిస్టులు',
+    AppLang.hindi: 'ब्लैकलिस्ट',
+  },
+  'repExpiry': {
+    AppLang.english: 'Expires',
+    AppLang.telugu: 'గడువు',
+    AppLang.hindi: 'समाप्ति',
+  },
+  'repNameservers': {
+    AppLang.english: 'Name servers',
+    AppLang.telugu: 'నేమ్ సర్వర్లు',
+    AppLang.hindi: 'नेम सर्वर',
+  },
+  'repDnssec': {
+    AppLang.english: 'DNSSEC',
+    AppLang.telugu: 'DNSSEC',
+    AppLang.hindi: 'DNSSEC',
+  },
+  'repChecks': {
+    AppLang.english: 'Domain checks',
+    AppLang.telugu: 'డొమైన్ తనిఖీలు',
+    AppLang.hindi: 'डोमेन जांचें',
+  },
+  'repClean': {
+    AppLang.english: 'clean',
+    AppLang.telugu: 'క్లీన్',
+    AppLang.hindi: 'साफ',
+  },
+  'repProgress': {
+    AppLang.english: '{d}/{t} checks…',
+    AppLang.telugu: '{d}/{t} తనిఖీలు…',
+    AppLang.hindi: '{d}/{t} जांचें…',
+  },
+  'repRetry': {
+    AppLang.english: 'Retry',
+    AppLang.telugu: 'మళ్లీ ప్రయత్నించండి',
+    AppLang.hindi: 'पुनः प्रयास करें',
+  },
+  'repPartial': {
+    AppLang.english: '{n} checks timed out.',
+    AppLang.telugu: '{n} తనిఖీలు టైమ్ అయ్యాయి.',
+    AppLang.hindi: '{n} जांचें समय पर नहीं हुईं।',
+  },
+  'repPrivacy': {
+    AppLang.english: 'Online check sends only the domain name, never the full link.',
+    AppLang.telugu: 'ఆన్‌లైన్ తనిఖీ డొమైన్ పేరు మాత్రమే పంపుతుంది, పూర్తి లింక్ కాదు.',
+    AppLang.hindi: 'ऑनलाइन जांच सिर्फ डोमेन नाम भेजती है, पूरा लिंक नहीं।',
+  },
+  'tipUrl': {
+    AppLang.english: 'Real banks never send login links by SMS. When in doubt, open the app yourself — never tap the link.',
+    AppLang.telugu: 'నిజమైన బ్యాంకులు SMSలో లాగిన్ లింకులు పంపవు. అనుమానం ఉంటే యాప్ మీరే తెరవండి — లింక్ నొక్కకండి.',
+    AppLang.hindi: 'असली बैंक SMS में लॉगिन लिंक नहीं भेजते। शक हो तो ऐप खुद खोलें — लिंक न दबाएं।',
+  },
+  'tipQr': {
+    AppLang.english: 'Scan QR codes only at trusted shops. A QR can open a payment or download — always preview first.',
+    AppLang.telugu: 'నమ్మకమైన షాపుల్లో మాత్రమే QR స్కాన్ చేయండి. QR పేమెంట్ తెరవచ్చు — ముందు చూడండి.',
+    AppLang.hindi: 'भरोसेमंद दुकानों पर ही QR स्कैन करें। QR पेमेंट खोल सकता है — पहले जांचें।',
+  },
+  'tipUpi': {
+    AppLang.english: 'You never enter a PIN to RECEIVE money. Any "approve to receive" request is fraud — decline it.',
+    AppLang.telugu: 'డబ్బు తీసుకోవడానికి PIN అవసరం లేదు. "రిసీవ్ చేయడానికి అప్రూవ్" అంటే మోసం — తిరస్కరించండి.',
+    AppLang.hindi: 'पैसे पाने के लिए PIN नहीं चाहिए। "पाने के लिए अप्रूव करें" मतलब धोखा — मना करें।',
+  },
+  'tipSms': {
+    AppLang.english: 'Banks never ask for OTP on call or SMS. Forward fraud texts to 1930 with the sender number.',
+    AppLang.telugu: 'బ్యాంకులు ఫోన్/SMSలో OTP అడగవు. మోసం మెసేజ్‌లను 1930కి పంపండి.',
+    AppLang.hindi: 'बैंक फोन/SMS पर OTP नहीं मांगते। धोखे वाले संदेश 1930 पर भेजें।',
+  },
+  'simTitle': {
+    AppLang.english: 'SIM-swap security check',
+    AppLang.telugu: 'SIM మార్పు భద్రతా తనిఖీ',
+    AppLang.hindi: 'SIM-बदलाव सुरक्षा जांच',
+  },
+  'simSub': {
+    AppLang.english: 'Answer honestly — Kavach scores whether someone may have taken over your number.',
+    AppLang.telugu: 'నిజాయితీగా జవాబు ఇవ్వండి — మీ నంబర్ ఎవరైనా లాక్కున్నారా అని చెప్తుంది.',
+    AppLang.hindi: 'सच जवाब दें — कवच बताएगा कि आपका नंबर खतरे में है या नहीं।',
+  },
+  'simQ1': {
+    AppLang.english: 'Signal lost suddenly for no reason?',
+    AppLang.telugu: 'కారణం లేకుండా సిగ్నల్ పోయిందా?',
+    AppLang.hindi: 'बिना वजह सिग्नल गायब हुआ?',
+  },
+  'simQ2': {
+    AppLang.english: 'Cannot call or send SMS anymore?',
+    AppLang.telugu: 'కాల్/SMS చేయలేకపోతున్నారా?',
+    AppLang.hindi: 'कॉल/SMS नहीं हो रहा?',
+  },
+  'simQ3': {
+    AppLang.english: 'Others say your number is switched off?',
+    AppLang.telugu: 'మీ నంబర్ స్విచ్ ఆఫ్ అని ఇతరులు అంటున్నారా?',
+    AppLang.hindi: 'लोग कह रहे हैं आपका नंबर बंद है?',
+  },
+  'simQ4': {
+    AppLang.english: 'Getting OTPs you never asked for?',
+    AppLang.telugu: 'మీరు అడగని OTPలు వస్తున్నాయా?',
+    AppLang.hindi: 'बिना मांगे OTP आ रहे हैं?',
+  },
+  'simQ5': {
+    AppLang.english: 'Bank/operator message about a new SIM or eSIM?',
+    AppLang.telugu: 'కొత్త SIM/eSIM గురించి బ్యాంక్ మెసేజ్ వచ్చిందా?',
+    AppLang.hindi: 'नए SIM/eSIM के बारे में बैंक का संदेश आया?',
+  },
+  'tipSim': {
+    AppLang.english: 'If danger: call your mobile operator immediately, then your bank to freeze UPI and net-banking.',
+    AppLang.telugu: 'ప్రమాదం అయితే: వెంటనే మీ ఆపరేటర్‌కు కాల్ చేసి, తర్వాత బ్యాంకుకు చెప్పి UPI ఆపండి.',
+    AppLang.hindi: 'खतरा हो तो: तुरंत ऑपरेटर को कॉल करें, फिर बैंक से UPI बंद कराएं।',
+  },
+  // Threats
+  'threatsTitle': {
+    AppLang.english: 'Threats',
+    AppLang.telugu: 'ముప్పులు',
+    AppLang.hindi: 'खतरे',
+  },
+  'unifiedTitle': {
+    AppLang.english: 'Your threat report',
+    AppLang.telugu: 'మీ ముప్పు రిపోర్ట్',
+    AppLang.hindi: 'आपकी खतरा रिपोर्ट',
+  },
+  'totalScansM': {
+    AppLang.english: 'Total checks',
+    AppLang.telugu: 'మొత్తం తనిఖీలు',
+    AppLang.hindi: 'कुल जांचें',
+  },
+  'dangersCaught': {
+    AppLang.english: 'Dangers caught',
+    AppLang.telugu: 'పట్టిన ప్రమాదాలు',
+    AppLang.hindi: 'पकड़े खतरे',
+  },
+  'intelTitle': {
+    AppLang.english: 'Threat alerts near you',
+    AppLang.telugu: 'మీ చుట్టూ ముప్పు హెచ్చరికలు',
+    AppLang.hindi: 'आपके आसपास खतरे की चेतावनी',
+  },
+  'topThreat': {
+    AppLang.english: 'Top threat',
+    AppLang.telugu: 'అతిపెద్ద ముప్పు',
+    AppLang.hindi: 'सबसे बड़ा खतरा',
+  },
+  'adv1t': {
+    AppLang.english: 'Digital-arrest calls rising',
+    AppLang.telugu: 'డిజిటల్-అరెస్ట్ కాల్స్ పెరుగుతున్నాయి',
+    AppLang.hindi: 'डिजिटल-अरेस्ट कॉल बढ़ रहे हैं',
+  },
+  'adv1b': {
+    AppLang.english: 'Fake CBI/police video calls scare victims into paying "fines". Real officers never demand money on a call.',
+    AppLang.telugu: 'నకిలీ CBI/పోలీస్ వీడియో కాల్స్‌తో "జరిమానా" కట్టిస్తున్నారు. నిజమైన అధికారులు ఫోన్‌లో డబ్బు అడగరు.',
+    AppLang.hindi: 'नकली CBI/पुलिस वीडियो कॉल से "जुर्माना" वसूला जा रहा है। असली अधिकारी फोन पर पैसे नहीं मांगते।',
+  },
+  'adv2t': {
+    AppLang.english: 'KYC-suspension SMS wave',
+    AppLang.telugu: 'KYC ఆగిపోతుందని SMS మోసాలు',
+    AppLang.hindi: 'KYC-बंदी वाले SMS धोखे',
+  },
+  'adv2b': {
+    AppLang.english: '"Your bank KYC is blocked" texts carry phishing links. Delete them; update KYC only at the branch or official app.',
+    AppLang.telugu: '"మీ KYC బ్లాక్" మెసేజ్‌లలో నకిలీ లింకులు ఉంటాయి. తొలగించండి; KYC బ్రాంచ్/అధికారిక యాప్‌లోనే చేయండి.',
+    AppLang.hindi: '"KYC ब्लॉक" संदेशों में नकली लिंक होते हैं। हटाएं; KYC ब्रांच/आधिकारिक ऐप में ही कराएं।',
+  },
+  'adv3t': {
+    AppLang.english: 'QR-code payment traps',
+    AppLang.telugu: 'QR పేమెంట్ ఉచ్చులు',
+    AppLang.hindi: 'QR पेमेंट जाल',
+  },
+  'adv3b': {
+    AppLang.english: 'QR stickers at shops replaced with scammer codes. Check the receiver name on screen before paying.',
+    AppLang.telugu: 'షాపుల్లో QR స్టిక్కర్లు మార్చి మోసం చేస్తున్నారు. పే చేసేముందు పేరు చూడండి.',
+    AppLang.hindi: 'दुकानों पर QR स्टिकर बदलकर ठगी हो रही है। भुगतान से पहले स्क्रीन पर नाम जांचें।',
+  },
+  'adv4t': {
+    AppLang.english: 'Part-time job frauds',
+    AppLang.telugu: 'పార్ట్-టైమ్ ఉద్యోగ మోసాలు',
+    AppLang.hindi: 'पार्ट-टाइम नौकरी ठगी',
+  },
+  'adv4b': {
+    AppLang.english: 'Telegram/WhatsApp "like & earn" tasks end in big "deposit" demands. No real job asks you to pay first.',
+    AppLang.telugu: '"లైక్ చేసి సంపాదించండి" టాస్క్‌లు చివరికి "డిపాజిట్" అడుగుతాయి. నిజమైన ఉద్యోగం డబ్బు అడగదు.',
+    AppLang.hindi: '"लाइक करके कमाएं" टास्क अंत में "जमा" मांगते हैं। असली नौकरी पहले पैसे नहीं मांगती।',
+  },
+  'adv5t': {
+    AppLang.english: 'SIM-swap + OTP theft',
+    AppLang.telugu: 'SIM మార్పు + OTP దొంగతనం',
+    AppLang.hindi: 'SIM-बदलाव + OTP चोरी',
+  },
+  'adv5b': {
+    AppLang.english: 'Sudden signal loss can mean your number moved to a scammer SIM. Call your operator at once.',
+    AppLang.telugu: 'అకస్మాత్తుగా సిగ్నల్ పోవడం అంటే మీ నంబర్ మోసగాడి SIMకి మారి ఉండవచ్చు. వెంటనే ఆపరేటర్‌కు కాల్ చేయండి.',
+    AppLang.hindi: 'अचानक सिग्नल जाना मतलब नंबर ठग के SIM पर जा सकता है। तुरंत ऑपरेटर को कॉल करें।',
+  },
+  // History
+  'historyTitle': {
+    AppLang.english: 'History',
+    AppLang.telugu: 'చరిత్ర',
+    AppLang.hindi: 'इतिहास',
+  },
+  'filterAll': {
+    AppLang.english: 'All',
+    AppLang.telugu: 'అన్నీ',
+    AppLang.hindi: 'सभी',
+  },
+  'filterCalls': {
+    AppLang.english: 'Calls',
+    AppLang.telugu: 'కాల్స్',
+    AppLang.hindi: 'कॉल',
+  },
+  'filterScans': {
+    AppLang.english: 'Scans',
+    AppLang.telugu: 'స్కాన్లు',
+    AppLang.hindi: 'स्कैन',
+  },
+  'emptyHistory': {
+    AppLang.english: 'No history yet. Protect a call or run a scan.',
+    AppLang.telugu: 'ఇంకా చరిత్ర లేదు. కాల్ రక్షించండి లేదా స్కాన్ చేయండి.',
+    AppLang.hindi: 'अभी इतिहास नहीं। कॉल सुरक्षित करें या स्कैन करें।',
+  },
+  'clearScansBtn': {
+    AppLang.english: 'Clear scan history',
+    AppLang.telugu: 'స్కాన్ చరిత్ర తొలగించండి',
+    AppLang.hindi: 'स्कैन इतिहास साफ़ करें',
+  },
+  // Safety
+  'safetyTitle': {
+    AppLang.english: 'Safety guide',
+    AppLang.telugu: 'భద్రతా మార్గదర్శి',
+    AppLang.hindi: 'सुरक्षा मार्गदर्शिका',
+  },
+  'safetySub': {
+    AppLang.english: 'Lost money or sense danger? Do this now, in order.',
+    AppLang.telugu: 'డబ్బు పోయిందా లేదా ప్రమాదం అనిపిస్తోందా? వెంటనే ఇలా చేయండి.',
+    AppLang.hindi: 'पैसे गए या खतरा लगा? अभी यही करें, इसी क्रम में।',
+  },
+  'stepAT': {
+    AppLang.english: 'Stop all payments',
+    AppLang.telugu: 'అన్ని చెల్లింపులు ఆపండి',
+    AppLang.hindi: 'सभी भुगतान रोकें',
+  },
+  'stepAS': {
+    AppLang.english: 'Decline pending UPI requests. Switch on airplane mode if they control your screen.',
+    AppLang.telugu: 'పెండింగ్ UPI అభ్యర్థనలు తిరస్కరించండి. స్క్రీన్ వాళ్ల చేతిలో ఉంటే ఫ్లైట్ మోడ్ వేయండి.',
+    AppLang.hindi: 'लंबित UPI अनुरोध ठुकराएं। स्क्रीन उनके हाथ में हो तो फ्लाइट मोड लगाएं।',
+  },
+  'stepBT': {
+    AppLang.english: 'Call 1930 immediately',
+    AppLang.telugu: 'వెంటనే 1930కి కాల్ చేయండి',
+    AppLang.hindi: 'तुरंत 1930 पर कॉल करें',
+  },
+  'stepBS': {
+    AppLang.english: 'National cyber helpline — the faster you call, the better the chance to freeze the money.',
+    AppLang.telugu: 'జాతీయ సైబర్ హెల్ప్‌లైన్ — ఎంత త్వరగా కాల్ చేస్తే డబ్బు ఆగే అవకాశం అంత ఎక్కువ.',
+    AppLang.hindi: 'राष्ट्रीय साइबर हेल्पलाइन — जितनी जल्दी कॉल, पैसे रुकने की उतनी संभावना।',
+  },
+  'stepCT': {
+    AppLang.english: 'Tell your bank',
+    AppLang.telugu: 'మీ బ్యాంకుకు చెప్పండి',
+    AppLang.hindi: 'अपने बैंक को बताएं',
+  },
+  'stepCS': {
+    AppLang.english: 'Ask them to block UPI, cards and net-banking linked to the number.',
+    AppLang.telugu: 'నంబర్‌కు లింక్ అయిన UPI, కార్డులు, నెట్-బ్యాంకింగ్ బ్లాక్ చేయమని అడగండి.',
+    AppLang.hindi: 'नंबर से जुड़े UPI, कार्ड और नेट-बैंकिंग ब्लॉक कराने को कहें।',
+  },
+  'stepDT': {
+    AppLang.english: 'File a complaint',
+    AppLang.telugu: 'ఫిర్యాదు చేయండి',
+    AppLang.hindi: 'शिकायत दर्ज करें',
+  },
+  'stepDS': {
+    AppLang.english: 'Report at cybercrime.gov.in with screenshots, numbers and transaction IDs.',
+    AppLang.telugu: 'స్క్రీన్‌షాట్లు, నంబర్లు, లావాదేవీ IDలతో cybercrime.gov.inలో ఫిర్యాదు చేయండి.',
+    AppLang.hindi: 'स्क्रीनशॉट, नंबर और ट्रांजैक्शन ID के साथ cybercrime.gov.in पर शिकायत करें।',
+  },
+  // Settings
+  'settingsTitle': {
+    AppLang.english: 'Settings & privacy',
+    AppLang.telugu: 'సెట్టింగులు & గోప్యత',
+    AppLang.hindi: 'सेटिंग और प्राइवेसी',
+  },
+  'langSection': {
+    AppLang.english: 'Language',
+    AppLang.telugu: 'భాష',
+    AppLang.hindi: 'भाषा',
+  },
+  'privacySection': {
+    AppLang.english: 'Your privacy',
+    AppLang.telugu: 'మీ గోప్యత',
+    AppLang.hindi: 'आपकी प्राइवेसी',
+  },
+  'dataSection': {
+    AppLang.english: 'Your data',
+    AppLang.telugu: 'మీ డేటా',
+    AppLang.hindi: 'आपका डेटा',
+  },
+  'clearScanData': {
+    AppLang.english: 'Clear scan history',
+    AppLang.telugu: 'స్కాన్ చరిత్ర తొలగించండి',
+    AppLang.hindi: 'स्कैन इतिहास साफ़ करें',
+  },
+  'scansCleared': {
+    AppLang.english: 'Scan history cleared',
+    AppLang.telugu: 'స్కాన్ చరిత్ర తొలగింది',
+    AppLang.hindi: 'स्कैन इतिहास साफ़ हुआ',
+  },
+  'voiceSection': {
+    AppLang.english: 'Voice check',
+    AppLang.telugu: 'వాయిస్ తనిఖీ',
+    AppLang.hindi: 'वॉइस जांच',
+  },
+  'voiceBody': {
+    AppLang.english:
+        'Tests your microphone and speech recognition before a real call. Speak for a few seconds after tapping.',
+    AppLang.telugu:
+        'నిజమైన కాల్‌కు ముందు మైక్, వాయిస్ గుర్తింపు పనిచేస్తున్నాయో చూడండి. నొక్కి కొన్ని సెకన్లు మాట్లాడండి.',
+    AppLang.hindi:
+        'असली कॉल से पहले माइक और वॉइस पहचान जांचें। दबाकर कुछ सेकंड बोलें।',
+  },
+  'voiceTestBtn': {
+    AppLang.english: 'Test voice typing',
+    AppLang.telugu: 'వాయిస్ పరీక్షించండి',
+    AppLang.hindi: 'वॉइस जांचें',
+  },
+  'voiceStopBtn': {
+    AppLang.english: 'Stop',
+    AppLang.telugu: 'ఆపండి',
+    AppLang.hindi: 'रोकें',
+  },
+  'voiceNothing': {
+    AppLang.english: 'Heard nothing — speak louder, closer, or check network.',
+    AppLang.telugu: 'ఏమీ వినబడలేదు — గట్టిగా, దగ్గరగా మాట్లాడండి లేదా నెట్‌వర్క్ చూడండి.',
+    AppLang.hindi: 'कुछ सुनाई नहीं दिया — ज़ोर से, पास से बोलें या नेटवर्क देखें।',
+  },
+  'aboutSection': {
+    AppLang.english: 'About Kavach',
+    AppLang.telugu: 'Kavach గురించి',
+    AppLang.hindi: 'कवच के बारे में',
+  },
+  'aboutBody': {
+    AppLang.english: 'Kavach v1.0.0 — scam-call shield plus link, QR, UPI, SIM and SMS checks. All checks run offline on your phone; nothing is uploaded.',
+    AppLang.telugu: 'Kavach v1.0.0 — స్కామ్-కాల్ షీల్డ్ + లింక్, QR, UPI, SIM, SMS తనిఖీలు. అన్నీ మీ ఫోన్‌లోనే ఆఫ్‌లైన్‌లో జరుగుతాయి; ఏదీ అప్‌లోడ్ కాదు.',
+    AppLang.hindi: 'कवच v1.0.0 — स्कैम-कॉल शील्ड + लिंक, QR, UPI, SIM, SMS जांच। सभी जांच आपके फोन पर ऑफलाइन; कुछ अपलोड नहीं होता।',
+  },
 };

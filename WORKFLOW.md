@@ -237,3 +237,58 @@ iOS can never auto-detect calls.
     6 commits, code pushed.
 15. Step 7 (scoreboard, tappable last scan, clear history, first-run) —
     5 commits, code pushed; doc update here.
+
+## Tier-1 tactic engine port (KAVACH_IQOO, Apache-2.0)
+
+Replaced the 7-group keyword scorer (app + backend) with a faithful port of
+the KAVACH_IQOO Tier-1 deterministic engine (Atul Chahar & Anant Sharma):
+
+- `data/tactic_lexicon.json` (vendored, attributed) is the single source of
+  truth: 5 families (AUTHORITY_IMPERSONATION, ISOLATION_AND_SECRECY,
+  URGENCY_AND_THREAT, CREDENTIAL_EXTRACTION, REMOTE_ACCESS_AND_TRANSFER),
+  180 trilingual markers (EN / Hinglish / Devanagari), 40 negative guards.
+- `tool/gen_lexicon.ps1` codegens `tactic_lexicon_data.dart` for the app and
+  the backend; `tactic_engine.dart` is identical on both sides and implements
+  the reference normalizer, longest-first claimed-span matching, per-family
+  caps, 120 s half-life decay, guard subtraction, +15 diversity bonus.
+- Two documented adaptations: bands stay the app's 31/61 (their 40/70), and
+  DANGER additionally requires >= 3 distinct families (their HIGH_RISK rule;
+  single-family loud lines cap at 60, mirroring their 69-cap).
+- SMS analyzer runs the same engine plus the Message-Guard evidence rules:
+  suspicious-link + credential/payment instruction = HIGH, >= 2 evidences =
+  CAUTION.
+- Safe-word -20 and offline local fallback are unchanged.
+
+## Link scanner: heuristics + live domain reputation
+
+Ported the detection half of student-arch/hackthon (phishing_check.py) into
+Safety tools → Link scanner:
+
+- Offline indicators merged into `urlFindings` (weighted, capped sum):
+  raw-IP +30, @ +25, punycode +25, http +15, subdomain tiers +8/+15, hyphen
+  +8, digit runs +8, long domain +10, risky TLDs +12, domain bait words +10,
+  brand-buried-in-subdomain +15 (incl. sbi/hdfc/icici/paytm/phonepe),
+  shortener +15, deep path +5, encoded segments +10 — plus the existing
+  India extras (.apk +35, lure words, long-link, query secrets).
+- Online layer (`link_reputation.dart`, dnsxray.com, no key): WHOIS age
+  (<30 d +30, <180 d +20, <1 y +8), blacklist hits +40, poor health grade
+  +15, no HTTPS +15, weak mail +10, weak TLS +8. Ten sections in parallel
+  (6 s each), 5-minute cache, total fail-soft to heuristics-only.
+- Privacy: only the bare domain is sent, only on scan, and the result card
+  always states whether the online check ran.
+- Bands stay the app's 31/61 throughout.
+- Corpus proof: `test/fixtures/calls` (their 10 scam / 8 legit scripts)
+  replayed line-by-line — 10/10 reach DANGER with >= 3 families, 0/8 reach
+  DANGER (hardest legit peaks 35), on app AND backend.
+
+## Live listening (mic + speech recognition)
+
+Android mutes call audio for third-party apps, so there is no direct
+call-audio tap. The real path, now built: call on **speaker** + Protect puts
+the mic loop on (`LiveAudioListener` over `speech_to_text`, dictation mode,
+auto-restart on pause, duplicate finals filtered). Finished phrases feed the
+tactic engine exactly like typed lines; partial phrases show as "Heard: …".
+Locale follows the app language (en-IN / hi-IN / te-IN with device fallback).
+Mic denial or missing recognizer falls back to the typed box with a notice.
+Honest limits: needs speaker on and audible speech; transcription itself uses
+the phone's recognizer (may use network) while all scoring stays offline.

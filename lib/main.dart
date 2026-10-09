@@ -3,17 +3,19 @@ import 'package:permission_handler/permission_handler.dart';
 
 import 'demo/simulator.dart';
 import 'lang.dart';
+import 'screens/dashboard_screen.dart';
 import 'screens/family_screen.dart';
-import 'screens/home_screen.dart';
 import 'screens/live_screen.dart';
 import 'screens/report_screen.dart';
 import 'services/api.dart';
+import 'services/scan_history.dart';
 import 'theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GuardianStore.load();
   await HistoryStore.load();
+  await ScanHistoryStore.load();
   runApp(const KavachApp());
 }
 
@@ -110,154 +112,71 @@ class _KavachAppState extends State<KavachApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Kavach',
-      debugShowCheckedModeBanner: false,
-      theme: kavachTheme(),
-      home: LangScope(
-        lang: _lang,
-        onLang: (l) => setState(() => _lang = l),
-        child: Builder(
-          builder: (context) => Scaffold(
-            body: IndexedStack(
-              index: _tab,
-              children: [
-                HomeScreen(
-                  onProtect: _protect,
-                  onPractice: _practice,
-                  onSetupFamily: () => setState(() => _tab = 2),
-                  onViewReport: () => setState(() => _tab = 3),
-                  familySet: _familySet,
-                  lastResult: _lastResult,
-                ),
-                LiveScreen(session: _session, onFinish: _finish),
-                FamilyScreen(
-                    onSaved: () => setState(
-                        () => _familySet = GuardianStore.isConnected)),
-                ReportScreen(
-                  summary: _lastSummary,
-                  onNewScan: () => setState(() => _tab = 1),
-                  onHistoryCleared: () => setState(() => _lastSummary = null),
-                ),
-              ],
-            ),
-            bottomNavigationBar: null,
-            floatingActionButton: _FloatingNav(
-              index: _tab,
-              onSelect: (i) => setState(() => _tab = i),
-            ),
-            floatingActionButtonLocation:
-                FloatingActionButtonLocation.centerFloat,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Floating pill navigator with all four routes.
-class _FloatingNav extends StatelessWidget {
-  final int index;
-  final ValueChanged<int> onSelect;
-
-  const _FloatingNav({required this.index, required this.onSelect});
-
-  @override
-  Widget build(BuildContext context) {
-    const items = [
-      (Icons.shield_outlined, Icons.shield_rounded, 'tabHome'),
-      (
-        Icons.phone_in_talk_outlined,
-        Icons.phone_in_talk_rounded,
-        'tabLive'
-      ),
-      (
-        Icons.family_restroom_outlined,
-        Icons.family_restroom_rounded,
-        'tabFamily'
-      ),
-      (Icons.summarize_outlined, Icons.summarize_rounded, 'tabReport'),
-    ];
-    // No outer shell — the buttons float directly over the content.
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        for (var i = 0; i < items.length; i++)
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 3),
-            child: _pillItem(context, i, items[i]),
-          ),
-      ],
-    );
-  }
-
-  Widget _pillItem(
-    BuildContext context,
-    int i,
-    (IconData, IconData, String) item,
-  ) {
-    final selected = i == index;
-    if (selected) {
-      return InkWell(
-        borderRadius: BorderRadius.circular(999),
-        onTap: () => onSelect(i),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          decoration: BoxDecoration(
-            color: KavachColors.blue,
-            borderRadius: BorderRadius.circular(999),
-            boxShadow: [
-              BoxShadow(
-                color: KavachColors.blue.withValues(alpha: 0.45),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
+    // LangScope sits ABOVE MaterialApp so pushed pages (settings, tools,
+    // threats, history, safety) inherit the language too.
+    return LangScope(
+      lang: _lang,
+      onLang: (l) => setState(() => _lang = l),
+      child: MaterialApp(
+        title: 'Kavach',
+        debugShowCheckedModeBanner: false,
+        theme: kavachTheme(),
+      home: Builder(
+        builder: (context) => Scaffold(
+          body: IndexedStack(
+            index: _tab,
             children: [
-              Icon(item.$2, color: Colors.white, size: 22),
-              const SizedBox(width: 6),
-              Text(
-                context.tr(item.$3),
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white,
-                ),
+              DashboardScreen(
+                onProtect: _protect,
+                onPractice: _practice,
+                onSetupFamily: () => setState(() => _tab = 2),
+                onViewReport: () => setState(() => _tab = 3),
+                familySet: _familySet,
+                lastResult: _lastResult,
+              ),
+              LiveScreen(session: _session, onFinish: _finish),
+              FamilyScreen(
+                  onSaved: () => setState(
+                      () => _familySet = GuardianStore.isConnected)),
+              ReportScreen(
+                summary: _lastSummary,
+                onNewScan: () => setState(() => _tab = 1),
+                onHistoryCleared: () => setState(() => _lastSummary = null),
+              ),
+            ],
+          ),
+          bottomNavigationBar: NavigationBar(
+            selectedIndex: _tab,
+            onDestinationSelected: (i) => setState(() => _tab = i),
+            destinations: [
+              NavigationDestination(
+                icon: const Icon(Icons.shield_outlined),
+                selectedIcon: const Icon(Icons.shield_rounded),
+                label: context.tr('tabHome'),
+              ),
+              NavigationDestination(
+                icon: const Icon(Icons.phone_in_talk_outlined),
+                selectedIcon:
+                    const Icon(Icons.phone_in_talk_rounded),
+                label: context.tr('tabLive'),
+              ),
+              NavigationDestination(
+                icon: const Icon(Icons.family_restroom_outlined),
+                selectedIcon:
+                    const Icon(Icons.family_restroom_rounded),
+                label: context.tr('tabFamily'),
+              ),
+              NavigationDestination(
+                icon: const Icon(Icons.summarize_outlined),
+                selectedIcon:
+                    const Icon(Icons.summarize_rounded),
+                label: context.tr('tabReport'),
               ),
             ],
           ),
         ),
-      );
-    }
-    return InkWell(
-      borderRadius: BorderRadius.circular(999),
-      onTap: () => onSelect(i),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        width: 48,
-        height: 48,
-        decoration: const BoxDecoration(
-          color: Color(0xFFE9EEF5),
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: Color(0x260D47A1),
-              blurRadius: 10,
-              offset: Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Icon(
-          item.$1,
-          color: KavachColors.sub,
-          size: 22,
-        ),
       ),
+    ),
     );
   }
 }
