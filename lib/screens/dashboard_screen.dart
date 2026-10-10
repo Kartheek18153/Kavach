@@ -295,12 +295,12 @@ class DashboardScreen extends StatelessWidget {
 
   Widget _toolsCard(BuildContext context) {
     final tools = [
+      (Icons.sim_card_rounded, 'toolSim', 'toolSimSub',
+          const SimSwapScreen()),
       (Icons.link_rounded, 'toolUrl', 'toolUrlSub',
           const UrlScannerScreen()),
       (Icons.qr_code_2_rounded, 'toolQrUpi', 'toolQrUpiSub',
           const QrUpiScreen()),
-      (Icons.sim_card_rounded, 'toolSim', 'toolSimSub',
-          const SimSwapScreen()),
       (Icons.sms_rounded, 'toolSms', 'toolSmsSub',
           const SmsAnalyzerScreen()),
     ];
