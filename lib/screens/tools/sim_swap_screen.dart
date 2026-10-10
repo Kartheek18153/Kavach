@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 
 import '../../lang.dart';
+import '../../services/api.dart';
 import '../../services/scan_history.dart';
 import '../../services/scanners.dart';
+import '../../services/sim_swap_api.dart';
+import '../../theme.dart';
 import '../../widgets/cards.dart';
 import '../../widgets/scan_widgets.dart';
 
-/// SIM-swap security check: 5 yes/no questions scored into a verdict.
+/// SIM-swap security check, two layers:
+/// 1. Telco network check (CAMARA SimSwap via our backend) — the strongest
+///    signal: asks the operator if this SIM changed recently.
+/// 2. The offline 5-question checklist (works with no network).
 class SimSwapScreen extends StatefulWidget {
   const SimSwapScreen({super.key});
 
@@ -17,6 +23,81 @@ class SimSwapScreen extends StatefulWidget {
 class _SimSwapScreenState extends State<SimSwapScreen> {
   final List<bool> _answers = List.filled(5, false);
   ScanFinding? _finding;
+
+  late final TextEditingController _phone;
+  int _lookback = 72;
+  bool _telcoBusy = false;
+  TelcoSimSwapResult? _telco;
+  String? _telcoMsg;
+
+  @override
+  void initState() {
+    super.initState();
+    final saved = GuardianStore.phone.trim();
+    _phone = TextEditingController(
+      text: GuardianStore.isValidPhone(saved)
+          ? '+91${GuardianStore.normalizePhone(saved)}'
+          : '',
+    );
+  }
+
+  @override
+  void dispose() {
+    _phone.dispose();
+    super.dispose();
+  }
+
+  String _digits() => _phone.text.trim();
+
+  Future<void> _runTelco(
+      Future<TelcoSimSwapResult?> Function() call) async {
+    final phone = _digits();
+    if (!isValidE164Phone(phone)) {
+      setState(() {
+        _telco = null;
+        _telcoMsg = context.tr('telcoInvalid');
+      });
+      return;
+    }
+    setState(() {
+      _telcoBusy = true;
+      _telcoMsg = null;
+    });
+    TelcoSimSwapResult? out;
+    try {
+      out = await call();
+    } catch (_) {
+      out = null;
+    }
+    if (!mounted) return;
+    setState(() {
+      _telcoBusy = false;
+      _telco = out;
+      _telcoMsg = null;
+      if (out == null) {
+        _telcoMsg = context.tr('telcoUnavailable');
+        return;
+      }
+      if (out.status != 'completed') return; // warning card, no gauge/history
+      final f = telcoSimSwapFinding(out);
+      ScanHistoryStore.add(ScanRecord(
+        kind: 'sim',
+        input: '${out.maskedPhone} telco',
+        risk: f.risk,
+        level: levelNameFor(f.risk),
+        reasons: f.reasons,
+        ts: DateTime.now().toIso8601String(),
+      ));
+    });
+  }
+
+  Future<void> _checkTelco() => _runTelco(() => SimSwapApi.check(
+        phoneNumber: _digits(),
+        lookbackHours: _lookback,
+      ));
+
+  Future<void> _lastChange() =>
+      _runTelco(() => SimSwapApi.retrieveDate(phoneNumber: _digits()));
 
   void _analyze() {
     final f = scoreSimSwap(_answers);
@@ -47,6 +128,82 @@ class _SimSwapScreenState extends State<SimSwapScreen> {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(18, 8, 18, 32),
         children: [
+          _telcoCard(),
+          if (_telcoBusy) ...[
+            const SizedBox(height: 14),
+            GlassCard(
+              child: Row(
+                children: [
+                  const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child:
+                        CircularProgressIndicator(strokeWidth: 2.5),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                      child: Text('${context.tr('telcoCheck')}…')),
+                ],
+              ),
+            ),
+          ],
+          if (_telcoMsg != null) ...[
+            const SizedBox(height: 14),
+            GlassCard(
+              borderColor:
+                  CyberSafeColors.caution.withValues(alpha: 0.5),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(Icons.cloud_off_rounded,
+                      color: CyberSafeColors.caution),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(_telcoMsg!,
+                        style: const TextStyle(
+                            fontSize: 14, height: 1.5)),
+                  ),
+                ],
+              ),
+            ),
+          ],
+          if (_telco != null && _telco!.status == 'completed') ...[
+            const SizedBox(height: 14),
+            ScanResultCard(finding: telcoSimSwapFinding(_telco!)),
+            const SizedBox(height: 8),
+            Center(
+              child: Text(
+                '${_telco!.provider} • ${_telco!.lookbackHours ?? _lookback}h',
+                style: const TextStyle(
+                    color: CyberSafeColors.sub, fontSize: 12.5),
+              ),
+            ),
+          ],
+          if (_telco != null && _telco!.status != 'completed') ...[
+            const SizedBox(height: 14),
+            GlassCard(
+              borderColor:
+                  CyberSafeColors.caution.withValues(alpha: 0.5),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(Icons.info_outline_rounded,
+                      color: CyberSafeColors.caution),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      _telco!.detail.isNotEmpty
+                          ? _telco!.detail
+                          : context.tr('telcoUnavailable'),
+                      style: const TextStyle(
+                          fontSize: 14, height: 1.5),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+          const SizedBox(height: 14),
           GlassCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -100,6 +257,83 @@ class _SimSwapScreenState extends State<SimSwapScreen> {
           ],
           const SizedBox(height: 14),
           ToolTipCard(context.tr('tipSim')),
+        ],
+      ),
+    );
+  }
+
+  Widget _telcoCard() {
+    return GlassCard(
+      borderColor: CyberSafeColors.teal.withValues(alpha: 0.4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.cell_tower_rounded,
+                  color: CyberSafeColors.teal),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(context.tr('telcoTitle'),
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 15)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(context.tr('telcoSub'),
+              style: const TextStyle(
+                  color: CyberSafeColors.sub,
+                  fontSize: 13.5,
+                  height: 1.5)),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _phone,
+            keyboardType: TextInputType.phone,
+            textInputAction: TextInputAction.done,
+            onSubmitted: (_) => _checkTelco(),
+            decoration: InputDecoration(
+              hintText: context.tr('telcoPhoneHint'),
+              prefixIcon: const Icon(Icons.phone_rounded),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              for (final h in [24, 72, 720])
+                Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: ChoiceChip(
+                    label: Text('${h}h'),
+                    selected: _lookback == h,
+                    selectedColor: CyberSafeColors.washTeal,
+                    onSelected: (_) =>
+                        setState(() => _lookback = h),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: _telcoBusy ? null : _checkTelco,
+                  icon: const Icon(Icons.cell_tower_rounded),
+                  label: Text(context.tr('telcoCheck')),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: _telcoBusy ? null : _lastChange,
+                  icon: const Icon(Icons.history_rounded),
+                  label: Text(context.tr('telcoLastChange')),
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );

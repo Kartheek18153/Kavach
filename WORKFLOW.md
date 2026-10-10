@@ -1,4 +1,4 @@
-# Kavach — Scam Call Shield: Full Picture
+# CyberSafe — Scam Call Shield: Full Picture
 
 Telugu-first live scam-call protection. Flutter app + Dart Shelf backend.
 Put the call on speaker → tap Protect → watch the danger meter →
@@ -158,11 +158,19 @@ watch the meter → hang up on red → get help from the report.
   shows/hides correctly.
 
 ### Key Q&A decisions recorded
-- **AI or not:** decided NO. Scammer controls the transcript (spoken
-  prompt-injection), cloud AI breaks the never-uploads promise, needs
-  internet/money/latency, and there are no live words to judge yet.
+- **AI or not:** decided NO for scoring. Scammer controls the transcript
+  (spoken prompt-injection), cloud AI breaks the never-uploads promise,
+  needs internet/money/latency, and there are no live words to judge yet.
   Rule engine stays the core; model at most an opt-in second opinion
   later that can only raise risk.
+- **AI text role (Agnes 2.5 Flash, added later):** display-only text for
+  the two human features — "Why am I at risk?" explanations and "What
+  should I do?" advice (`lib/services/agnes.dart`). Never touches the
+  meter.
+  Strictly opt-in (Settings toggle, default OFF); when on, only detected
+  signals (matched phrases, families, risk) are sent — never the full
+  transcript. Key via `--dart-define=AGNES_API_KEY=` (never in git);
+  every call fails soft to the rule-based cards.
 - **Better intent without AI:** ranked — (1) contacts + spam-number
   reputation, (2) script-stage sequence detection, (3) tougher matching
   (built as Step 4), (4) safe-word challenge flow, (5) carrier/crowd
@@ -195,7 +203,7 @@ watch the meter → hang up on red → get help from the report.
   safe-word −20. Parity + boundary + cap tests lock it.
 - **Stateful backend sessions** (`start` / `score` / `end`, safeWord
   aware) with offline local fallback; sessions pruned (30-min TTL,
-  cap 500). Point app via `--dart-define=KAVACH_API=`.
+  cap 500). Point app via `--dart-define=CYBERSAFE_API=`.
 - **Family:** validated + normalized + persisted contact, safe word,
   Connected badge, SMS fallback, remove-with-confirm.
 - **Red alert:** vibration + looping alarm, cut-first overlay,

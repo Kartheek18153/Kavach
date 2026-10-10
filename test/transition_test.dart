@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:kavach/main.dart';
+import 'package:cybersafe/main.dart';
 
 void main() {
   testWidgets('tab transitions during a live session do not throw',
       (WidgetTester tester) async {
-    await tester.pumpWidget(const KavachApp());
+    await tester.pumpWidget(const CyberSafeApp());
 
     // Start the scam demo from Home.
     await tester.tap(find.text('Protect this call'));

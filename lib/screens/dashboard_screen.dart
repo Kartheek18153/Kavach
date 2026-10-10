@@ -61,7 +61,7 @@ class DashboardScreen extends StatelessWidget {
     final scoreLevel = riskLevelFor(100 - score);
     return Scaffold(
       body: Container(
-        color: KavachColors.bg0,
+        color: CyberSafeColors.bg0,
         child: SafeArea(
           child: ListView(
             padding: const EdgeInsets.fromLTRB(18, 8, 18, 24),
@@ -92,16 +92,17 @@ class DashboardScreen extends StatelessWidget {
 
   Widget _header(BuildContext context) {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Container(
           width: 46,
           height: 46,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(14),
-            color: KavachColors.blue,
+            color: CyberSafeColors.blue,
             boxShadow: [
               BoxShadow(
-                color: KavachColors.blue.withValues(alpha: 0.45),
+                color: CyberSafeColors.blue.withValues(alpha: 0.45),
                 blurRadius: 14,
                 offset: const Offset(0, 4),
               ),
@@ -113,16 +114,25 @@ class DashboardScreen extends StatelessWidget {
         const SizedBox(width: 12),
         Expanded(
           child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('KAVACH',
+              const Text('CYBERSAFE',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 3)),
+                      fontSize: 17,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1.5,
+                      height: 1.1,
+                      color: CyberSafeColors.ink)),
+              const SizedBox(height: 2),
               Text(context.tr('brandSub'),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                      color: KavachColors.sub, fontSize: 13)),
+                      color: CyberSafeColors.sub, fontSize: 12)),
             ],
           ),
         ),
@@ -132,27 +142,27 @@ class DashboardScreen extends StatelessWidget {
           onPressed: () => Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const SettingsScreen())),
           icon: const Icon(Icons.settings_rounded,
-              color: KavachColors.sub),
+              color: CyberSafeColors.sub),
         ),
         Container(
           padding:
               const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           decoration: BoxDecoration(
-            color: KavachColors.tintForLevel(RiskLevel.safe),
+            color: CyberSafeColors.tintForLevel(RiskLevel.safe),
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
-                color: KavachColors.safe.withValues(alpha: 0.5)),
+                color: CyberSafeColors.safe.withValues(alpha: 0.5)),
           ),
           child: Row(
             children: [
               const Icon(Icons.circle,
-                  size: 8, color: KavachColors.safe),
+                  size: 8, color: CyberSafeColors.safe),
               const SizedBox(width: 6),
               Text(context.tr('ready'),
                   style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w800,
-                      color: KavachColors.safe)),
+                      color: CyberSafeColors.safe)),
             ],
           ),
         ),
@@ -161,7 +171,7 @@ class DashboardScreen extends StatelessWidget {
   }
 
   Widget _shieldCard(BuildContext context, int score, RiskLevel level) {
-    final c = KavachColors.forLevel(level);
+    final c = CyberSafeColors.forLevel(level);
     final checks =
         HistoryStore.entries.length + ScanHistoryStore.entries.length;
     final dangers = HistoryStore.entries
@@ -178,7 +188,7 @@ class DashboardScreen extends StatelessWidget {
             alignment: Alignment.center,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: KavachColors.tintForLevel(level),
+              color: CyberSafeColors.tintForLevel(level),
               border: Border.all(color: c, width: 3),
             ),
             child: Text('$score',
@@ -198,7 +208,7 @@ class DashboardScreen extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(context.tr('shieldSub'),
                     style: const TextStyle(
-                        color: KavachColors.sub,
+                        color: CyberSafeColors.sub,
                         fontSize: 12.5,
                         height: 1.45)),
                 const SizedBox(height: 8),
@@ -225,9 +235,9 @@ class DashboardScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: KavachColors.surface2,
+        color: CyberSafeColors.surface2,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: KavachColors.line),
+        border: Border.all(color: CyberSafeColors.line),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -236,10 +246,10 @@ class DashboardScreen extends StatelessWidget {
               style: const TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w900,
-                  color: KavachColors.teal)),
+                  color: CyberSafeColors.teal)),
           Text(label,
               style: const TextStyle(
-                  color: KavachColors.sub,
+                  color: CyberSafeColors.sub,
                   fontSize: 11,
                   fontWeight: FontWeight.w600)),
         ],
@@ -249,7 +259,7 @@ class DashboardScreen extends StatelessWidget {
 
   Widget _protectCard(BuildContext context) {
     return GlassCard(
-      borderColor: KavachColors.blue.withValues(alpha: 0.35),
+      borderColor: CyberSafeColors.blue.withValues(alpha: 0.35),
       child: Column(
         children: [
           Text(
@@ -263,7 +273,7 @@ class DashboardScreen extends StatelessWidget {
             context.tr('heroSub'),
             textAlign: TextAlign.center,
             style: const TextStyle(
-                color: KavachColors.sub, fontSize: 13.5, height: 1.5),
+                color: CyberSafeColors.sub, fontSize: 13.5, height: 1.5),
           ),
           const SizedBox(height: 14),
           SizedBox(
@@ -311,11 +321,11 @@ class DashboardScreen extends StatelessWidget {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: KavachColors.washTeal,
+                  color: CyberSafeColors.washTeal,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(tools[i].$1,
-                    color: KavachColors.teal, size: 22),
+                    color: CyberSafeColors.teal, size: 22),
               ),
               title: Text(context.tr(tools[i].$2),
                   style: const TextStyle(
@@ -324,9 +334,9 @@ class DashboardScreen extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                      color: KavachColors.sub, fontSize: 12.5)),
+                      color: CyberSafeColors.sub, fontSize: 12.5)),
               trailing: const Icon(Icons.chevron_right_rounded,
-                  color: KavachColors.sub),
+                  color: CyberSafeColors.sub),
               onTap: () => _openTool(context, tools[i].$4),
             ),
         ],
@@ -339,7 +349,7 @@ class DashboardScreen extends StatelessWidget {
             .where((e) => e['level'] == 'danger')
             .length +
         ScanHistoryStore.entries.where((e) => e.level == 'danger').length;
-    final c = dangers > 0 ? KavachColors.danger : KavachColors.safe;
+    final c = dangers > 0 ? CyberSafeColors.danger : CyberSafeColors.safe;
     return GlassCard(
       borderColor: c.withValues(alpha: 0.45),
       onTap: () => _openTool(context, const ThreatsScreen()),
@@ -350,7 +360,7 @@ class DashboardScreen extends StatelessWidget {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: KavachColors.tintForLevel(
+              color: CyberSafeColors.tintForLevel(
                   dangers > 0 ? RiskLevel.danger : RiskLevel.safe),
               borderRadius: BorderRadius.circular(12),
             ),
@@ -369,13 +379,13 @@ class DashboardScreen extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                      color: KavachColors.sub, fontSize: 12.5),
+                      color: CyberSafeColors.sub, fontSize: 12.5),
                 ),
               ],
             ),
           ),
           const Icon(Icons.chevron_right_rounded,
-              color: KavachColors.sub),
+              color: CyberSafeColors.sub),
         ],
       ),
     );
@@ -392,11 +402,11 @@ class DashboardScreen extends StatelessWidget {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: KavachColors.washTeal,
+              color: CyberSafeColors.washTeal,
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(Icons.health_and_safety_rounded,
-                color: KavachColors.teal, size: 26),
+                color: CyberSafeColors.teal, size: 26),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -411,13 +421,13 @@ class DashboardScreen extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                      color: KavachColors.sub, fontSize: 12.5),
+                      color: CyberSafeColors.sub, fontSize: 12.5),
                 ),
               ],
             ),
           ),
           const Icon(Icons.chevron_right_rounded,
-              color: KavachColors.sub),
+              color: CyberSafeColors.sub),
         ],
       ),
     );
@@ -476,7 +486,7 @@ class DashboardScreen extends StatelessWidget {
           if (items.isEmpty)
             Text(context.tr('noActivity'),
                 style: const TextStyle(
-                    color: KavachColors.sub, fontSize: 13.5))
+                    color: CyberSafeColors.sub, fontSize: 13.5))
           else
             InkWell(
               onTap: () =>
@@ -500,7 +510,7 @@ class DashboardScreen extends StatelessWidget {
                           ),
                           Text(a.sub,
                               style: const TextStyle(
-                                  color: KavachColors.sub,
+                                  color: CyberSafeColors.sub,
                                   fontSize: 12.5,
                                   fontWeight: FontWeight.w700)),
                         ],
@@ -524,7 +534,7 @@ class DashboardScreen extends StatelessWidget {
       width: 10,
       height: 10,
       decoration: BoxDecoration(
-        color: KavachColors.forLevel(lv),
+        color: CyberSafeColors.forLevel(lv),
         shape: BoxShape.circle,
       ),
     );
@@ -534,8 +544,8 @@ class DashboardScreen extends StatelessWidget {
     return GlassCard(
       onTap: familySet ? null : onSetupFamily,
       borderColor: familySet
-          ? KavachColors.safe.withValues(alpha: 0.5)
-          : KavachColors.caution.withValues(alpha: 0.5),
+          ? CyberSafeColors.safe.withValues(alpha: 0.5)
+          : CyberSafeColors.caution.withValues(alpha: 0.5),
       child: Row(
         children: [
           Icon(
@@ -543,8 +553,8 @@ class DashboardScreen extends StatelessWidget {
                 ? Icons.family_restroom_rounded
                 : Icons.family_restroom_outlined,
             color: familySet
-                ? KavachColors.safe
-                : KavachColors.caution,
+                ? CyberSafeColors.safe
+                : CyberSafeColors.caution,
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -560,8 +570,8 @@ class DashboardScreen extends StatelessWidget {
                       : context.tr('notSet'),
                   style: TextStyle(
                     color: familySet
-                        ? KavachColors.safe
-                        : KavachColors.caution,
+                        ? CyberSafeColors.safe
+                        : CyberSafeColors.caution,
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                   ),
@@ -583,7 +593,7 @@ class DashboardScreen extends StatelessWidget {
                     Text(lastResult!,
                         textAlign: TextAlign.end,
                         style: const TextStyle(
-                            color: KavachColors.sub,
+                            color: CyberSafeColors.sub,
                             fontSize: 12.5,
                             fontWeight: FontWeight.w600)),
                   ],
@@ -599,14 +609,14 @@ class DashboardScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
       decoration: BoxDecoration(
-        color: KavachColors.washCaution,
+        color: CyberSafeColors.washCaution,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-            color: KavachColors.caution.withValues(alpha: 0.45)),
+            color: CyberSafeColors.caution.withValues(alpha: 0.45)),
       ),
       child: Row(
         children: [
-          const Icon(Icons.sos_rounded, color: KavachColors.caution),
+          const Icon(Icons.sos_rounded, color: CyberSafeColors.caution),
           const SizedBox(width: 12),
           Expanded(
             child: Text(

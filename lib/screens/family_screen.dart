@@ -70,7 +70,7 @@ class _FamilyScreenState extends State<FamilyScreen> {
           TextButton(
             onPressed: () => Navigator.of(c).pop(true),
             child: Text(context.tr('deleteBtn'),
-                style: const TextStyle(color: KavachColors.danger)),
+                style: const TextStyle(color: CyberSafeColors.danger)),
           ),
         ],
       ),
@@ -109,11 +109,11 @@ class _FamilyScreenState extends State<FamilyScreen> {
             ),
             const SizedBox(height: 12),
             GlassCard(
-            borderColor: KavachColors.teal.withValues(alpha: 0.4),
+            borderColor: CyberSafeColors.teal.withValues(alpha: 0.4),
             child: Row(
               children: [
                 const Icon(Icons.family_restroom_rounded,
-                    color: KavachColors.teal, size: 30),
+                    color: CyberSafeColors.teal, size: 30),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
@@ -161,13 +161,13 @@ class _FamilyScreenState extends State<FamilyScreen> {
                 Text(
                   context.tr('safeWordInfo'),
                   style: const TextStyle(
-                      color: KavachColors.sub, fontSize: 13.5, height: 1.6),
+                      color: CyberSafeColors.sub, fontSize: 13.5, height: 1.6),
                 ),
                 const SizedBox(height: 12),
                 Text(
                   context.tr('safeWordHelp'),
                   style: const TextStyle(
-                      color: KavachColors.teal,
+                      color: CyberSafeColors.teal,
                       fontSize: 13,
                       height: 1.6,
                       fontWeight: FontWeight.w600),

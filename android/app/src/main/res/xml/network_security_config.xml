@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- Dev backend runs on plain http:// (emulator 10.0.2.2 / localhost /
+         PC LAN IP). Public reputation API (dnsxray) stays HTTPS.
+         Base allows cleartext so any LAN IP works without editing XML. -->
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

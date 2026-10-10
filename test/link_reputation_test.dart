@@ -5,8 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 
-import 'package:kavach/services/link_reputation.dart';
-import 'package:kavach/services/scanners.dart';
+import 'package:cybersafe/services/link_reputation.dart';
+import 'package:cybersafe/services/scanners.dart';
 
 void main() {
   group('merged URL heuristics', () {

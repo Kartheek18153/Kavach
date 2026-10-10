@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:kavach/services/scanners.dart';
+import 'package:cybersafe/services/scanners.dart';
 
 void main() {
   group('URL scanner', () {

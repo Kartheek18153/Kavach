@@ -24,6 +24,9 @@ class TranscriptLine {
 }
 
 /// Immutable snapshot of the demo session, pushed via [DemoSession.state].
+///
+/// Carries the explainable breakdown (families, evidence, per-family
+/// contributions) so Live + Report can answer "Why am I at risk?".
 class DemoState {
   final List<TranscriptLine> lines;
   final int risk;
@@ -36,6 +39,11 @@ class DemoState {
   final bool finished;
   final int elapsedSec;
   final bool isDemo;
+  final Set<String> families;
+  final Map<String, List<String>> evidence;
+  final Map<String, double> capped;
+  final int bonus;
+  final double guardDelta;
 
   const DemoState({
     this.lines = const [],
@@ -49,6 +57,11 @@ class DemoState {
     this.finished = false,
     this.elapsedSec = 0,
     this.isDemo = true,
+    this.families = const {},
+    this.evidence = const {},
+    this.capped = const {},
+    this.bonus = 0,
+    this.guardDelta = 0,
   });
 
   DemoState copyWith({
@@ -63,6 +76,11 @@ class DemoState {
     bool? finished,
     int? elapsedSec,
     bool? isDemo,
+    Set<String>? families,
+    Map<String, List<String>>? evidence,
+    Map<String, double>? capped,
+    int? bonus,
+    double? guardDelta,
   }) {
     return DemoState(
       lines: lines ?? this.lines,
@@ -76,6 +94,11 @@ class DemoState {
       finished: finished ?? this.finished,
       elapsedSec: elapsedSec ?? this.elapsedSec,
       isDemo: isDemo ?? this.isDemo,
+      families: families ?? this.families,
+      evidence: evidence ?? this.evidence,
+      capped: capped ?? this.capped,
+      bonus: bonus ?? this.bonus,
+      guardDelta: guardDelta ?? this.guardDelta,
     );
   }
 }
@@ -158,7 +181,7 @@ class DemoSession extends ChangeNotifier implements ValueListenable<DemoState> {
     _timer = Timer.periodic(const Duration(seconds: 1), (_) => _onTick());
     // Open a stateful backend session when reachable; ticks fall back
     // to local scoring until the id arrives.
-    KavachApi.startSession(isScam: isScam).then((id) {
+    CyberSafeApi.startSession(isScam: isScam).then((id) {
       if (id != null && _state.running) _sessionId = id;
     });
   }
@@ -166,7 +189,7 @@ class DemoSession extends ChangeNotifier implements ValueListenable<DemoState> {
   void _endSessionFireForget() {
     final id = _sessionId;
     _sessionId = null;
-    if (id != null) KavachApi.endSession(id);
+    if (id != null) CyberSafeApi.endSession(id);
   }
 
   bool _safeWordHit(String text) {
@@ -190,14 +213,14 @@ class DemoSession extends ChangeNotifier implements ValueListenable<DemoState> {
       // Prefer stateful backend session; then stateless; then local engine.
       final sid = _sessionId;
       if (sid != null) {
-        final st = await KavachApi.scoreInSession(sessionId: sid, text: s.text);
+        final st = await CyberSafeApi.scoreInSession(sessionId: sid, text: s.text);
         if (st != null) {
           final r = (st['risk'] as num?)?.toInt() ?? _state.risk;
           final synced = (st['reasons'] as List? ?? const []).map((e) => '$e').toList();
           // Keep the local engine fed so offline fallback stays continuous.
           _tactics.addWindow(s.text, nowMs);
-          _seenFamilies
-              .addAll(_tactics.scoreAt(nowMs).families);
+          final snap = _tactics.scoreAt(nowMs);
+          _seenFamilies.addAll(snap.families);
           lines = [...lines, TranscriptLine(s.text, flagged: ((st['points'] as num?)?.toInt() ?? 0) > 0)];
           risk = r;
           final lvl = riskLevelFor(risk);
@@ -213,13 +236,18 @@ class DemoSession extends ChangeNotifier implements ValueListenable<DemoState> {
             running: !doneEarly,
             finished: doneEarly,
             elapsedSec: elapsed,
+            families: {..._seenFamilies},
+            evidence: Map.of(snap.evidence),
+            capped: Map.of(snap.cappedByFamily),
+            bonus: snap.diversityBonus,
+            guardDelta: snap.guardDelta,
           );
           _safeNotify();
           if (doneEarly) _timer?.cancel();
           return;
         }
       }
-      final remote = await KavachApi.scoreLine(s.text);
+      final remote = await CyberSafeApi.scoreLine(s.text);
       int newSignals;
       if (remote != null) {
         newSignals = (remote['points'] as num?)?.toInt() ?? 0;
@@ -241,6 +269,7 @@ class DemoSession extends ChangeNotifier implements ValueListenable<DemoState> {
     final alerted = _state.alerted || level == RiskLevel.danger;
     // Real mode stays live until the user ends it; demos finish the script.
     final done = _state.isDemo && _cursor >= _script.length;
+    final snap = _tactics.scoreAt(nowMs);
     _state = _state.copyWith(
       lines: lines,
       risk: risk,
@@ -252,6 +281,11 @@ class DemoSession extends ChangeNotifier implements ValueListenable<DemoState> {
       running: !done,
       finished: done,
       elapsedSec: elapsed,
+      families: {..._seenFamilies},
+      evidence: Map.of(snap.evidence),
+      capped: Map.of(snap.cappedByFamily),
+      bonus: snap.diversityBonus,
+      guardDelta: snap.guardDelta,
     );
     _safeNotify();
     if (done) _timer?.cancel();
@@ -271,10 +305,11 @@ class DemoSession extends ChangeNotifier implements ValueListenable<DemoState> {
     final sid = _sessionId;
     final nowMs = _state.elapsedSec * 1000;
     if (sid != null) {
-      final st = await KavachApi.scoreInSession(sessionId: sid, text: t);
+      final st = await CyberSafeApi.scoreInSession(sessionId: sid, text: t);
       if (st != null) {
         _tactics.addWindow(t, nowMs);
-        _seenFamilies.addAll(_tactics.scoreAt(nowMs).families);
+        final snap0 = _tactics.scoreAt(nowMs);
+        _seenFamilies.addAll(snap0.families);
         final r = (st['risk'] as num?)?.toInt() ?? _state.risk;
         final lvl = riskLevelFor(r);
         _state = _state.copyWith(
@@ -286,12 +321,17 @@ class DemoSession extends ChangeNotifier implements ValueListenable<DemoState> {
           reasons: ((st['reasons'] as List?) ?? const []).map((e) => '$e').toList(),
           reasonsTelugu: '${st['reasonsTelugu'] ?? _reasonsTelugu()}',
           alerted: (st['alerted'] == true) || _state.alerted || lvl == RiskLevel.danger,
+          families: {..._seenFamilies},
+          evidence: Map.of(snap0.evidence),
+          capped: Map.of(snap0.cappedByFamily),
+          bonus: snap0.diversityBonus,
+          guardDelta: snap0.guardDelta,
         );
         _safeNotify();
         return;
       }
     }
-    final remote = await KavachApi.scoreLine(t);
+    final remote = await CyberSafeApi.scoreLine(t);
     int newSignals;
     if (remote != null) {
       newSignals = (remote['points'] as num?)?.toInt() ?? 0;
@@ -315,6 +355,11 @@ class DemoSession extends ChangeNotifier implements ValueListenable<DemoState> {
       reasons: _reasons(),
       reasonsTelugu: _reasonsTelugu(),
       alerted: _state.alerted || level == RiskLevel.danger,
+      families: {..._seenFamilies},
+      evidence: Map.of(snap.evidence),
+      capped: Map.of(snap.cappedByFamily),
+      bonus: snap.diversityBonus,
+      guardDelta: snap.guardDelta,
     );
     _safeNotify();
   }
@@ -323,7 +368,7 @@ class DemoSession extends ChangeNotifier implements ValueListenable<DemoState> {
     _timer?.cancel();
     _endSessionFireForget();
     // Privacy: drop the live transcript the moment the call ends -
-    // Kavach listens, it never records.
+    // CyberSafe listens, it never records.
     _state = _state.copyWith(
         running: false, finished: true, lines: const []);
     _safeNotify();

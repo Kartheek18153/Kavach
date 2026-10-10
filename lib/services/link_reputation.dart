@@ -102,7 +102,7 @@ Future<({Map<String, dynamic> section, String? error})> _fetchSection(
         ? Uri.parse('$_api?action=whois&target=$host')
         : Uri.parse('$_api?domain=$host&section=$kind');
     final res = await client
-        .get(uri, headers: {'User-Agent': 'kavach-link-check/1.0'})
+        .get(uri, headers: {'User-Agent': 'cybersafe-link-check/1.0'})
         .timeout(_requestTimeout);
     if (res.statusCode != 200) {
       return (section: <String, dynamic>{}, error: 'http ${res.statusCode}');

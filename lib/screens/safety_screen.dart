@@ -65,7 +65,7 @@ class SafetyScreen extends StatelessWidget {
             const SizedBox(height: 8),
             GlassCard(
               borderColor:
-                  KavachColors.danger.withValues(alpha: 0.5),
+                  CyberSafeColors.danger.withValues(alpha: 0.5),
               child: Text(
                 context.tr('safetySub'),
                 style: const TextStyle(
@@ -86,13 +86,13 @@ class SafetyScreen extends StatelessWidget {
                           height: 34,
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
-                            color: KavachColors.washDanger,
+                            color: CyberSafeColors.washDanger,
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Text(s.$1,
                               style: const TextStyle(
                                   fontWeight: FontWeight.w900,
-                                  color: KavachColors.danger)),
+                                  color: CyberSafeColors.danger)),
                         ),
                         title: Text(s.$2,
                             style: const TextStyle(
@@ -100,7 +100,7 @@ class SafetyScreen extends StatelessWidget {
                                 fontSize: 15)),
                         subtitle: Text(s.$3,
                             style: const TextStyle(
-                                color: KavachColors.sub, fontSize: 13)),
+                                color: CyberSafeColors.sub, fontSize: 13)),
                       ),
                     )
                     .toList(),
@@ -139,7 +139,7 @@ class SafetyScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Icon(Icons.check_circle_rounded,
-                              size: 18, color: KavachColors.safe),
+                              size: 18, color: CyberSafeColors.safe),
                           const SizedBox(width: 10),
                           Expanded(
                             child: Text(context.tr(k),
@@ -157,7 +157,7 @@ class SafetyScreen extends StatelessWidget {
             GlassCard(
               child: Text(context.tr('learnBody'),
                   style: const TextStyle(
-                      color: KavachColors.sub,
+                      color: CyberSafeColors.sub,
                       fontSize: 13.5,
                       height: 1.55)),
             ),

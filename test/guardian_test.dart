@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:kavach/lang.dart';
-import 'package:kavach/screens/dashboard_screen.dart';
-import 'package:kavach/services/api.dart';
+import 'package:cybersafe/lang.dart';
+import 'package:cybersafe/screens/dashboard_screen.dart';
+import 'package:cybersafe/services/api.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {

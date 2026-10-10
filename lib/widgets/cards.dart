@@ -23,10 +23,10 @@ class GlassCard extends StatelessWidget {
     final card = Container(
       padding: padding,
       decoration: BoxDecoration(
-        color: KavachColors.surface,
+        color: CyberSafeColors.surface,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: borderColor ?? KavachColors.line,
+          color: borderColor ?? CyberSafeColors.line,
         ),
         boxShadow: const [
           // Tight key shadow — grounds the card.
@@ -69,7 +69,7 @@ class SectionTitle extends StatelessWidget {
           fontSize: 12,
           fontWeight: FontWeight.w700,
           letterSpacing: 1.4,
-          color: KavachColors.sub,
+          color: CyberSafeColors.sub,
         ),
       ),
     );
@@ -84,11 +84,11 @@ class StatusChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = KavachColors.forLevel(level);
+    final c = CyberSafeColors.forLevel(level);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
       decoration: BoxDecoration(
-        color: KavachColors.tintForLevel(level),
+        color: CyberSafeColors.tintForLevel(level),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: c.withValues(alpha: 0.55)),
         boxShadow: const [

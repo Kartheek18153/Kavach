@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:kavach/lang.dart';
-import 'package:kavach/services/live_audio.dart';
+import 'package:cybersafe/lang.dart';
+import 'package:cybersafe/services/live_audio.dart';
 
 void main() {
   test('preferred locale per language', () {

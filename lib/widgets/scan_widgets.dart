@@ -18,7 +18,7 @@ class ScanResultCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final level = _levelForFinding(finding);
     return GlassCard(
-      borderColor: KavachColors.forLevel(level).withValues(alpha: 0.5),
+      borderColor: CyberSafeColors.forLevel(level).withValues(alpha: 0.5),
       child: Column(
         children: [
           DangerMeter(risk: finding.risk, level: level, size: 200),
@@ -29,13 +29,13 @@ class ScanResultCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Icon(Icons.check_circle_rounded,
-                  size: 14, color: KavachColors.safe),
+                  size: 14, color: CyberSafeColors.safe),
               const SizedBox(width: 6),
               Flexible(
                 child: Text(
                   context.tr('savedNote'),
                   style: const TextStyle(
-                      color: KavachColors.sub, fontSize: 12.5),
+                      color: CyberSafeColors.sub, fontSize: 12.5),
                 ),
               ),
             ],
@@ -55,7 +55,7 @@ class ReasonList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = KavachColors.forLevel(level);
+    final c = CyberSafeColors.forLevel(level);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -102,15 +102,15 @@ class ToolTipCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
       decoration: BoxDecoration(
-        color: KavachColors.washTeal,
+        color: CyberSafeColors.washTeal,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-            color: KavachColors.teal.withValues(alpha: 0.35)),
+            color: CyberSafeColors.teal.withValues(alpha: 0.35)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.lightbulb_rounded, color: KavachColors.teal),
+          const Icon(Icons.lightbulb_rounded, color: CyberSafeColors.teal),
           const SizedBox(width: 12),
           Expanded(
             child: Text(text,

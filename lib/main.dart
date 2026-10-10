@@ -3,6 +3,7 @@ import 'package:permission_handler/permission_handler.dart';
 
 import 'demo/simulator.dart';
 import 'lang.dart';
+import 'services/agnes.dart';
 import 'screens/dashboard_screen.dart';
 import 'screens/family_screen.dart';
 import 'screens/live_screen.dart';
@@ -16,18 +17,19 @@ void main() async {
   await GuardianStore.load();
   await HistoryStore.load();
   await ScanHistoryStore.load();
-  runApp(const KavachApp());
+  await AgnesConsent.load();
+  runApp(const CyberSafeApp());
 }
 
-/// Kavach — Telugu-first scam-call shield (hackathon UI build).
-class KavachApp extends StatefulWidget {
-  const KavachApp({super.key});
+/// CyberSafe — Telugu-first scam-call shield (hackathon UI build).
+class CyberSafeApp extends StatefulWidget {
+  const CyberSafeApp({super.key});
 
   @override
-  State<KavachApp> createState() => _KavachAppState();
+  State<CyberSafeApp> createState() => _CyberSafeAppState();
 }
 
-class _KavachAppState extends State<KavachApp> {
+class _CyberSafeAppState extends State<CyberSafeApp> {
   int _tab = 0;
   late final DemoSession _session;
   bool _familySet = false;
@@ -84,9 +86,22 @@ class _KavachAppState extends State<KavachApp> {
   Map<String, dynamic>? _restoreLatest() {
     if (HistoryStore.entries.isEmpty) return null;
     final e = HistoryStore.entries.first;
+    Map<String, List<String>> evMap(Object? v) {
+      if (v is! Map) return {};
+      return v.map((k, e) => MapEntry(
+          '$k', ((e as List?) ?? const []).map((x) => '$x').toList()));
+    }
+
+    Map<String, double> capMap(Object? v) {
+      if (v is! Map) return {};
+      return v.map(
+          (k, e) => MapEntry('$k', (e as num? ?? 0).toDouble()));
+    }
+
     return {
       'risk': e['risk'] ?? 0,
       'level': _levelFrom(e['level']),
+      'band': '${e['band'] ?? e['level'] ?? 'safe'}',
       'scamType': e['scamType'] ?? '-',
       'reasons': List.from(e['reasons'] ?? const []),
       'reasonsTelugu': e['reasonsTelugu'] ?? '',
@@ -95,6 +110,13 @@ class _KavachAppState extends State<KavachApp> {
       'lines': e['lines'] ?? 0,
       'isDemo': e['demo'] ?? false,
       'smsSent': e['smsSent'] ?? false,
+      'families': ((e['families'] as List?) ?? const [])
+          .map((x) => '$x')
+          .toList(),
+      'evidence': evMap(e['evidence']),
+      'capped': capMap(e['capped']),
+      'bonus': (e['bonus'] as num? ?? 0).toInt(),
+      'guardDelta': (e['guardDelta'] as num? ?? 0).toDouble(),
     };
   }
 
@@ -118,9 +140,9 @@ class _KavachAppState extends State<KavachApp> {
       lang: _lang,
       onLang: (l) => setState(() => _lang = l),
       child: MaterialApp(
-        title: 'Kavach',
+        title: 'CyberSafe',
         debugShowCheckedModeBanner: false,
-        theme: kavachTheme(),
+        theme: cyberSafeTheme(),
       home: Builder(
         builder: (context) => Scaffold(
           body: IndexedStack(

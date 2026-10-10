@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:kavach/lang.dart';
-import 'package:kavach/screens/history_screen.dart';
-import 'package:kavach/screens/safety_screen.dart';
-import 'package:kavach/screens/settings_screen.dart';
-import 'package:kavach/screens/threats_screen.dart';
-import 'package:kavach/screens/tools/url_scanner_screen.dart';
+import 'package:cybersafe/lang.dart';
+import 'package:cybersafe/screens/history_screen.dart';
+import 'package:cybersafe/screens/safety_screen.dart';
+import 'package:cybersafe/screens/settings_screen.dart';
+import 'package:cybersafe/screens/threats_screen.dart';
+import 'package:cybersafe/screens/tools/url_scanner_screen.dart';
 
 /// Regression test: every pushed page must render inside the app's
 /// language scope. Pushed routes live above the home tree, so a scope
@@ -28,11 +28,11 @@ void main() {
     expect(find.text('YOUR PRIVACY'), findsOneWidget);
     expect(find.text('YOUR DATA'), findsOneWidget);
     await t.dragUntilVisible(
-      find.text('ABOUT KAVACH'),
+      find.text('ABOUT CYBERSAFE'),
       find.byType(ListView),
       const Offset(0, -200),
     );
-    expect(find.text('ABOUT KAVACH'), findsOneWidget);
+    expect(find.text('ABOUT CYBERSAFE'), findsOneWidget);
   });
 
   testWidgets('tool screen renders', (t) async {

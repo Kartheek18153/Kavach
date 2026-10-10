@@ -21,7 +21,7 @@ class DangerMeter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = KavachColors.forLevel(level);
+    final color = CyberSafeColors.forLevel(level);
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -59,7 +59,7 @@ class DangerMeter extends StatelessWidget {
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
                         letterSpacing: 2,
-                        color: KavachColors.sub,
+                        color: CyberSafeColors.sub,
                       ),
                     ),
                   ],
@@ -94,9 +94,9 @@ class _GaugePainter extends CustomPainter {
       ..strokeCap = StrokeCap.round;
     const zones = [0.0, 0.3, 0.6, 1.0];
     const zoneColors = [
-      KavachColors.safe,
-      KavachColors.caution,
-      KavachColors.danger
+      CyberSafeColors.safe,
+      CyberSafeColors.caution,
+      CyberSafeColors.danger
     ];
     for (var i = 0; i < 3; i++) {
       trackPaint.color = zoneColors[i].withValues(alpha: 0.18);
@@ -127,11 +127,11 @@ class _GaugePainter extends CustomPainter {
       center,
       needleEnd,
       Paint()
-        ..color = KavachColors.ink.withValues(alpha: 0.85)
+        ..color = CyberSafeColors.ink.withValues(alpha: 0.85)
         ..strokeWidth = 3
         ..strokeCap = StrokeCap.round,
     );
-    canvas.drawCircle(center, 7, Paint()..color = KavachColors.surface);
+    canvas.drawCircle(center, 7, Paint()..color = CyberSafeColors.surface);
     canvas.drawCircle(center, 7, Paint()..color = color..style = PaintingStyle.stroke..strokeWidth = 3);
   }
 

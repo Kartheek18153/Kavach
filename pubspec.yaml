@@ -1,4 +1,4 @@
-name: kavach
+name: cybersafe
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -41,6 +41,8 @@ dependencies:
   audioplayers: ^6.8.1
   share_plus: ^13.3.1
   speech_to_text: ^7.5.0
+  mobile_scanner: ^7.4.2
+  image_picker: ^1.2.4
 
 dev_dependencies:
   flutter_test:

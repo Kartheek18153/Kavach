@@ -4,9 +4,12 @@ import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../lang.dart';
+import '../services/agnes.dart';
 import '../services/api.dart';
+import '../services/risk_explain.dart';
 import '../theme.dart';
 import '../widgets/cards.dart';
+import '../widgets/explain_widgets.dart';
 
 /// After-call report: verdict, 1930 helper, checklist, per-scam learning,
 /// share, and browsable past scans.
@@ -43,9 +46,22 @@ class _ReportScreenState extends State<ReportScreen> {
   }
 
   Map<String, dynamic> _restore(Map<String, dynamic> e) {
+    Map<String, List<String>> evMap(Object? v) {
+      if (v is! Map) return {};
+      return v.map((k, x) => MapEntry(
+          '$k', ((x as List?) ?? const []).map((y) => '$y').toList()));
+    }
+
+    Map<String, double> capMap(Object? v) {
+      if (v is! Map) return {};
+      return v.map(
+          (k, x) => MapEntry('$k', (x as num? ?? 0).toDouble()));
+    }
+
     return {
       'risk': e['risk'] ?? 0,
       'level': e['level'] is RiskLevel ? e['level'] : _levelFrom(e['level']),
+      'band': '${e['band'] ?? e['level'] ?? 'safe'}',
       'scamType': e['scamType'] ?? '-',
       'reasons': List.from(e['reasons'] ?? const []),
       'reasonsTelugu': e['reasonsTelugu'] ?? '',
@@ -54,7 +70,68 @@ class _ReportScreenState extends State<ReportScreen> {
       'lines': e['lines'] ?? 0,
       'isDemo': e['demo'] ?? e['isDemo'] ?? false,
       'smsSent': e['smsSent'] ?? false,
+      'families': ((e['families'] as List?) ?? const [])
+          .map((x) => '$x')
+          .toList(),
+      'evidence': evMap(e['evidence']),
+      'capped': capMap(e['capped']),
+      'bonus': (e['bonus'] as num? ?? 0).toInt(),
+      'guardDelta': (e['guardDelta'] as num? ?? 0).toDouble(),
     };
+  }
+
+  String _langCode(BuildContext c) {
+    final l = c.appLang;
+    return l == AppLang.telugu ? 'te' : l == AppLang.hindi ? 'hi' : 'en';
+  }
+
+  Set<String> _familiesOf(Map<String, dynamic> s) =>
+      ((s['families'] as List?) ?? const []).map((e) => '$e').toSet();
+
+  Map<String, List<String>> _evidenceOf(Map<String, dynamic> s) {
+    final v = s['evidence'];
+    if (v is! Map) return {};
+    return v.map((k, e) => MapEntry(
+        '$k', ((e as List?) ?? const []).map((x) => '$x').toList()));
+  }
+
+  Map<String, double> _cappedOf(Map<String, dynamic> s) {
+    final v = s['capped'];
+    if (v is! Map) return {};
+    return v.map(
+        (k, e) => MapEntry('$k', (e as num? ?? 0).toDouble()));
+  }
+
+  String _bandOf(Map<String, dynamic> s) {
+    final b = '${s['band'] ?? ''}';
+    if (b == 'danger' || b == 'caution' || b == 'safe') return b;
+    final l = s['level'];
+    if (l == RiskLevel.danger) return 'danger';
+    if (l == RiskLevel.caution) return 'caution';
+    return 'safe';
+  }
+
+  Future<void> _smsFamilyReport(
+      BuildContext context, Map<String, dynamic> s) async {
+    final phone = GuardianStore.phone.trim();
+    if (phone.isEmpty) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.tr('smsNoContact'))),
+      );
+      return;
+    }
+    final body = Uri.encodeComponent(
+        context.trP('smsDangerBody', {'type': '${s['scamType']}', 'risk': '${s['risk']}'}));
+    final uri = Uri.parse('sms:$phone?body=$body');
+    try {
+      await launchUrl(uri);
+    } catch (_) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.tr('smsNoContact'))),
+      );
+    }
   }
 
   @override
@@ -90,11 +167,75 @@ class _ReportScreenState extends State<ReportScreen> {
                     const SizedBox(height: 12),
                     _verdictHeader(context, s),
                     const SizedBox(height: 14),
+                    SectionTitle(context.tr('whyTitle')),
+                    WhyAtRiskCard(
+                      risk: (s['risk'] as num? ?? 0).toInt(),
+                      level: s['level'] is RiskLevel
+                          ? s['level'] as RiskLevel
+                          : _levelFrom(s['level']),
+                      families: _familiesOf(s),
+                      evidence: _evidenceOf(s),
+                      cappedByFamily: _cappedOf(s),
+                      diversityBonus:
+                          (s['bonus'] as num? ?? 0).toInt(),
+                      guardDelta:
+                          (s['guardDelta'] as num? ?? 0).toDouble(),
+                      lang: _langCode(context),
+                      title: context.tr('whyTitle'),
+                      emptyText: context.tr('whyEmpty'),
+                    ),
+                    const SizedBox(height: 10),
+                    AiInsightCard(
+                      available: AgnesConfig.isConfigured &&
+                          AgnesConsent.isOn,
+                      askLabel: context.tr('aiAsk'),
+                      loadingLabel: context.tr('aiLoading'),
+                      failedText: context.tr('aiFailed'),
+                      noteText: context.tr('aiNote'),
+                      badgeLabel: context.tr('aiBadge'),
+                      onFetch: () => AgnesClient.explain(
+                        families: _familiesOf(s),
+                        evidence: _evidenceOf(s),
+                        risk: (s['risk'] as num? ?? 0).toInt(),
+                        band: _bandOf(s),
+                        scamType: '${s['scamType']}',
+                        lang: _langCode(context),
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    SectionTitle(context.tr('whatTitle')),
+                    ActionPlanCard(
+                      actions: actionsFor(
+                        families: _familiesOf(s),
+                        risk: (s['risk'] as num? ?? 0).toInt(),
+                        band: _bandOf(s),
+                      ),
+                      lang: _langCode(context),
+                      title: context.tr('whatSub'),
+                      onCall1930: () => _dial1930(context),
+                      onOpenPortal: () => _openPortal(context),
+                      onSmsFamily: () =>
+                          _smsFamilyReport(context, s),
+                    ),
+                    const SizedBox(height: 10),
+                    AiInsightCard(
+                      available: AgnesConfig.isConfigured &&
+                          AgnesConsent.isOn,
+                      askLabel: context.tr('aiAskAdvice'),
+                      loadingLabel: context.tr('aiLoading'),
+                      failedText: context.tr('aiFailed'),
+                      noteText: context.tr('aiNote'),
+                      badgeLabel: context.tr('aiBadge'),
+                      onFetch: () => AgnesClient.advise(
+                        families: _familiesOf(s),
+                        risk: (s['risk'] as num? ?? 0).toInt(),
+                        band: _bandOf(s),
+                        lang: _langCode(context),
+                      ),
+                    ),
+                    const SizedBox(height: 14),
                     SectionTitle(context.tr('reportHelp')),
                     _reportHelper(context, s),
-                    const SizedBox(height: 14),
-                    SectionTitle(context.tr('checklist')),
-                    _checklist(context),
                     const SizedBox(height: 14),
                     SectionTitle(context.tr('learnTitle')),
                     _learningCard(context, s),
@@ -112,14 +253,14 @@ class _ReportScreenState extends State<ReportScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const Icon(Icons.lock_rounded,
-                            size: 14, color: KavachColors.sub),
+                            size: 14, color: CyberSafeColors.sub),
                         const SizedBox(width: 6),
                         Flexible(
                           child: Text(
                             context.tr('privacyReport'),
                             textAlign: TextAlign.center,
                             style: const TextStyle(
-                                color: KavachColors.sub, fontSize: 12.5),
+                                color: CyberSafeColors.sub, fontSize: 12.5),
                           ),
                         ),
                       ],
@@ -152,7 +293,7 @@ class _ReportScreenState extends State<ReportScreen> {
           context.tr('reportEmpty'),
           textAlign: TextAlign.center,
           style: const TextStyle(
-              color: KavachColors.sub, fontSize: 15, height: 1.7),
+              color: CyberSafeColors.sub, fontSize: 15, height: 1.7),
         ),
       ),
     );
@@ -160,7 +301,7 @@ class _ReportScreenState extends State<ReportScreen> {
 
   Widget _verdictHeader(BuildContext context, Map<String, dynamic> s) {
     final level = s['level'] as RiskLevel;
-    final color = KavachColors.forLevel(level);
+    final color = CyberSafeColors.forLevel(level);
     final alerted = s['alerted'] == true
         ? context.tr('alertedYes')
         : context.tr('alertedNo');
@@ -194,13 +335,13 @@ class _ReportScreenState extends State<ReportScreen> {
             const SizedBox(height: 6),
             Text('${s['reasonsTelugu']}',
                 style: const TextStyle(
-                    color: KavachColors.sub, fontSize: 14, height: 1.5)),
+                    color: CyberSafeColors.sub, fontSize: 14, height: 1.5)),
           ],
           const SizedBox(height: 8),
           Text(
             '${context.tr('durationWord')} ${s['elapsedSec']}s | ${s['lines']} ${context.tr('linesWord')} | ${context.tr('familyWord')} $alerted',
             style: const TextStyle(
-                color: KavachColors.sub,
+                color: CyberSafeColors.sub,
                 fontSize: 12.5,
                 fontWeight: FontWeight.w600),
           ),
@@ -208,7 +349,7 @@ class _ReportScreenState extends State<ReportScreen> {
           Text(
             '$origin | SMS $sms',
             style: const TextStyle(
-                color: KavachColors.sub,
+                color: CyberSafeColors.sub,
                 fontSize: 12.5,
                 fontWeight: FontWeight.w600),
           ),
@@ -249,8 +390,14 @@ class _ReportScreenState extends State<ReportScreen> {
   }
 
   Widget _reportHelper(BuildContext context, Map<String, dynamic> s) {
+    final fams = _familiesOf(s);
+    final topActions = actionsFor(
+      families: fams,
+      risk: (s['risk'] as num? ?? 0).toInt(),
+      band: _bandOf(s),
+    ).take(3).map((a) => a.t(_langCode(context))).join(' | ');
     final text =
-        'Kavach report - ${DateTime.now().toLocal().toString().substring(0, 16)}\nType: ${s['scamType']}\nRisk: ${s['risk']}/100\nReasons: ${(s['reasons'] as List).join('; ')}';
+        'CyberSafe report - ${DateTime.now().toLocal().toString().substring(0, 16)}\nType: ${s['scamType']}\nRisk: ${s['risk']}/100\nWhy: ${(s['reasons'] as List).join('; ')}\nDo now: $topActions\nHelpline: 1930';
     return GlassCard(
       child: Column(
         children: [
@@ -261,7 +408,7 @@ class _ReportScreenState extends State<ReportScreen> {
                   onPressed: () => _dial1930(context),
                   style: ElevatedButton.styleFrom(
                     backgroundColor:
-                        KavachColors.danger.withValues(alpha: 0.9),
+                        CyberSafeColors.danger.withValues(alpha: 0.9),
                     foregroundColor: Colors.white,
                   ),
                   icon: const Icon(Icons.call_rounded),
@@ -283,9 +430,9 @@ class _ReportScreenState extends State<ReportScreen> {
             width: double.infinity,
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: KavachColors.surface2,
+              color: CyberSafeColors.surface2,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: KavachColors.line),
+              border: Border.all(color: CyberSafeColors.line),
               boxShadow: const [
                 BoxShadow(
                   color: Color(0x1F0D47A1),
@@ -327,32 +474,6 @@ class _ReportScreenState extends State<ReportScreen> {
     );
   }
 
-  Widget _checklist(BuildContext context) {
-    final items = [
-      context.tr('check1'),
-      context.tr('check2'),
-      context.tr('check3'),
-      context.tr('check4'),
-    ];
-    return GlassCard(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Column(
-        children: items
-            .map(
-              (t) => ListTile(
-                dense: true,
-                leading: const Icon(Icons.check_circle_rounded,
-                    color: KavachColors.safe),
-                title: Text(t,
-                    style: const TextStyle(
-                        fontSize: 14.5, fontWeight: FontWeight.w600)),
-              ),
-            )
-            .toList(),
-      ),
-    );
-  }
-
   String _learnKey(String scamType) {
     final t = scamType.toLowerCase();
     if (t.contains('screen')) return 'learnScreen';
@@ -365,14 +486,14 @@ class _ReportScreenState extends State<ReportScreen> {
 
   Widget _learningCard(BuildContext context, Map<String, dynamic> s) {
     return GlassCard(
-      borderColor: KavachColors.violet.withValues(alpha: 0.45),
+      borderColor: CyberSafeColors.violet.withValues(alpha: 0.45),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
               const Icon(Icons.school_rounded,
-                  color: KavachColors.violet),
+                  color: CyberSafeColors.violet),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(context.tr('learnTitle'),
@@ -385,7 +506,7 @@ class _ReportScreenState extends State<ReportScreen> {
           Text(
             context.tr(_learnKey('${s['scamType']}')),
             style: const TextStyle(
-                color: KavachColors.sub, fontSize: 14, height: 1.6),
+                color: CyberSafeColors.sub, fontSize: 14, height: 1.6),
           ),
           const SizedBox(height: 8),
           Text(
@@ -416,7 +537,7 @@ class _ReportScreenState extends State<ReportScreen> {
           TextButton(
             onPressed: () => Navigator.of(c).pop(true),
             child: Text(context.tr('deleteBtn'),
-                style: const TextStyle(color: KavachColors.danger)),
+                style: const TextStyle(color: CyberSafeColors.danger)),
           ),
         ],
       ),
@@ -444,7 +565,7 @@ class _ReportScreenState extends State<ReportScreen> {
 
   Widget _historyRow(Map<String, dynamic> e, bool latest) {
     final level = _levelFrom(e['level']);
-    final color = KavachColors.forLevel(level);
+    final color = CyberSafeColors.forLevel(level);
     final ts = '${e['ts'] ?? ''}';
     final when = ts.length >= 16 ? ts.substring(0, 16) : ts;
     return ListTile(
@@ -459,7 +580,7 @@ class _ReportScreenState extends State<ReportScreen> {
           style: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.w600)),
       subtitle: Text(
         '$when • ${e['risk'] ?? 0}/100${e['demo'] == true ? ' • demo' : ''}',
-        style: const TextStyle(color: KavachColors.sub, fontSize: 12.5),
+        style: const TextStyle(color: CyberSafeColors.sub, fontSize: 12.5),
       ),
       trailing: const Icon(Icons.chevron_right_rounded),
     );

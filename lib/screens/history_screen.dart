@@ -121,7 +121,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   child: Center(child: Text(labels[i])),
                 ),
                 selected: _filter == i,
-                selectedColor: KavachColors.washTeal,
+                selectedColor: CyberSafeColors.washTeal,
                 onSelected: (_) => setState(() => _filter = i),
               ),
             ),
@@ -132,7 +132,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   Widget _scanTile(BuildContext context, ScanRecord s) {
     final level = _levelFrom(s.level);
-    final c = KavachColors.forLevel(level);
+    final c = CyberSafeColors.forLevel(level);
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: GlassCard(
@@ -145,7 +145,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
               height: 44,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: KavachColors.tintForLevel(level),
+                color: CyberSafeColors.tintForLevel(level),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text('${s.risk}',
@@ -166,10 +166,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                          color: KavachColors.sub, fontSize: 12.5)),
+                          color: CyberSafeColors.sub, fontSize: 12.5)),
                   Text(_dateOf(s.ts),
                       style: const TextStyle(
-                          color: KavachColors.sub, fontSize: 11.5)),
+                          color: CyberSafeColors.sub, fontSize: 11.5)),
                 ],
               ),
             ),
@@ -182,7 +182,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   Widget _callTile(BuildContext context, Map<String, dynamic> e) {
     final level = _levelFrom('${e['level'] ?? 'safe'}');
-    final c = KavachColors.forLevel(level);
+    final c = CyberSafeColors.forLevel(level);
     final risk = (e['risk'] as num? ?? 0).toInt();
     final demo = e['demo'] == true;
     return Padding(
@@ -197,7 +197,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
               height: 44,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: KavachColors.tintForLevel(level),
+                color: CyberSafeColors.tintForLevel(level),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text('$risk',
@@ -219,10 +219,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           ? context.tr('originDemo')
                           : context.tr('originLive'),
                       style: const TextStyle(
-                          color: KavachColors.sub, fontSize: 12.5)),
+                          color: CyberSafeColors.sub, fontSize: 12.5)),
                   Text(_dateOf('${e['ts'] ?? ''}'),
                       style: const TextStyle(
-                          color: KavachColors.sub, fontSize: 11.5)),
+                          color: CyberSafeColors.sub, fontSize: 11.5)),
                 ],
               ),
             ),
@@ -244,12 +244,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
             child: Column(
               children: [
                 const Icon(Icons.history_rounded,
-                    size: 48, color: KavachColors.sky),
+                    size: 48, color: CyberSafeColors.sky),
                 const SizedBox(height: 12),
                 Text(context.tr('emptyHistory'),
                     textAlign: TextAlign.center,
                     style: const TextStyle(
-                        color: KavachColors.sub, fontSize: 14, height: 1.5)),
+                        color: CyberSafeColors.sub, fontSize: 14, height: 1.5)),
               ],
             ),
           ),

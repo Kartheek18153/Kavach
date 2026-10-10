@@ -97,11 +97,19 @@ class HistoryStore {
   }
 
   static Future<void> add(Map<String, dynamic> summary) async {
+    Map<String, dynamic> strMap(Object? v) {
+      if (v is Map) {
+        return v.map((k, e) => MapEntry('$k', e));
+      }
+      return {};
+    }
+
     final entry = <String, dynamic>{
       'ts': DateTime.now().toIso8601String(),
       'scamType': '${summary['scamType'] ?? '-'}',
       'risk': (summary['risk'] as num? ?? 0).toInt(),
       'level': _levelName(summary['level']),
+      'band': '${summary['band'] ?? _levelName(summary['level'])}',
       'reasons': ((summary['reasons'] as List?) ?? const []).take(5).toList(),
       'reasonsTelugu': '${summary['reasonsTelugu'] ?? ''}',
       'alerted': summary['alerted'] == true,
@@ -109,6 +117,15 @@ class HistoryStore {
       'lines': (summary['lines'] as num? ?? 0).toInt(),
       'demo': summary['isDemo'] == true,
       'smsSent': summary['smsSent'] == true,
+      'families': ((summary['families'] as List?) ?? const [])
+          .map((e) => '$e')
+          .toList(),
+      'evidence': strMap(summary['evidence']).map(
+          (k, v) => MapEntry(k, ((v as List?) ?? const []).map((e) => '$e').toList())),
+      'capped': strMap(summary['capped']).map(
+          (k, v) => MapEntry(k, (v as num? ?? 0).toDouble())),
+      'bonus': (summary['bonus'] as num? ?? 0).toInt(),
+      'guardDelta': (summary['guardDelta'] as num? ?? 0).toDouble(),
     };
     entries = [entry, ...entries].take(20).toList();
     final prefs = await SharedPreferences.getInstance();
@@ -154,16 +171,16 @@ class HistoryStore {
   }
 }
 
-/// Thin client for the Kavach backend (`backend/`).
+/// Thin client for the CyberSafe backend (`backend/`).
 ///
 /// Point at your backend at build time:
-///   Android emulator: `--dart-define=KAVACH_API=http://10.0.2.2:8080`
-///   Real device:      `--dart-define=KAVACH_API=http://<PC-LAN-IP>:8080`
+///   Android emulator: `--dart-define=CYBERSAFE_API=http://10.0.2.2:8080`
+///   Real device:      `--dart-define=CYBERSAFE_API=http://<PC-LAN-IP>:8080`
 /// Every call fails soft so the app keeps working offline with the
 /// built-in local rule engine.
-class KavachApi {
+class CyberSafeApi {
   static const baseUrl = String.fromEnvironment(
-    'KAVACH_API',
+    'CYBERSAFE_API',
     defaultValue: 'http://localhost:8080',
   );
 

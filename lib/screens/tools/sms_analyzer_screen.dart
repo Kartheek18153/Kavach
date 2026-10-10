@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
 import '../../lang.dart';
+import '../../services/agnes.dart';
 import '../../services/scan_history.dart';
 import '../../services/scanners.dart';
 import '../../widgets/cards.dart';
+import '../../widgets/explain_widgets.dart';
 import '../../widgets/scan_widgets.dart';
 
 /// SMS & message scam analyzer: scores text plus any embedded links.
@@ -36,6 +38,11 @@ class _SmsAnalyzerScreenState extends State<SmsAnalyzerScreen> {
       reasons: f.reasons,
       ts: DateTime.now().toIso8601String(),
     ));
+  }
+
+  String _langCode(BuildContext c) {
+    final l = c.appLang;
+    return l == AppLang.telugu ? 'te' : l == AppLang.hindi ? 'hi' : 'en';
   }
 
   @override
@@ -90,6 +97,23 @@ class _SmsAnalyzerScreenState extends State<SmsAnalyzerScreen> {
           if (_finding != null) ...[
             const SizedBox(height: 14),
             ScanResultCard(finding: _finding!),
+            const SizedBox(height: 10),
+            AiInsightCard(
+              available:
+                  AgnesConfig.isConfigured && AgnesConsent.isOn,
+              askLabel: context.tr('aiAskSms'),
+              loadingLabel: context.tr('aiLoading'),
+              failedText: context.tr('aiFailed'),
+              noteText: context.tr('aiNote'),
+              badgeLabel: context.tr('aiBadge'),
+              onFetch: () => AgnesClient.analyzeSms(
+                message: _ctrl.text,
+                risk: _finding!.risk,
+                band: levelNameFor(_finding!.risk),
+                signals: _finding!.reasons,
+                lang: _langCode(context),
+              ),
+            ),
           ],
           const SizedBox(height: 14),
           ToolTipCard(context.tr('tipSms')),

@@ -1,4 +1,4 @@
-/// KAVACH Tier-1 tactic engine: deterministic on-device scam scoring.
+/// Tier-1 tactic engine: deterministic on-device scam scoring.
 ///
 /// Port of the Tier-1 engine from KAVACH_IQOO (Atul Chahar & Anant Sharma,
 /// Apache-2.0): 5 tactic families, ~180 trilingual markers (EN / romanised
@@ -110,14 +110,41 @@ class TacticSignal {
   const TacticSignal(this.family, this.weight, this.span, this.tsMs);
 }
 
-/// Snapshot of the session at one moment.
+/// Snapshot of the session at one moment, with an explainable breakdown:
+/// per-family raw/capped contributions, diversity bonus and guard delta,
+/// so the UI can show exactly which signals caused the score.
 class TacticScore {
   final int score;
   final Set<String> families;
   final Map<String, List<String>> evidence;
   final String band; // 'safe' | 'caution' | 'danger' (app thresholds)
+  final Map<String, double> rawByFamily;
+  final Map<String, double> cappedByFamily;
+  final int diversityBonus;
+  final double guardDelta;
 
-  const TacticScore(this.score, this.families, this.evidence, this.band);
+  const TacticScore(
+    this.score,
+    this.families,
+    this.evidence,
+    this.band, {
+    this.rawByFamily = const {},
+    this.cappedByFamily = const {},
+    this.diversityBonus = 0,
+    this.guardDelta = 0,
+  });
+
+  /// JSON-safe breakdown for API responses + history persistence.
+  Map<String, dynamic> toJson() => {
+        'score': score,
+        'band': band,
+        'families': families.toList(growable: false),
+        'evidence': evidence.map((k, v) => MapEntry(k, List.of(v))),
+        'rawByFamily': rawByFamily.map((k, v) => MapEntry(k, v)),
+        'cappedByFamily': cappedByFamily.map((k, v) => MapEntry(k, v)),
+        'diversityBonus': diversityBonus,
+        'guardDelta': guardDelta,
+      };
 }
 
 /// Stateful session: feed transcript windows, read decayed scores.
@@ -182,14 +209,22 @@ class TacticSession {
       familySum[s.family] = (familySum[s.family] ?? 0) + decayed;
       (evidence[s.family] ??= []).add(s.span);
     }
+    final rawByFamily = <String, double>{};
+    final cappedByFamily = <String, double>{};
     var total = 0.0;
     var distinct = 0;
     for (final f in tacticFamilies) {
       final sum = familySum[f.id] ?? 0;
+      rawByFamily[f.id] = sum;
+      final capped = math.min(f.cap.toDouble(), sum);
+      cappedByFamily[f.id] = capped;
       if (sum > 0) distinct++;
-      total += math.min(f.cap.toDouble(), sum);
+      total += capped;
     }
-    total += tacticDiversityBonus * math.max(0, distinct - 2);
+    final extraFamilies = distinct - 2;
+    final bonus =
+        tacticDiversityBonus * (extraFamilies > 0 ? extraFamilies : 0);
+    total += bonus;
     total += guards;
     var score = total.clamp(0, 100).toInt();
     if (score >= tacticDangerFloor &&
@@ -201,7 +236,16 @@ class TacticSession {
         : score >= tacticCautionFloor
             ? 'caution'
             : 'safe';
-    return TacticScore(score, familySum.keys.toSet(), evidence, band);
+    return TacticScore(
+      score,
+      familySum.keys.toSet(),
+      evidence,
+      band,
+      rawByFamily: rawByFamily,
+      cappedByFamily: cappedByFamily,
+      diversityBonus: bonus,
+      guardDelta: guards,
+    );
   }
 
   /// Stateless one-shot score (SMS path): whole text as a single window.

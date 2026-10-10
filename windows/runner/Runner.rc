@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.kavach" "\0"
-            VALUE "FileDescription", "kavach" "\0"
+            VALUE "CompanyName", "com.cybersafe" "\0"
+            VALUE "FileDescription", "cybersafe" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "kavach" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2026 com.kavach. All rights reserved." "\0"
-            VALUE "OriginalFilename", "kavach.exe" "\0"
-            VALUE "ProductName", "kavach" "\0"
+            VALUE "InternalName", "cybersafe" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2026 com.cybersafe. All rights reserved." "\0"
+            VALUE "OriginalFilename", "cybersafe.exe" "\0"
+            VALUE "ProductName", "cybersafe" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

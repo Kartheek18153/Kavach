@@ -224,7 +224,7 @@ class _UrlScannerScreenState extends State<UrlScannerScreen> {
     final level = riskLevelFor(finding.risk);
     final rep = _rep;
     return GlassCard(
-      borderColor: KavachColors.forLevel(level).withValues(alpha: 0.5),
+      borderColor: CyberSafeColors.forLevel(level).withValues(alpha: 0.5),
       child: Column(
         children: [
           DangerMeter(risk: finding.risk, level: level, size: 200),
@@ -249,7 +249,7 @@ class _UrlScannerScreenState extends State<UrlScannerScreen> {
                         {'n': '${rep.facts.sectionsFailed.length}'}),
                     textAlign: TextAlign.center,
                     style: const TextStyle(
-                        color: KavachColors.caution, fontSize: 12.5),
+                        color: CyberSafeColors.caution, fontSize: 12.5),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -265,13 +265,13 @@ class _UrlScannerScreenState extends State<UrlScannerScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Icon(Icons.check_circle_rounded,
-                  size: 14, color: KavachColors.safe),
+                  size: 14, color: CyberSafeColors.safe),
               const SizedBox(width: 6),
               Flexible(
                 child: Text(
                   context.tr('savedNote'),
                   style: const TextStyle(
-                      color: KavachColors.sub, fontSize: 12.5),
+                      color: CyberSafeColors.sub, fontSize: 12.5),
                 ),
               ),
             ],
@@ -300,7 +300,7 @@ class _UrlScannerScreenState extends State<UrlScannerScreen> {
           const SizedBox(width: 8),
           Text(label,
               style: const TextStyle(
-                  color: KavachColors.sub, fontSize: 12.5)),
+                  color: CyberSafeColors.sub, fontSize: 12.5)),
         ],
       );
     }
@@ -309,13 +309,13 @@ class _UrlScannerScreenState extends State<UrlScannerScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Icon(Icons.wifi_off_rounded,
-              size: 14, color: KavachColors.sub),
+              size: 14, color: CyberSafeColors.sub),
           const SizedBox(width: 6),
           Flexible(
             child: Text(
               context.tr('repOffline'),
               style: const TextStyle(
-                  color: KavachColors.sub, fontSize: 12.5),
+                  color: CyberSafeColors.sub, fontSize: 12.5),
             ),
           ),
         ],
@@ -325,12 +325,12 @@ class _UrlScannerScreenState extends State<UrlScannerScreen> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         const Icon(Icons.verified_rounded,
-            size: 14, color: KavachColors.safe),
+            size: 14, color: CyberSafeColors.safe),
         const SizedBox(width: 6),
         Text(
           '${context.tr('repGrade')}: ${rep.facts.grade} (${rep.facts.healthScore})',
           style: const TextStyle(
-              color: KavachColors.sub,
+              color: CyberSafeColors.sub,
               fontSize: 12.5,
               fontWeight: FontWeight.w700),
         ),
@@ -372,9 +372,9 @@ class _UrlScannerScreenState extends State<UrlScannerScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: KavachColors.surface2,
+        color: CyberSafeColors.surface2,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: KavachColors.line),
+        border: Border.all(color: CyberSafeColors.line),
       ),
       child: Column(
         children: [
@@ -386,7 +386,7 @@ class _UrlScannerScreenState extends State<UrlScannerScreen> {
                   Expanded(
                     child: Text(r.$1,
                         style: const TextStyle(
-                            color: KavachColors.sub,
+                            color: CyberSafeColors.sub,
                             fontSize: 12.5,
                             fontWeight: FontWeight.w600)),
                   ),

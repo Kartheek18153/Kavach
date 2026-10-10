@@ -6,11 +6,14 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../demo/simulator.dart';
 import '../lang.dart';
+import '../services/agnes.dart';
 import '../services/api.dart';
 import '../services/live_audio.dart';
+import '../services/risk_explain.dart';
 import '../theme.dart';
 import '../widgets/cards.dart';
 import '../widgets/danger_meter.dart';
+import '../widgets/explain_widgets.dart';
 import '../widgets/transcript_list.dart';
 import '../widgets/waveform.dart';
 
@@ -73,7 +76,7 @@ class _LiveScreenState extends State<LiveScreen> {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            backgroundColor: KavachColors.danger,
+            backgroundColor: CyberSafeColors.danger,
             content: Text(context.tr('dangerNow'),
                 style: const TextStyle(fontWeight: FontWeight.w700)),
           ),
@@ -213,9 +216,25 @@ class _LiveScreenState extends State<LiveScreen> {
     await widget.session.analyzeText(t);
   }
 
+  static String _bandName(RiskLevel l) =>
+      l == RiskLevel.danger ? 'danger' : l == RiskLevel.caution ? 'caution' : 'safe';
+
+  String _langCode(BuildContext c) {
+    final l = c.appLang;
+    return l == AppLang.telugu ? 'te' : l == AppLang.hindi ? 'hi' : 'en';
+  }
+
+  Future<void> _dial1930Live(BuildContext context) async {
+    final uri = Uri(scheme: 'tel', path: '1930');
+    try {
+      await launchUrl(uri);
+    } catch (_) {}
+  }
+
   Map<String, dynamic> _summary(DemoState s) => {
         'risk': s.risk,
         'level': s.level,
+        'band': _bandName(s.level),
         'scamType': s.scamType,
         'reasons': s.reasons,
         'reasonsTelugu': s.reasonsTelugu,
@@ -224,6 +243,11 @@ class _LiveScreenState extends State<LiveScreen> {
         'lines': s.lines.length,
         'isDemo': s.isDemo,
         'smsSent': _smsOpened,
+        'families': s.families.toList(growable: false),
+        'evidence': s.evidence.map((k, v) => MapEntry(k, List.of(v))),
+        'capped': s.capped.map((k, v) => MapEntry(k, v)),
+        'bonus': s.bonus,
+        'guardDelta': s.guardDelta,
       };
 
   @override
@@ -248,7 +272,7 @@ class _LiveScreenState extends State<LiveScreen> {
                     _statusCard(s),
                   const SizedBox(height: 14),
                   GlassCard(
-                    borderColor: KavachColors.forLevel(s.level)
+                    borderColor: CyberSafeColors.forLevel(s.level)
                         .withValues(alpha: 0.45),
                     child: Column(
                       children: [
@@ -263,7 +287,7 @@ class _LiveScreenState extends State<LiveScreen> {
                                   ? context.tr('callComplete')
                                   : context.tr('pressDemo'),
                           style: const TextStyle(
-                              color: KavachColors.sub, fontSize: 13),
+                              color: CyberSafeColors.sub, fontSize: 13),
                         ),
                       ],
                     ),
@@ -273,6 +297,50 @@ class _LiveScreenState extends State<LiveScreen> {
                   if (!s.isDemo) const SizedBox(height: 14),
                   if (s.reasonsTelugu.isNotEmpty || s.reasons.isNotEmpty)
                     _verdictCard(s),
+                  WhyAtRiskCard(
+                    risk: s.risk,
+                    level: s.level,
+                    families: s.families,
+                    evidence: s.evidence,
+                    cappedByFamily: s.capped,
+                    diversityBonus: s.bonus,
+                    guardDelta: s.guardDelta,
+                    lang: _langCode(context),
+                    title: context.tr('whyTitle'),
+                    emptyText: context.tr('whyEmpty'),
+                  ),
+                  const SizedBox(height: 10),
+                  AiInsightCard(
+                    available: AgnesConfig.isConfigured &&
+                        AgnesConsent.isOn,
+                    askLabel: context.tr('aiAsk'),
+                    loadingLabel: context.tr('aiLoading'),
+                    failedText: context.tr('aiFailed'),
+                    noteText: context.tr('aiNote'),
+                    badgeLabel: context.tr('aiBadge'),
+                    onFetch: () => AgnesClient.explain(
+                      families: {...s.families},
+                      evidence: Map.of(s.evidence),
+                      risk: s.risk,
+                      band: _bandName(s.level),
+                      scamType: s.scamType,
+                      lang: _langCode(context),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  SectionTitle(context.tr('whatTitle')),
+                  ActionPlanCard(
+                    actions: actionsFor(
+                      families: s.families,
+                      risk: s.risk,
+                      band: _bandName(s.level),
+                    ),
+                    lang: _langCode(context),
+                    title: context.tr('whatSub'),
+                    onCall1930: () => _dial1930Live(context),
+                    onSmsFamily: () => _smsFamily(s),
+                  ),
+                  const SizedBox(height: 14),
                   SectionTitle(context.tr('liveTranscript')),
                   GlassCard(child: TranscriptList(lines: s.lines)),
                   const SizedBox(height: 14),
@@ -307,7 +375,7 @@ class _LiveScreenState extends State<LiveScreen> {
           Text(
             _fmtTime(s.elapsedSec),
             style: const TextStyle(
-                color: KavachColors.sub,
+                color: CyberSafeColors.sub,
                 fontSize: 14,
                 fontWeight: FontWeight.w600),
           ),
@@ -320,8 +388,8 @@ class _LiveScreenState extends State<LiveScreen> {
 
   /// Honest mode label: green LIVE for real sessions, amber DEMO for scripts.
   Widget _modeChip(bool isDemo) {
-    final bg = isDemo ? KavachColors.washCaution : KavachColors.washSafe;
-    final fg = isDemo ? KavachColors.caution : KavachColors.safe;
+    final bg = isDemo ? CyberSafeColors.washCaution : CyberSafeColors.washSafe;
+    final fg = isDemo ? CyberSafeColors.caution : CyberSafeColors.safe;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
@@ -342,7 +410,7 @@ class _LiveScreenState extends State<LiveScreen> {
       width: 10,
       height: 10,
       decoration: BoxDecoration(
-        color: running ? KavachColors.danger : KavachColors.sub,
+        color: running ? CyberSafeColors.danger : CyberSafeColors.sub,
         shape: BoxShape.circle,
       ),
     );
@@ -359,7 +427,7 @@ class _LiveScreenState extends State<LiveScreen> {
               children: [
                 const Text('Detected pattern',
                     style:
-                        TextStyle(color: KavachColors.sub, fontSize: 12)),
+                        TextStyle(color: CyberSafeColors.sub, fontSize: 12)),
                 const SizedBox(height: 2),
                 Text(s.scamType,
                     style: const TextStyle(
@@ -374,7 +442,7 @@ class _LiveScreenState extends State<LiveScreen> {
   }
 
   Widget _verdictCard(DemoState s) {
-    final color = KavachColors.forLevel(s.level);
+    final color = CyberSafeColors.forLevel(s.level);
     final bigVerdict = context.appLang == AppLang.telugu || s.reasons.isEmpty
         ? s.reasonsTelugu
         : s.reasons.join(' | ');
@@ -382,7 +450,7 @@ class _LiveScreenState extends State<LiveScreen> {
       margin: const EdgeInsets.only(bottom: 14),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: KavachColors.tintForLevel(s.level),
+        color: CyberSafeColors.tintForLevel(s.level),
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: color.withValues(alpha: 0.5)),
         boxShadow: const [
@@ -426,7 +494,7 @@ class _LiveScreenState extends State<LiveScreen> {
                   Expanded(
                     child: Text(r,
                         style: const TextStyle(
-                            color: KavachColors.sub, fontSize: 13.5)),
+                            color: CyberSafeColors.sub, fontSize: 13.5)),
                   ),
                 ],
               ),
@@ -440,8 +508,8 @@ class _LiveScreenState extends State<LiveScreen> {
     final active = _audioOn && s.running;
     return GlassCard(
       borderColor: active
-          ? KavachColors.danger.withValues(alpha: 0.5)
-          : KavachColors.teal.withValues(alpha: 0.4),
+          ? CyberSafeColors.danger.withValues(alpha: 0.5)
+          : CyberSafeColors.teal.withValues(alpha: 0.4),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       child: Row(
         children: [
@@ -459,10 +527,10 @@ class _LiveScreenState extends State<LiveScreen> {
             icon: Icon(active ? Icons.mic_rounded : Icons.mic_off_rounded),
             style: IconButton.styleFrom(
               backgroundColor: active
-                  ? KavachColors.danger
-                  : KavachColors.surface2,
+                  ? CyberSafeColors.danger
+                  : CyberSafeColors.surface2,
               foregroundColor:
-                  active ? Colors.white : KavachColors.sub,
+                  active ? Colors.white : CyberSafeColors.sub,
             ),
           ),
           const SizedBox(width: 10),
@@ -477,8 +545,8 @@ class _LiveScreenState extends State<LiveScreen> {
                       height: 8,
                       decoration: BoxDecoration(
                         color: active
-                            ? KavachColors.danger
-                            : KavachColors.sub,
+                            ? CyberSafeColors.danger
+                            : CyberSafeColors.sub,
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -501,7 +569,7 @@ class _LiveScreenState extends State<LiveScreen> {
                     child: Text(
                       _audio.activeLocale,
                       style: const TextStyle(
-                          color: KavachColors.sub,
+                          color: CyberSafeColors.sub,
                           fontSize: 11.5,
                           fontWeight: FontWeight.w600),
                     ),
@@ -513,7 +581,7 @@ class _LiveScreenState extends State<LiveScreen> {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                        color: KavachColors.sub,
+                        color: CyberSafeColors.sub,
                         fontSize: 13,
                         fontStyle: FontStyle.italic),
                   ),
@@ -540,7 +608,7 @@ class _LiveScreenState extends State<LiveScreen> {
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor:
-                        KavachColors.danger.withValues(alpha: 0.85),
+                        CyberSafeColors.danger.withValues(alpha: 0.85),
                     foregroundColor: Colors.white,
                   ),
                   icon: const Icon(Icons.warning_amber_rounded),
@@ -556,7 +624,7 @@ class _LiveScreenState extends State<LiveScreen> {
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor:
-                        KavachColors.safe.withValues(alpha: 0.85),
+                        CyberSafeColors.safe.withValues(alpha: 0.85),
                     foregroundColor: Colors.white,
                   ),
                   icon: const Icon(Icons.mark_chat_read_rounded),
@@ -634,6 +702,53 @@ class _LiveScreenState extends State<LiveScreen> {
     return '$m:$s';
   }
 
+  /// Compact NOW-actions strip inside the red overlay: the 3 most urgent
+  /// steps so the user sees them before dismissing.
+  Widget _overlayUrgentStrip(DemoState s) {
+    final code = _langCode(context);
+    final urgent = actionsFor(
+      families: s.families,
+      risk: s.risk,
+      band: _bandName(s.level),
+    ).where((a) => a.priority == 0).take(3).toList();
+    if (urgent.isEmpty) return const SizedBox.shrink();
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: CyberSafeColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        border:
+            Border.all(color: CyberSafeColors.danger.withValues(alpha: 0.4)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (var i = 0; i < urgent.length; i++)
+            Padding(
+              padding: EdgeInsets.only(top: i == 0 ? 0 : 4),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('${i + 1}. ',
+                      style: const TextStyle(
+                          color: CyberSafeColors.danger,
+                          fontWeight: FontWeight.w900)),
+                  Expanded(
+                    child: Text(urgent[i].t(code),
+                        style: const TextStyle(
+                            color: CyberSafeColors.danger,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 14)),
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
   Widget _dangerOverlay(DemoState s) {
     final overlayVerdict =
         context.appLang == AppLang.telugu || s.reasons.isEmpty
@@ -641,7 +756,7 @@ class _LiveScreenState extends State<LiveScreen> {
             : s.reasons.join(' | ');
     return Positioned.fill(
       child: Container(
-        color: KavachColors.washDanger,
+        color: CyberSafeColors.washDanger,
         child: SafeArea(
           child: Center(
             child: SingleChildScrollView(
@@ -655,9 +770,9 @@ class _LiveScreenState extends State<LiveScreen> {
                   height: 130,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: KavachColors.surface,
+                    color: CyberSafeColors.surface,
                     border: Border.all(
-                        color: KavachColors.danger, width: 3),
+                        color: CyberSafeColors.danger, width: 3),
                     boxShadow: const [
                       BoxShadow(
                         color: Color(0x400D47A1),
@@ -669,7 +784,7 @@ class _LiveScreenState extends State<LiveScreen> {
                   child: const Icon(
                       Icons.do_not_disturb_on_rounded,
                       size: 64,
-                      color: KavachColors.danger),
+                      color: CyberSafeColors.danger),
                 ),
                 const SizedBox(height: 18),
                 Text(context.tr('hangup'),
@@ -677,13 +792,13 @@ class _LiveScreenState extends State<LiveScreen> {
                         fontSize: 40,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 1,
-                        color: KavachColors.danger)),
+                        color: CyberSafeColors.danger)),
                 const SizedBox(height: 6),
                 Text(context.tr('hangupSub'),
                     style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w800,
-                        color: KavachColors.danger)),
+                        color: CyberSafeColors.danger)),
                 const SizedBox(height: 14),
                 Text(
                   overlayVerdict,
@@ -691,30 +806,32 @@ class _LiveScreenState extends State<LiveScreen> {
                   style: const TextStyle(
                       fontSize: 16,
                       height: 1.5,
-                      color: KavachColors.danger),
+                      color: CyberSafeColors.danger),
                 ),
+                const SizedBox(height: 12),
+                _overlayUrgentStrip(s),
                 const SizedBox(height: 16),
                 Container(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 14, vertical: 10),
                   decoration: BoxDecoration(
-                    color: KavachColors.surface,
+                    color: CyberSafeColors.surface,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                        color: KavachColors.danger
+                        color: CyberSafeColors.danger
                             .withValues(alpha: 0.4)),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       const Icon(Icons.touch_app_rounded,
-                          color: KavachColors.danger),
+                          color: CyberSafeColors.danger),
                       const SizedBox(width: 8),
                       Flexible(
                         child: Text(context.tr('cutFirst'),
                             textAlign: TextAlign.center,
                             style: const TextStyle(
-                                color: KavachColors.danger,
+                                color: CyberSafeColors.danger,
                                 fontWeight: FontWeight.w800)),
                       ),
                     ],
@@ -742,7 +859,7 @@ class _LiveScreenState extends State<LiveScreen> {
                       widget.onFinish(sum);
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: KavachColors.danger,
+                      backgroundColor: CyberSafeColors.danger,
                       foregroundColor: Colors.white,
                     ),
                     child: Text(context.tr('hungUp')),
@@ -752,7 +869,7 @@ class _LiveScreenState extends State<LiveScreen> {
                   onPressed: () => _dismissOverlay(s),
                   child: Text(context.tr('keepListening'),
                       style:
-                          const TextStyle(color: KavachColors.sub)),
+                          const TextStyle(color: CyberSafeColors.sub)),
                 ),
               ],
             ),

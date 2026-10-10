@@ -77,7 +77,7 @@ class ThreatsScreen extends StatelessWidget {
             SectionTitle(context.tr('unifiedTitle')),
             GlassCard(
               borderColor:
-                  (dangers > 0 ? KavachColors.danger : KavachColors.safe)
+                  (dangers > 0 ? CyberSafeColors.danger : CyberSafeColors.safe)
                       .withValues(alpha: 0.5),
               child: Column(
                 children: [
@@ -85,15 +85,15 @@ class ThreatsScreen extends StatelessWidget {
                     children: [
                       Expanded(
                           child: _stat('$total',
-                              context.tr('totalScansM'), KavachColors.teal)),
+                              context.tr('totalScansM'), CyberSafeColors.teal)),
                       const SizedBox(width: 10),
                       Expanded(
                           child: _stat(
                               '$dangers',
                               context.tr('dangersCaught'),
                               dangers > 0
-                                  ? KavachColors.danger
-                                  : KavachColors.safe)),
+                                  ? CyberSafeColors.danger
+                                  : CyberSafeColors.safe)),
                     ],
                   ),
                   const SizedBox(height: 10),
@@ -105,11 +105,11 @@ class ThreatsScreen extends StatelessWidget {
                                   ? context.tr('noneYet')
                                   : '$absoluteWorst/100',
                               context.tr('worstMonth'),
-                              KavachColors.teal)),
+                              CyberSafeColors.teal)),
                       const SizedBox(width: 10),
                       Expanded(
                           child: _stat(_topThreat(),
-                              context.tr('topThreat'), KavachColors.caution)),
+                              context.tr('topThreat'), CyberSafeColors.caution)),
                     ],
                   ),
                 ],
@@ -128,9 +128,9 @@ class ThreatsScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: KavachColors.surface2,
+        color: CyberSafeColors.surface2,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: KavachColors.line),
+        border: Border.all(color: CyberSafeColors.line),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -142,7 +142,7 @@ class ThreatsScreen extends StatelessWidget {
                   color: color)),
           Text(label,
               style: const TextStyle(
-                  color: KavachColors.sub,
+                  color: CyberSafeColors.sub,
                   fontSize: 12,
                   fontWeight: FontWeight.w600)),
         ],
@@ -152,7 +152,7 @@ class ThreatsScreen extends StatelessWidget {
 
   Widget _advisory(
       BuildContext context, (String, String, RiskLevel) a) {
-    final c = KavachColors.forLevel(a.$3);
+    final c = CyberSafeColors.forLevel(a.$3);
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: GlassCard(
@@ -164,7 +164,7 @@ class ThreatsScreen extends StatelessWidget {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: KavachColors.tintForLevel(a.$3),
+                color: CyberSafeColors.tintForLevel(a.$3),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(Icons.warning_rounded, color: c, size: 24),
@@ -180,7 +180,7 @@ class ThreatsScreen extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(context.tr(a.$2),
                       style: const TextStyle(
-                          color: KavachColors.sub,
+                          color: CyberSafeColors.sub,
                           fontSize: 13.5,
                           height: 1.5)),
                 ],

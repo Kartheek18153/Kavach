@@ -1,12 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:kavach/main.dart';
+import 'package:cybersafe/main.dart';
 
 void main() {
-  testWidgets('Kavach home smoke test', (WidgetTester tester) async {
-    await tester.pumpWidget(const KavachApp());
+  testWidgets('CyberSafe home smoke test', (WidgetTester tester) async {
+    await tester.pumpWidget(const CyberSafeApp());
 
-    expect(find.text('KAVACH'), findsOneWidget);
+    expect(find.text('CYBERSAFE'), findsOneWidget);
     expect(find.text('Protect this call'), findsOneWidget);
   });
 }

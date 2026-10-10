@@ -108,11 +108,11 @@ class LangButton extends StatelessWidget {
     return TextButton.icon(
       onPressed: () => scope.onLang(scope.lang.next),
       icon: const Icon(Icons.translate_rounded,
-          size: 18, color: KavachColors.teal),
+          size: 18, color: CyberSafeColors.teal),
       label: Text(
         scope.lang.buttonLabel,
         style: const TextStyle(
-          color: KavachColors.teal,
+          color: CyberSafeColors.teal,
           fontWeight: FontWeight.w800,
           fontSize: 14,
         ),
@@ -122,9 +122,9 @@ class LangButton extends StatelessWidget {
         minimumSize: const Size(0, 36),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
-          side: const BorderSide(color: KavachColors.line),
+          side: const BorderSide(color: CyberSafeColors.line),
         ),
-        backgroundColor: KavachColors.surface,
+        backgroundColor: CyberSafeColors.surface,
       ),
     );
   }
@@ -154,9 +154,9 @@ const Map<String, Map<AppLang, String>> _strings = {
   },
   // Home
   'brandSub': {
-    AppLang.english: 'Kavach | Scam Call Shield',
-    AppLang.telugu: 'కవచ్ | స్కామ్ కాల్ షీల్డ్',
-    AppLang.hindi: 'कवच | स्कैम कॉल शील्ड',
+    AppLang.english: 'CyberSafe | Scam Call Shield',
+    AppLang.telugu: 'సైబర్‌సేఫ్ | స్కామ్ కాల్ షీల్డ్',
+    AppLang.hindi: 'साइबरसेफ | स्कैम कॉल शील्ड',
   },
   'ready': {
     AppLang.english: 'READY',
@@ -232,9 +232,9 @@ const Map<String, Map<AppLang, String>> _strings = {
     AppLang.hindi: 'Protect दबाएं',
   },
   'step2s': {
-    AppLang.english: 'Kavach listens, you watch the meter',
-    AppLang.telugu: 'Kavach vintundi, meter chudandi',
-    AppLang.hindi: 'कवच सुनेगा, आप मीटर देखें',
+    AppLang.english: 'CyberSafe listens, you watch the meter',
+    AppLang.telugu: 'CyberSafe vintundi, meter chudandi',
+    AppLang.hindi: 'साइबरसेफ सुनेगा, आप मीटर देखें',
   },
   'step3t': {
     AppLang.english: 'We warn + alert family',
@@ -263,11 +263,11 @@ const Map<String, Map<AppLang, String>> _strings = {
   },
   'privacyBody': {
     AppLang.english:
-        'Kavach never records, saves, or uploads your calls. It listens live on your device only while Protect is on - and forgets everything the moment the call ends.',
+        'CyberSafe never records, saves, or uploads your calls. It listens live on your device only while Protect is on - and forgets everything the moment the call ends.',
     AppLang.telugu:
-        'Kavach మీ కాల్స్‌ను రికార్డ్ చేయదు, సేవ్ చేయదు, అప్‌లోడ్ చేయదు. Protect ఆన్‌లో ఉన్నప్పుడు మాత్రమే మీ ఫోన్‌లోనే వింటుంది - కాల్ ముగియగానే అన్నీ మర్చిపోతుంది.',
+        'CyberSafe మీ కాల్స్‌ను రికార్డ్ చేయదు, సేవ్ చేయదు, అప్‌లోడ్ చేయదు. Protect ఆన్‌లో ఉన్నప్పుడు మాత్రమే మీ ఫోన్‌లోనే వింటుంది - కాల్ ముగియగానే అన్నీ మర్చిపోతుంది.',
     AppLang.hindi:
-        'कवच आपकी कॉल रिकॉर्ड, सेव या अपलोड नहीं करता। सिर्फ Protect ऑन रहने पर आपके डिवाइस पर लाइव सुनता है - कॉल खत्म होते ही सब भूल जाता है।',
+        'साइबरसेफ आपकी कॉल रिकॉर्ड, सेव या अपलोड नहीं करता। सिर्फ Protect ऑन रहने पर आपके डिवाइस पर लाइव सुनता है - कॉल खत्म होते ही सब भूल जाता है।',
   },
   'privacyReport': {
     AppLang.english: 'Call audio was never recorded or saved.',
@@ -372,11 +372,11 @@ const Map<String, Map<AppLang, String>> _strings = {
   },
   'smsDangerBody': {
     AppLang.english:
-        'Kavach DANGER: {type} risk {risk}/100. Cut the call now. Dial 1930 if money was shared.',
+        'CyberSafe DANGER: {type} risk {risk}/100. Cut the call now. Dial 1930 if money was shared.',
     AppLang.telugu:
-        'Kavach ప్రమాదం: {type} రిస్క్ {risk}/100. వెంటనే కాల్ కట్ చేయండి. డబ్బు విషయం ఉంటే 1930కి కాల్ చేయండి.',
+        'CyberSafe ప్రమాదం: {type} రిస్క్ {risk}/100. వెంటనే కాల్ కట్ చేయండి. డబ్బు విషయం ఉంటే 1930కి కాల్ చేయండి.',
     AppLang.hindi:
-        'Kavach खतरा: {type} जोखिम {risk}/100। अभी कॉल काटें। पैसे की बात हो तो 1930 पर कॉल करें।',
+        'CyberSafe खतरा: {type} जोखिम {risk}/100। अभी कॉल काटें। पैसे की बात हो तो 1930 पर कॉल करें।',
   },
   'smsAlert': {
     AppLang.english: 'Alert family via SMS',
@@ -803,9 +803,9 @@ const Map<String, Map<AppLang, String>> _strings = {
   },
   // Scan hub + tools
   'scanSub': {
-    AppLang.english: 'Paste a link, QR text, UPI ID or message — Kavach scores the danger offline.',
-    AppLang.telugu: 'లింక్, QR టెక్స్ట్, UPI ID లేదా మెసేజ్ ఇవ్వండి — Kavach ఆఫ్‌లైన్‌లో రిస్క్ చెప్తుంది.',
-    AppLang.hindi: 'लिंक, QR टेक्स्ट, UPI ID या संदेश दें — कवच ऑफलाइन जोखिम बताएगा।',
+    AppLang.english: 'Paste a link, QR text, UPI ID or message — CyberSafe scores the danger offline.',
+    AppLang.telugu: 'లింక్, QR టెక్స్ట్, UPI ID లేదా మెసేజ్ ఇవ్వండి — CyberSafe ఆఫ్‌లైన్‌లో రిస్క్ చెప్తుంది.',
+    AppLang.hindi: 'लिंक, QR टेक्स्ट, UPI ID या संदेश दें — साइबरसेफ ऑफलाइन जोखिम बताएगा।',
   },
   'toolUrl': {
     AppLang.english: 'Link scanner',
@@ -978,9 +978,9 @@ const Map<String, Map<AppLang, String>> _strings = {
     AppLang.hindi: 'SIM-बदलाव सुरक्षा जांच',
   },
   'simSub': {
-    AppLang.english: 'Answer honestly — Kavach scores whether someone may have taken over your number.',
+    AppLang.english: 'Answer honestly — CyberSafe scores whether someone may have taken over your number.',
     AppLang.telugu: 'నిజాయితీగా జవాబు ఇవ్వండి — మీ నంబర్ ఎవరైనా లాక్కున్నారా అని చెప్తుంది.',
-    AppLang.hindi: 'सच जवाब दें — कवच बताएगा कि आपका नंबर खतरे में है या नहीं।',
+    AppLang.hindi: 'सच जवाब दें — साइबरसेफ बताएगा कि आपका नंबर खतरे में है या नहीं।',
   },
   'simQ1': {
     AppLang.english: 'Signal lost suddenly for no reason?',
@@ -1235,13 +1235,169 @@ const Map<String, Map<AppLang, String>> _strings = {
     AppLang.hindi: 'कुछ सुनाई नहीं दिया — ज़ोर से, पास से बोलें या नेटवर्क देखें।',
   },
   'aboutSection': {
-    AppLang.english: 'About Kavach',
-    AppLang.telugu: 'Kavach గురించి',
-    AppLang.hindi: 'कवच के बारे में',
+    AppLang.english: 'About CyberSafe',
+    AppLang.telugu: 'CyberSafe గురించి',
+    AppLang.hindi: 'साइबरसेफ के बारे में',
   },
   'aboutBody': {
-    AppLang.english: 'Kavach v1.0.0 — scam-call shield plus link, QR, UPI, SIM and SMS checks. All checks run offline on your phone; nothing is uploaded.',
-    AppLang.telugu: 'Kavach v1.0.0 — స్కామ్-కాల్ షీల్డ్ + లింక్, QR, UPI, SIM, SMS తనిఖీలు. అన్నీ మీ ఫోన్‌లోనే ఆఫ్‌లైన్‌లో జరుగుతాయి; ఏదీ అప్‌లోడ్ కాదు.',
-    AppLang.hindi: 'कवच v1.0.0 — स्कैम-कॉल शील्ड + लिंक, QR, UPI, SIM, SMS जांच। सभी जांच आपके फोन पर ऑफलाइन; कुछ अपलोड नहीं होता।',
+    AppLang.english: 'CyberSafe v1.0.0 — scam-call shield plus link, QR, UPI, SIM and SMS checks. All checks run offline on your phone; nothing is uploaded.',
+    AppLang.telugu: 'CyberSafe v1.0.0 — స్కామ్-కాల్ షీల్డ్ + లింక్, QR, UPI, SIM, SMS తనిఖీలు. అన్నీ మీ ఫోన్‌లోనే ఆఫ్‌లైన్‌లో జరుగుతాయి; ఏదీ అప్‌లోడ్ కాదు.',
+    AppLang.hindi: 'साइबरसेफ v1.0.0 — स्कैम-कॉल शील्ड + लिंक, QR, UPI, SIM, SMS जांच। सभी जांच आपके फोन पर ऑफलाइन; कुछ अपलोड नहीं होता।',
+  },
+  // Explainability + decision support
+  'whyTitle': {
+    AppLang.english: 'Why am I at risk?',
+    AppLang.telugu: 'నాకు రిస్క్ ఎందుకు ఉంది?',
+    AppLang.hindi: 'मुझे जोखिम क्यों है?',
+  },
+  'whyEmpty': {
+    AppLang.english: 'No scam signals yet — keep listening. The moment a trick appears, it will show up here with proof.',
+    AppLang.telugu: 'ఇంకా మోస సంకేతాలు లేవు — వింటూ ఉండండి. ఎత్తుగడ కనిపించగానే రుజువుతో ఇక్కడ చూపిస్తాం.',
+    AppLang.hindi: 'अभी कोई ठगी संकेत नहीं — सुनते रहें। चाल दिखते ही सबूत के साथ यहां दिखेगा।',
+  },
+  'whatTitle': {
+    AppLang.english: 'What should I do?',
+    AppLang.telugu: 'నేనేం చేయాలి?',
+    AppLang.hindi: 'मुझे क्या करना चाहिए?',
+  },
+  'whatSub': {
+    AppLang.english: 'Do them in order — NOW first, then NEXT.',
+    AppLang.telugu: 'వరుసగా చేయండి — ముందు ఇప్పుడేవి, తర్వాత తర్వాతివి.',
+    AppLang.hindi: 'इसी क्रम में करें — पहले अभी वाले, फिर आगे वाले।',
+  },
+  // Agnes AI second opinion (opt-in)
+  'aiSection': {
+    AppLang.english: 'AI second opinion',
+    AppLang.telugu: 'AI రెండో అభిప్రాయం',
+    AppLang.hindi: 'AI दूसरी राय',
+  },
+  'aiBody': {
+    AppLang.english:
+        'Optional and off by default. When on, CyberSafe sends only the detected scam signals (matched phrases, risk score) to an AI service for a plain-language note. Full call words never leave your phone; scoring stays offline.',
+    AppLang.telugu:
+        'ఐచ్ఛికం, డిఫాల్ట్‌గా ఆఫ్. ఆన్ చేస్తే గుర్తించిన సంకేతాలు (మాటలు, రిస్క్ స్కోర్) మాత్రమే AI సేవకు వెళ్తాయి. పూర్తి కాల్ మాటలు ఫోన్ దాటవు; స్కోరింగ్ ఆఫ్‌లైన్‌లోనే.',
+    AppLang.hindi:
+        'वैकल्पिक, डिफ़ॉल्ट रूप से बंद। चालू हो तो सिर्फ पहचाने संकेत (वाक्य, जोखिम स्कोर) AI सेवा को जाते हैं। पूरी कॉल बातें फोन से बाहर नहीं जातीं; स्कोरिंग ऑफलाइन रहती है।',
+  },
+  'aiOptIn': {
+    AppLang.english: 'AI explanations',
+    AppLang.telugu: 'AI వివరణలు',
+    AppLang.hindi: 'AI व्याख्या',
+  },
+  'aiAsk': {
+    AppLang.english: 'Explain with AI',
+    AppLang.telugu: 'AIతో వివరించు',
+    AppLang.hindi: 'AI से समझें',
+  },
+  'aiAskAdvice': {
+    AppLang.english: 'Get AI advice',
+    AppLang.telugu: 'AI సలహా తీసుకోండి',
+    AppLang.hindi: 'AI सलाह लें',
+  },
+  'aiRetry': {
+    AppLang.english: 'Retry',
+    AppLang.telugu: 'మళ్లీ',
+    AppLang.hindi: 'पुनः प्रयास',
+  },
+  'aiLoading': {
+    AppLang.english: 'Asking AI…',
+    AppLang.telugu: 'AIని అడుగుతున్నాం…',
+    AppLang.hindi: 'AI से पूछ रहे हैं…',
+  },
+  'aiFailed': {
+    AppLang.english: 'AI unavailable — the rule-based result above still stands.',
+    AppLang.telugu: 'AI అందుబాటులో లేదు — పైన రూల్-ఆధారిత ఫలితమే వర్తిస్తుంది.',
+    AppLang.hindi: 'AI उपलब्ध नहीं — ऊपर वाला नियम-आधारित परिणाम ही मान्य है।',
+  },
+  'aiBadge': {
+    AppLang.english: 'AI',
+    AppLang.telugu: 'AI',
+    AppLang.hindi: 'AI',
+  },
+  'aiNote': {
+    AppLang.english: 'AI can be wrong — the meter is always the boss.',
+    AppLang.telugu: 'AI తప్పు చెప్పవచ్చు — మీటరే ఎప్పుడూ నిర్ణయం.',
+    AppLang.hindi: 'AI गलत हो सकता है — मीटर ही अंतिम है।',
+  },
+  // Telco SIM-swap network check
+  'telcoTitle': {
+    AppLang.english: 'Network check (telco)',
+    AppLang.telugu: 'నెట్‌వర్క్ తనిఖీ',
+    AppLang.hindi: 'नेटवर्क जांच',
+  },
+  'telcoSub': {
+    AppLang.english:
+        'Ask your mobile network if this SIM changed recently — the strongest SIM-swap signal.',
+    AppLang.telugu:
+        'ఈ SIM ఇటీవల మారిందేమో మీ మొబైల్ నెట్‌వర్క్‌ను అడగండి — ఇదే బలమైన SIM-మార్పు సంకేతం.',
+    AppLang.hindi:
+        'यह SIM हाल में बदला है या नहीं, अपने मोबाइल नेटवर्क से पूछें — यही सबसे पक्का SIM-बदलाव संकेत है।',
+  },
+  'telcoPhoneHint': {
+    AppLang.english: 'Phone in +91… format',
+    AppLang.telugu: '+91… ఆకృతిలో ఫోన్ నంబర్',
+    AppLang.hindi: '+91… प्रारूप में फोन नंबर',
+  },
+  'telcoCheck': {
+    AppLang.english: 'Check network',
+    AppLang.telugu: 'నెట్‌వర్క్ తనిఖీ',
+    AppLang.hindi: 'नेटवर्क जांचें',
+  },
+  'telcoLastChange': {
+    AppLang.english: 'Last change?',
+    AppLang.telugu: 'చివరి మార్పు?',
+    AppLang.hindi: 'आखिरी बदलाव?',
+  },
+  'telcoInvalid': {
+    AppLang.english: 'Enter a valid number like +919876543210',
+    AppLang.telugu: '+919876543210 లాంటి సరైన నంబర్ ఇవ్వండి',
+    AppLang.hindi: '+919876543210 जैसा सही नंबर डालें',
+  },
+  'telcoUnavailable': {
+    AppLang.english: 'Network check unavailable — use the checklist below.',
+    AppLang.telugu: 'నెట్‌వర్క్ తనిఖీ అందుబాటులో లేదు — కింది జాబితా వాడండి.',
+    AppLang.hindi: 'नेटवर्क जांच उपलब्ध नहीं — नीचे वाली सूची इस्तेमाल करें।',
+  },
+  // QR scanning
+  'scanQr': {
+    AppLang.english: 'Scan QR',
+    AppLang.telugu: 'QR స్కాన్ చేయండి',
+    AppLang.hindi: 'QR स्कैन करें',
+  },
+  'scanHint': {
+    AppLang.english: 'Point the camera at the QR code',
+    AppLang.telugu: 'కెమెరాను QR కోడ్ వైపు చూపండి',
+    AppLang.hindi: 'कैमरे को QR कोड की ओर रखें',
+  },
+  'scanGallery': {
+    AppLang.english: 'Gallery',
+    AppLang.telugu: 'గ్యాలరీ',
+    AppLang.hindi: 'गैलरी',
+  },
+  'scanDenied': {
+    AppLang.english: 'Camera blocked — allow it in Settings to scan.',
+    AppLang.telugu: 'కెమెరా బ్లాక్ అయింది — స్కాన్ చేయడానికి సెట్టింగ్స్‌లో అనుమతించండి.',
+    AppLang.hindi: 'कैमरा ब्लॉक है — स्कैन के लिए सेटिंग्स में अनुमति दें।',
+  },
+  'scanEmpty': {
+    AppLang.english: 'No QR found in that image.',
+    AppLang.telugu: 'ఆ చిత్రంలో QR కనబడలేదు.',
+    AppLang.hindi: 'उस तस्वीर में QR नहीं मिला।',
+  },
+  'aiAskSms': {
+    AppLang.english: 'AI verdict',
+    AppLang.telugu: 'AI తీర్పు',
+    AppLang.hindi: 'AI फैसला',
+  },
+  // QR & UPI direction (reverse-collect context)
+  'expectPay': {
+    AppLang.english: 'I’m paying',
+    AppLang.telugu: 'నేను చెల్లిస్తున్నాను',
+    AppLang.hindi: 'मैं भुगतान कर रहा हूं',
+  },
+  'expectReceive': {
+    AppLang.english: 'I’m receiving',
+    AppLang.telugu: 'నేను తీసుకుంటున్నాను',
+    AppLang.hindi: 'मैं प्राप्त कर रहा हूं',
   },
 };

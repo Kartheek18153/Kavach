@@ -37,7 +37,7 @@ class _WaveformState extends State<Waveform> {
   @override
   Widget build(BuildContext context) {
     const bars = 30;
-    final color = KavachColors.forLevel(widget.level);
+    final color = CyberSafeColors.forLevel(widget.level);
     return SizedBox(
       height: 56,
       child: Row(

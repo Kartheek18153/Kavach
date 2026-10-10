@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:kavach_backend/tactic_engine.dart';
+import 'package:cybersafe_backend/tactic_engine.dart';
 import 'package:test/test.dart';
 
 /// Backend mirror of the app corpus test: vendored KAVACH_IQOO fixtures

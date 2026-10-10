@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:kavach/services/tactic_engine.dart';
+import 'package:cybersafe/services/tactic_engine.dart';
 
 /// Corpus regression test: the vendored KAVACH_IQOO fixture set
 /// (test/fixtures/calls) replayed line-by-line (6 s per line) through the

@@ -48,7 +48,7 @@ class _TranscriptListState extends State<TranscriptList> {
             context.tr('transcriptEmpty'),
             textAlign: TextAlign.center,
             style: const TextStyle(
-                color: KavachColors.sub, fontSize: 14, height: 1.6),
+                color: CyberSafeColors.sub, fontSize: 14, height: 1.6),
           ),
         ),
       );
@@ -65,13 +65,13 @@ class _TranscriptListState extends State<TranscriptList> {
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
           decoration: BoxDecoration(
             color: line.flagged
-                ? KavachColors.tintForLevel(RiskLevel.danger)
-                : KavachColors.surface2.withValues(alpha: 0.7),
+                ? CyberSafeColors.tintForLevel(RiskLevel.danger)
+                : CyberSafeColors.surface2.withValues(alpha: 0.7),
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
               color: line.flagged
-                  ? KavachColors.danger.withValues(alpha: 0.5)
-                  : KavachColors.line,
+                  ? CyberSafeColors.danger.withValues(alpha: 0.5)
+                  : CyberSafeColors.line,
             ),
           ),
           child: Row(
@@ -83,8 +83,8 @@ class _TranscriptListState extends State<TranscriptList> {
                     : Icons.mic_none_rounded,
                 size: 18,
                 color: line.flagged
-                    ? KavachColors.danger
-                    : KavachColors.sub,
+                    ? CyberSafeColors.danger
+                    : CyberSafeColors.sub,
               ),
               const SizedBox(width: 10),
               Expanded(

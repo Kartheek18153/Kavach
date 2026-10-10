@@ -33,9 +33,9 @@ extension RiskLevelX on RiskLevel {
   }
 }
 
-/// Kavach palette: icy-blue screenshot palette — ice background,
+/// CyberSafe palette: icy-blue screenshot palette — ice background,
 /// white + sky cards, vivid blue actions, deep-navy depth accents.
-class KavachColors {
+class CyberSafeColors {
   static const bg0 = Color(0xFFE3F2FD);
   static const bg1 = Color(0xFFCDE6FB);
   static const surface = Color(0xFFFFFFFF);
@@ -82,32 +82,32 @@ class KavachColors {
   }
 }
 
-ThemeData kavachTheme() {
+ThemeData cyberSafeTheme() {
   const scheme = ColorScheme.light(
-    primary: KavachColors.teal,
-    secondary: KavachColors.teal,
-    surface: KavachColors.surface,
-    error: KavachColors.danger,
-    onSurface: KavachColors.ink,
-    onSurfaceVariant: KavachColors.sub,
+    primary: CyberSafeColors.teal,
+    secondary: CyberSafeColors.teal,
+    surface: CyberSafeColors.surface,
+    error: CyberSafeColors.danger,
+    onSurface: CyberSafeColors.ink,
+    onSurfaceVariant: CyberSafeColors.sub,
     onPrimary: Colors.white,
   );
 
   final base = ThemeData.light(useMaterial3: true);
   return base.copyWith(
-    scaffoldBackgroundColor: KavachColors.bg0,
+    scaffoldBackgroundColor: CyberSafeColors.bg0,
     colorScheme: scheme,
-    iconTheme: const IconThemeData(color: KavachColors.teal),
+    iconTheme: const IconThemeData(color: CyberSafeColors.teal),
     appBarTheme: const AppBarTheme(
-      backgroundColor: KavachColors.bg0,
+      backgroundColor: CyberSafeColors.bg0,
       elevation: 0,
       centerTitle: false,
-      iconTheme: IconThemeData(color: KavachColors.ink),
+      iconTheme: IconThemeData(color: CyberSafeColors.ink),
       titleTextStyle: TextStyle(
         fontSize: 20,
         fontWeight: FontWeight.w800,
         letterSpacing: 0.5,
-        color: KavachColors.ink,
+        color: CyberSafeColors.ink,
       ),
     ),
     textTheme: const TextTheme(
@@ -115,114 +115,114 @@ ThemeData kavachTheme() {
           fontSize: 34,
           fontWeight: FontWeight.w800,
           height: 1.15,
-          color: KavachColors.ink),
+          color: CyberSafeColors.ink),
       displayMedium: TextStyle(
           fontSize: 30,
           fontWeight: FontWeight.w800,
           height: 1.15,
-          color: KavachColors.ink),
+          color: CyberSafeColors.ink),
       displaySmall: TextStyle(
           fontSize: 26,
           fontWeight: FontWeight.w800,
           height: 1.2,
-          color: KavachColors.ink),
+          color: CyberSafeColors.ink),
       headlineLarge: TextStyle(
           fontSize: 30,
           fontWeight: FontWeight.w800,
           height: 1.15,
-          color: KavachColors.ink),
+          color: CyberSafeColors.ink),
       headlineMedium: TextStyle(
           fontSize: 24,
           fontWeight: FontWeight.w800,
           height: 1.2,
-          color: KavachColors.ink),
+          color: CyberSafeColors.ink),
       headlineSmall: TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.w700,
-          color: KavachColors.ink),
+          color: CyberSafeColors.ink),
       titleLarge: TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.w700,
-          color: KavachColors.ink),
+          color: CyberSafeColors.ink),
       titleMedium: TextStyle(
           fontSize: 17,
           fontWeight: FontWeight.w600,
-          color: KavachColors.ink),
+          color: CyberSafeColors.ink),
       titleSmall: TextStyle(
           fontSize: 15,
           fontWeight: FontWeight.w700,
-          color: KavachColors.ink),
+          color: CyberSafeColors.ink),
       bodyLarge: TextStyle(
-          fontSize: 16, height: 1.45, color: KavachColors.ink),
+          fontSize: 16, height: 1.45, color: CyberSafeColors.ink),
       bodyMedium: TextStyle(
-          fontSize: 14.5, height: 1.5, color: KavachColors.ink),
+          fontSize: 14.5, height: 1.5, color: CyberSafeColors.ink),
       bodySmall: TextStyle(
-          fontSize: 13, height: 1.5, color: KavachColors.sub),
+          fontSize: 13, height: 1.5, color: CyberSafeColors.sub),
       labelLarge: TextStyle(
           fontSize: 15,
           fontWeight: FontWeight.w700,
-          color: KavachColors.ink),
+          color: CyberSafeColors.ink),
       labelMedium: TextStyle(
           fontSize: 13,
           fontWeight: FontWeight.w600,
-          color: KavachColors.sub),
+          color: CyberSafeColors.sub),
       labelSmall: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w600,
           letterSpacing: 0.6,
-          color: KavachColors.sub),
+          color: CyberSafeColors.sub),
     ),
     cardTheme: CardThemeData(
-      color: KavachColors.surface,
+      color: CyberSafeColors.surface,
       elevation: 0,
       shadowColor: const Color(0x0F1F2937),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
-        side: const BorderSide(color: KavachColors.line),
+        side: const BorderSide(color: CyberSafeColors.line),
       ),
     ),
     chipTheme: base.chipTheme.copyWith(
-      backgroundColor: KavachColors.surface2,
-      selectedColor: KavachColors.washTeal,
+      backgroundColor: CyberSafeColors.surface2,
+      selectedColor: CyberSafeColors.washTeal,
       labelStyle: const TextStyle(
           fontSize: 13,
           fontWeight: FontWeight.w600,
-          color: KavachColors.ink),
+          color: CyberSafeColors.ink),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: const BorderSide(color: KavachColors.line),
+        side: const BorderSide(color: CyberSafeColors.line),
       ),
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
       fillColor: Colors.white,
-      hintStyle: const TextStyle(color: KavachColors.sub, fontSize: 14),
+      hintStyle: const TextStyle(color: CyberSafeColors.sub, fontSize: 14),
       labelStyle: const TextStyle(
-          color: KavachColors.sub,
+          color: CyberSafeColors.sub,
           fontSize: 14,
           fontWeight: FontWeight.w600),
       floatingLabelStyle: const TextStyle(
-          color: KavachColors.teal, fontWeight: FontWeight.w700),
-      prefixIconColor: KavachColors.sub,
-      suffixIconColor: KavachColors.sub,
+          color: CyberSafeColors.teal, fontWeight: FontWeight.w700),
+      prefixIconColor: CyberSafeColors.sub,
+      suffixIconColor: CyberSafeColors.sub,
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(color: KavachColors.line),
+        borderSide: const BorderSide(color: CyberSafeColors.line),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(color: KavachColors.line),
+        borderSide: const BorderSide(color: CyberSafeColors.line),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(color: KavachColors.teal, width: 1.5),
+        borderSide: const BorderSide(color: CyberSafeColors.teal, width: 1.5),
       ),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         minimumSize: const Size(48, 54),
-        backgroundColor: KavachColors.teal,
+        backgroundColor: CyberSafeColors.teal,
         foregroundColor: Colors.white,
         textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
         shape: RoundedRectangleBorder(
@@ -232,7 +232,7 @@ ThemeData kavachTheme() {
     ),
     navigationBarTheme: NavigationBarThemeData(
       backgroundColor: Colors.white,
-      indicatorColor: KavachColors.washTeal,
+      indicatorColor: CyberSafeColors.washTeal,
       labelTextStyle: WidgetStateProperty.all(
         const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
       ),

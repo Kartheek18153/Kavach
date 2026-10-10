@@ -5,9 +5,9 @@ import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'package:shelf_cors_headers/shelf_cors_headers.dart';
 
-import 'package:kavach_backend/server.dart';
+import 'package:cybersafe_backend/server.dart';
 
-/// `dart run bin/server.dart` — serves the Kavach API.
+/// `dart run bin/server.dart` — serves the CyberSafe API.
 ///
 /// Env:
 ///   PORT (default 8080)
@@ -24,5 +24,5 @@ Future<void> main() async {
       int.tryParse(Platform.environment['PORT'] ?? '') ?? 8080;
   final server = await shelf_io.serve(handler, '0.0.0.0', port);
   // ignore: avoid_print
-  print('Kavach backend on http://${server.address.host}:${server.port}');
+  print('CyberSafe backend on http://${server.address.host}:${server.port}');
 }

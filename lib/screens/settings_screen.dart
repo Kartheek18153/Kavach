@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../lang.dart';
+import '../services/agnes.dart';
 import '../services/api.dart';
 import '../services/live_audio.dart';
 import '../services/scan_history.dart';
@@ -160,14 +161,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           child: Text(l.nativeName,
                               style: TextStyle(
                                 color: selected
-                                    ? KavachColors.teal
-                                    : KavachColors.sub,
+                                    ? CyberSafeColors.teal
+                                    : CyberSafeColors.sub,
                                 fontWeight: FontWeight.w700,
                               )),
                         ),
                       ),
                       selected: selected,
-                      selectedColor: KavachColors.washTeal,
+                      selectedColor: CyberSafeColors.washTeal,
                       onSelected: (_) => scope.onLang(l),
                     ),
                   ),
@@ -183,7 +184,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               children: [
                 Text(context.tr('voiceBody'),
                     style: const TextStyle(
-                        color: KavachColors.sub,
+                        color: CyberSafeColors.sub,
                         fontSize: 13.5,
                         height: 1.5)),
                 const SizedBox(height: 12),
@@ -205,10 +206,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: KavachColors.surface2,
+                      color: CyberSafeColors.surface2,
                       borderRadius: BorderRadius.circular(12),
                       border:
-                          Border.all(color: KavachColors.line),
+                          Border.all(color: CyberSafeColors.line),
                     ),
                     child: Text(
                       '${context.tr('liveHeard')}: $_heard',
@@ -224,7 +225,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           SectionTitle(context.tr('privacySection')),
           GlassCard(
             borderColor:
-                KavachColors.teal.withValues(alpha: 0.4),
+                CyberSafeColors.teal.withValues(alpha: 0.4),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -232,11 +233,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   width: 38,
                   height: 38,
                   decoration: BoxDecoration(
-                    color: KavachColors.washTeal,
+                    color: CyberSafeColors.washTeal,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(Icons.lock_rounded,
-                      color: KavachColors.teal, size: 22),
+                      color: CyberSafeColors.teal, size: 22),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -249,7 +250,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       const SizedBox(height: 4),
                       Text(context.tr('privacyBody'),
                           style: const TextStyle(
-                              color: KavachColors.sub,
+                              color: CyberSafeColors.sub,
                               fontSize: 13.5,
                               height: 1.55)),
                     ],
@@ -266,14 +267,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ListTile(
                   contentPadding: EdgeInsets.zero,
                   leading: const Icon(Icons.qr_code_scanner_rounded,
-                      color: KavachColors.teal),
+                      color: CyberSafeColors.teal),
                   title: Text(context.tr('clearScanData'),
                       style:
                           const TextStyle(fontWeight: FontWeight.w700)),
                   subtitle: Text(
                       '${ScanHistoryStore.entries.length}',
                       style: const TextStyle(
-                          color: KavachColors.sub, fontSize: 13)),
+                          color: CyberSafeColors.sub, fontSize: 13)),
                   trailing: TextButton(
                     onPressed: _confirmClearScans,
                     child: Text(context.tr('deleteBtn')),
@@ -283,13 +284,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ListTile(
                   contentPadding: EdgeInsets.zero,
                   leading: const Icon(Icons.phone_in_talk_rounded,
-                      color: KavachColors.teal),
+                      color: CyberSafeColors.teal),
                   title: Text(context.tr('clearHistory'),
                       style:
                           const TextStyle(fontWeight: FontWeight.w700)),
                   subtitle: Text('${HistoryStore.entries.length}',
                       style: const TextStyle(
-                          color: KavachColors.sub, fontSize: 13)),
+                          color: CyberSafeColors.sub, fontSize: 13)),
                   trailing: TextButton(
                     onPressed: _confirmClearCalls,
                     child: Text(context.tr('deleteBtn')),
@@ -299,11 +300,56 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
           const SizedBox(height: 14),
+          SectionTitle(context.tr('aiSection')),
+          GlassCard(
+            borderColor:
+                CyberSafeColors.violet.withValues(alpha: 0.4),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 38,
+                      height: 38,
+                      decoration: BoxDecoration(
+                        color: CyberSafeColors.surface2,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(Icons.auto_awesome_outlined,
+                          color: CyberSafeColors.violet, size: 22),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(context.tr('aiOptIn'),
+                          style: const TextStyle(
+                              fontWeight: FontWeight.w800,
+                              fontSize: 15)),
+                    ),
+                    Switch(
+                      value: AgnesConsent.isOn,
+                      onChanged: (v) async {
+                        await AgnesConsent.set(v);
+                        if (mounted) setState(() {});
+                      },
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text(context.tr('aiBody'),
+                    style: const TextStyle(
+                        color: CyberSafeColors.sub,
+                        fontSize: 13.5,
+                        height: 1.55)),
+              ],
+            ),
+          ),
+          const SizedBox(height: 14),
           SectionTitle(context.tr('aboutSection')),
           GlassCard(
             child: Text(context.tr('aboutBody'),
                 style: const TextStyle(
-                    color: KavachColors.sub,
+                    color: CyberSafeColors.sub,
                     fontSize: 13.5,
                     height: 1.55)),
           ),
