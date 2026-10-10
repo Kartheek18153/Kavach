@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../lang.dart';
 import '../../services/api.dart';
@@ -30,15 +31,29 @@ class _SimSwapScreenState extends State<SimSwapScreen> {
   TelcoSimSwapResult? _telco;
   String? _telcoMsg;
 
+  /// Last number the user actually typed (survives tab re-opens).
+  /// The saved guardian number is only a first-run default.
+  static String? _lastTyped;
+  static const _kLastPhone = 'kavach_telco_last_phone';
+
   @override
   void initState() {
     super.initState();
     final saved = GuardianStore.phone.trim();
-    _phone = TextEditingController(
-      text: GuardianStore.isValidPhone(saved)
-          ? '+91${GuardianStore.normalizePhone(saved)}'
-          : '',
-    );
+    final fallback = GuardianStore.isValidPhone(saved)
+        ? '+91${GuardianStore.normalizePhone(saved)}'
+        : '';
+    _phone = TextEditingController(text: _lastTyped ?? fallback);
+    if (_lastTyped == null && fallback.isNotEmpty) {
+      // Load a previously typed number from disk (fresh app start).
+      SharedPreferences.getInstance().then((prefs) {
+        final stored = prefs.getString(_kLastPhone);
+        if (stored != null && stored.isNotEmpty && mounted) {
+          _lastTyped = stored;
+          _phone.text = stored;
+        }
+      });
+    }
   }
 
   @override
@@ -63,6 +78,15 @@ class _SimSwapScreenState extends State<SimSwapScreen> {
       _telcoBusy = true;
       _telcoMsg = null;
     });
+    // Remember what the user typed so the field doesn't snap back to the
+    // saved guardian number on the next visit.
+    _lastTyped = phone;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_kLastPhone, phone);
+    } catch (_) {
+      // Disk persistence is best-effort; in-memory value still applies.
+    }
     TelcoSimSwapResult? out;
     try {
       out = await call();
@@ -173,7 +197,7 @@ class _SimSwapScreenState extends State<SimSwapScreen> {
             const SizedBox(height: 8),
             Center(
               child: Text(
-                '${_telco!.provider} • ${_telco!.lookbackHours ?? _lookback}h',
+                '${_telco!.provider} • ${_telco!.lookbackHours ?? _lookback}h • ${_telco!.maskedPhone}',
                 style: const TextStyle(
                     color: CyberSafeColors.sub, fontSize: 12.5),
               ),
